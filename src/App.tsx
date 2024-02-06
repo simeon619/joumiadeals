@@ -6,7 +6,7 @@ import {
 import { Toaster } from "@/components/ui/sonner"
 
 import { router } from './lib/route';
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			retry: false,

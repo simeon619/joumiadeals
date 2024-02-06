@@ -1,9 +1,9 @@
-import HomePage from '@/pages/HomePage';
-import AuthLayout from '@/pages/layout/AuthLayout';
-import IndexLayout from '@/pages/layout/IndexLayout';
-import ProfileLayout from '@/pages/layout/ProfileLayout';
-import ProfilePage from '@/pages/ProfilePage';
-import RegisterPage from '@/pages/RegisterPage';
+import HomePage from '@/pages/index/HomePage';
+import AuthLayout from '@/pages/_layout/AuthLayout';
+import IndexLayout from '@/pages/_layout/IndexLayout';
+import ProfileLayout from '@/pages/_layout/ProfileLayout';
+import ProfilePage from '@/pages/profile/ProfilePage';
+import RegisterPage from '@/pages/auth/RegisterPage';
 // import { useAuth } from '@/services/state/User/auth';
 // import {z} from "zod"
 import { 
@@ -16,6 +16,7 @@ import {
 	createRootRoute,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
+import LoginPage from '@/pages/auth/LoginPage';
 // import { RootRoute, Outlet, Route } from "@tanstack/react-router";
 const rootRoute = createRootRoute({
 	component: () => (
@@ -69,10 +70,16 @@ const profileLayout = createRoute({
 
 
 
+export const loginRoot = createRoute({
+	getParentRoute: () => authLayout,
+	path: 'login',
+	component: LoginPage
+});
+
+
 export const registerRoot = createRoute({
 	getParentRoute: () => authLayout,
 	path: 'register',
-	// validateSearch : (search) => dataUserParams.parse(search),
 	component: RegisterPage,
 });
 
@@ -90,7 +97,7 @@ const homeRoot = createRoute({
 
 const routeTree = rootRoute.addChildren([
 	indexLayout.addChildren([homeRoot]),
-	authLayout.addChildren([registerRoot]),
+	authLayout.addChildren([registerRoot, loginRoot]),
 	profileLayout.addChildren([profileRoot]),
 ]);
 

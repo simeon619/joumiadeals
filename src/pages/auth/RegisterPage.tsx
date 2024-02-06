@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cities } from '@/utils/city';
+import { cities } from '@/utils/mock/city';
 import Select from 'react-select';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
@@ -32,7 +32,7 @@ export default function RegisterPage() {
 		oauth_provider_name: string;
 		oauth_client_id: string;
 	};
-	const { login, isAuth } = useAuth();
+	const { register : registerUser, isAuth } = useAuth();
 	const name = searchParams.name;
 	const email = searchParams.email!;
 	const avatarUrl = searchParams.avatarUrl as string;
@@ -46,7 +46,6 @@ export default function RegisterPage() {
 		}
 	}, []);
 
-	console.log('🚀 ~ useLayoutEffect ~ router.latestLocation:', router);
 	useLayoutEffect(() => {
 		if (isAuth) {
 			// router.latestLocation;
@@ -64,7 +63,7 @@ export default function RegisterPage() {
 			oauth_provider_name,
 			...data,
 		};
-		login(dataToSend);
+		registerUser(dataToSend);
 	};
 
 	return (

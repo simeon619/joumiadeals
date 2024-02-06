@@ -5,7 +5,8 @@ import { useAuth } from '@/services/state/User/auth';
 // } from '@tanstack/react-router';
 
 export default function ProfilePage() {
-	const { logout, isAuth } = useAuth();
+	const { logout, isAuth,InfoUser } = useAuth();
+	console.log("🚀 ~ ProfilePage ~ isAuth:", isAuth)
 	// const router = useRouter();
 	// useLayoutEffect(() => {
 	// 	if (!isAuth) {
@@ -19,7 +20,7 @@ export default function ProfilePage() {
 			<button onClick={logout}>
 				logout 
 			</button>
-			<h1>{JSON.stringify(isAuth)}</h1>
+			<h1>{JSON.stringify(InfoUser)}</h1>
 		</div>
 	);
 }

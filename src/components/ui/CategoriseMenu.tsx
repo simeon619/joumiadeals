@@ -1,4 +1,4 @@
-import { MenuCat } from '@/utils/Menucaegorie';
+import { MenuCat } from '@/utils/mock/Menucaegorie';
 import {
 	Baby,
 	Bike,
@@ -10,9 +10,7 @@ import {
 	Smartphone,
 	Sofa,
 } from 'lucide-react';
-// import { useState } from 'react';
 const SIZE_ICON = 20;
-
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -21,7 +19,12 @@ import {
 	NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { twMerge } from 'tailwind-merge';
+import { useRouter } from '@tanstack/react-router';
 export default function CategoriseMenu() {
+	const {state} =useRouter();
+
+	// state.location === ""
+
 	const iconKeys = {
 		immobilier: <Home size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />,
 		vehicules: <CarFront size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />,
@@ -38,7 +41,7 @@ export default function CategoriseMenu() {
 
 	return (
 		<>
-			<NavigationMenu className="w-full py-2">
+			<NavigationMenu className={twMerge(`w-full pt-1`, state.location.pathname === '/profile' ? 'hidden' : '')}>
 				<NavigationMenuList className="gap-x-3">
 					{Object.keys(MenuCat).map((Categorie, i) => {
 						const value = Categorie as keyof typeof MenuCat;

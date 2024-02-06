@@ -6,7 +6,7 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from '@/components/ui/carousel';
-import { dataSubCategorie } from '@/utils/sousCatItem';
+import { dataSubCategorie } from '@/utils/mock/sousCatItem';
 export default function HomePage() {
 	return (
 		<div className="flex flex-row justify-center gap-2 p-2">
