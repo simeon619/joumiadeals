@@ -10,20 +10,24 @@ export default function LoginPage() {
 	const searchParams = router.latestLocation.search as {
 		name: string;
 		email: string;
-		avatarUrl?: string | null;
+		avatar_url?: string | null;
 		oauth_provider_name: string;
         phone: string;
 		oauth_client_id: string;
 		token: string;
 		location: string;
+		created_at: string;
+		updated_at: string;
 	};
 	const name = searchParams.name;
 	const token = searchParams.token;
 	const location = searchParams.location;
     const phone = searchParams.phone;
-
+	const created_at = searchParams.created_at;
+	const updated_at = searchParams.updated_at;
 	const email = searchParams.email!;
-	const avatarUrl = searchParams.avatarUrl as string;
+	console.log("🚀 ~ LoginPage ~ searchParams:", searchParams)
+	const avatar_url = searchParams.avatar_url as string;
 	// const oauth_provider_name = searchParams.oauth_provider_name!;
 	// const oauth_client_id = searchParams.oauth_client_id!;
 
@@ -37,20 +41,16 @@ export default function LoginPage() {
 			router.history.push('/profile');
 			console.log({ name, token, location });
             login({
-                page: 'location',
-                send: {
+         
                     phone,
-                    avatar_url: avatarUrl,
+                    avatar_url,
                     name,
                     email,
                     location,
-                    token:{ token, type: 'Bearer' },
-                    access_id: '',
-                    acl_id: '',
-                    createdAt: Date.now().toString(),
-                    updatedAt: Date.now().toString(),
+                    token,
+                    created_at,
+                    updated_at,
                     id: '',
-                },
             });
 		}
 	}, []);

@@ -3,7 +3,7 @@
 import { Bell, Heart, MessageSquareText, Search, User } from 'lucide-react';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
-import { Link, useNavigate, useRouter } from '@tanstack/react-router';
+import { Link} from '@tanstack/react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import CategoriseMenu from '../ui/CategoriseMenu';
 import { useAuth } from '@/services/state/User/auth';
@@ -85,17 +85,13 @@ export default function Header() {
 							<Link className={wrapIcon} to={'/profile'}>
 								{/* <User size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth /> */}
 								<div>
-									<Avatar  className=" bg-blue text-blue">
-										<AvatarImage
-											className=""
-											src={InfoUser?.send?.avatar_url}
-											alt={InfoUser?.send?.name}
-										/>
-										<AvatarFallback>{InfoUser?.send?.name?.[0] + InfoUser?.send?.name?.[1]}</AvatarFallback>
-										<span className={contentIcon}>{InfoUser?.send?.name}</span>
+									<Avatar className=" bg-blue text-blue">
+										<AvatarImage className="" src={InfoUser?.avatar_url} alt={InfoUser?.name} />
+										<AvatarFallback>{InfoUser?.name?.[0] + InfoUser?.name?.[1]}</AvatarFallback>
+										<span className={contentIcon}>{InfoUser?.name}</span>
 									</Avatar>
 								</div>
-										<span className={contentIcon}>{isAuth ? InfoUser.send.name : 'Se connecter'}</span>
+								<span className={contentIcon}>{isAuth ? InfoUser.name : 'Se connecter'}</span>
 								<div className={UnderlineHover} />
 							</Link>
 						) : (

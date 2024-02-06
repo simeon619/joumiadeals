@@ -4,29 +4,20 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { setItemLocalStorage } from '@/lib/utils';
 import { persist, createJSONStorage } from 'zustand/middleware';
-const tokenSchema = z.object({
+
+
+const userSchema =  z.object({
+	avatar_url: z.string(),
+	created_at: z.string(),
+	email: z.string(),
+	id: z.string(),
+	location: z.string(),
+	name: z.string(),
+	phone: z.string(),
+	updated_at: z.string(),
 	token: z.string(),
-	type: z.string(),
-});
+})
 
-const userSchema = z.object({
-	page: z.string(),
-	send: z.object({
-		access_id: z.string(),
-		acl_id: z.string().nullable(),
-		avatar_url: z.string(),
-		createdAt: z.string(),
-		email: z.string(),
-		id: z.string(),
-		location: z.string(),
-		name: z.string(),
-		phone: z.string(),
-		updatedAt: z.string(),
-		token: tokenSchema,
-	}),
-});
-
-export type Token = z.infer<typeof tokenSchema>;
 export type UserData = z.infer<typeof userSchema>;
 export const dataToSendSchema = z.object({
 	phone: z.string(),
@@ -61,6 +52,7 @@ export const useAuth = create(
 					});
 
 					const data = await response.json();
+					console.log("🚀 ~ register: ~ data:", data)
 					const infoUser = userSchema.safeParse(data);
 
 					if (!infoUser.success) {
@@ -70,7 +62,7 @@ export const useAuth = create(
 					}
 					toast.success(' Connexion reussie', { position: 'top-center' });
 					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false }));
-					setItemLocalStorage<string>('token', infoUser.data.send.token.token);
+					setItemLocalStorage<string>('token', infoUser.data.token);
 				},
 
 				login: async (dataS: UserType) => {
