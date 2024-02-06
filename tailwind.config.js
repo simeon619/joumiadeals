@@ -73,6 +73,7 @@ export const theme = {
       bebasneue: ["BebasNeue", "sans-serif"],
       poppins: ["Poppins", "sans-serif"],
       gamjaflower: ["GamjaFlower", "cursive"],
+      BlackOpsOne : ["BlackOpsOne", "cursive"],
     },
     animation: {
       "accordion-down": "accordion-down 0.2s ease-out",

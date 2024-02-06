@@ -3,7 +3,7 @@ interface CategoryItem {
 	[key: string]: string[];
   }
   
-  export interface MenuCategories {
+  export type MenuCategories = {
 	immobilier: CategoryItem;
 	vehicules: CategoryItem;
 	emploi: CategoryItem;
@@ -13,7 +13,7 @@ interface CategoryItem {
 	electronique: CategoryItem;
 	Loisirs: CategoryItem;
 	Autres: CategoryItem;
-  }
+  } 
 export const MenuCat : MenuCategories = {
 	immobilier: {
 		'tout Immobilier': [''],
@@ -149,10 +149,6 @@ export const MenuCat : MenuCategories = {
 			'carte graphique',
 			'processeur',
 			'ram',
-			'souris',
-			'ecran',
-			'carte graphique',
-			'processeur',
 			'stockage',
 			'disque dur',
 			'autre',

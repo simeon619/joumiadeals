@@ -3,19 +3,49 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
+import { Route as LoginImport } from './routes/login'
+import { Route as ProfileImport } from './routes/_profile'
+import { Route as MainImport } from './routes/_main'
+import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProfileHomeImport } from './routes/_profile/home'
+import { Route as AuthRegisterImport } from './routes/_auth/register'
 
 // Create/Update Routes
 
-const AboutRoute = AboutImport.update({
-  path: '/about',
+const LoginRoute = LoginImport.update({
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileRoute = ProfileImport.update({
+  id: '/_profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MainRoute = MainImport.update({
+  id: '/_main',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileHomeRoute = ProfileHomeImport.update({
+  path: '/home',
+  getParentRoute: () => ProfileRoute,
+} as any)
+
+const AuthRegisterRoute = AuthRegisterImport.update({
+  path: '/register',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -26,13 +56,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      preLoaderRoute: typeof AboutImport
+    '/_auth': {
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
+    }
+    '/_main': {
+      preLoaderRoute: typeof MainImport
+      parentRoute: typeof rootRoute
+    }
+    '/_profile': {
+      preLoaderRoute: typeof ProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/register': {
+      preLoaderRoute: typeof AuthRegisterImport
+      parentRoute: typeof AuthImport
+    }
+    '/_profile/home': {
+      preLoaderRoute: typeof ProfileHomeImport
+      parentRoute: typeof ProfileImport
     }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren([IndexRoute, AboutRoute])
+export const routeTree = rootRoute.addChildren([
+  IndexRoute,
+  AuthRoute.addChildren([AuthRegisterRoute]),
+  MainRoute,
+  ProfileRoute.addChildren([ProfileHomeRoute]),
+  LoginRoute,
+])
