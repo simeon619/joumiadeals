@@ -3,13 +3,13 @@
 import { Bell, Heart, MessageSquareText, Search, User } from 'lucide-react';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
-import { Link} from '@tanstack/react-router';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link } from '@tanstack/react-router';
 import CategoriseMenu from '../ui/CategoriseMenu';
 import { useAuth } from '@/services/state/User/auth';
 import { redirectToConnect } from '@/lib/utils';
 import { useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
+import AvatarComponent from '../ui/AvatarComponent';
 const SIZE_ICON = 20;
 const wrapIcon = 'group relative flex flex-col justify-center items-center gap-2';
 const contentIcon = 'whitespace-nowrap text-xs';
@@ -37,16 +37,16 @@ export default function Header() {
 
 	return (
 		<div className="flex justify-center shadow-md">
-			<div className="flex flex-col bg-white py-3">
+			<div className="flex flex-col bg-white pt-2">
 				<div className={`relative flex items-center justify-between gap-x-3`}>
 					<Name />
 					<SetAdvert />
-					<div className={` flex min-w-[300px] items-center rounded-xl bg-slate-100 px-2`}>
+					<div className={` flex min-w-[268px] items-center rounded-xl bg-slate-100 px-2`}>
 						<input
 							ref={refInput}
 							type="text"
 							placeholder="Rechercher sur joumiadeals"
-							className="w-full border-0 bg-transparent px-2 py-3 placeholder:text-slate-600  focus:outline-none"
+							className="w-full border-0 bg-transparent p-2 placeholder:text-slate-600 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
 							inputMode="text"
@@ -69,7 +69,7 @@ export default function Header() {
 							<span className={contentIcon}>Mon historique</span>
 							<div className={UnderlineHover} />
 						</Link>
-						<Link className={wrapIcon}>
+						<Link to="/myprofile/favourite" className={wrapIcon}>
 							<Heart size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Favoris</span>
 							<div className={UnderlineHover} />
@@ -80,18 +80,9 @@ export default function Header() {
 							<span className={contentIcon}>Messages</span>
 							<div className={UnderlineHover} />
 						</Link>
-
 						{isAuth ? (
-							<Link className={wrapIcon} to={'/profile'}>
-								{/* <User size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth /> */}
-								<div>
-									<Avatar className=" bg-blue text-blue">
-										<AvatarImage className="" src={InfoUser?.avatar_url} alt={InfoUser?.name} />
-										<AvatarFallback>{InfoUser?.name?.[0] + InfoUser?.name?.[1]}</AvatarFallback>
-										<span className={contentIcon}>{InfoUser?.name}</span>
-									</Avatar>
-								</div>
-								<span className={contentIcon}>{isAuth ? InfoUser.name : 'Se connecter'}</span>
+							<Link className={wrapIcon} to={'/myprofile'}>
+								<AvatarComponent name={InfoUser.name} url={InfoUser.avatar_url || ''} />
 								<div className={UnderlineHover} />
 							</Link>
 						) : (

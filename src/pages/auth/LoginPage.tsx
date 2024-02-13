@@ -26,7 +26,6 @@ export default function LoginPage() {
 	const created_at = searchParams.created_at;
 	const updated_at = searchParams.updated_at;
 	const email = searchParams.email!;
-	console.log("🚀 ~ LoginPage ~ searchParams:", searchParams)
 	const avatar_url = searchParams.avatar_url as string;
 	// const oauth_provider_name = searchParams.oauth_provider_name!;
 	// const oauth_client_id = searchParams.oauth_client_id!;
@@ -38,7 +37,7 @@ export default function LoginPage() {
 	}, []);
 	useLayoutEffect(() => {
 		if (name && token && location) {
-			router.history.push('/profile');
+			router.history.push('/myprofile');
 			console.log({ name, token, location });
             login({
          

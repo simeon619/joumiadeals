@@ -3,10 +3,14 @@ import { Outlet } from '@tanstack/react-router';
 
 export default function IndexLayout() {
 	return (
-		<div className="h-screen w-screen bg-[#ffffff]">
+		<div>
 			<Header />
 			<hr />
-			<Outlet />
+			<div className="flex h-screen select-none justify-center">
+				<div className="w-app font-poppins">
+					<Outlet />
+				</div>
+			</div>
 		</div>
 	);
 }

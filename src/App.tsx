@@ -1,18 +1,9 @@
 import { RouterProvider } from '@tanstack/react-router';
-import {
-	QueryClient,
-	QueryClientProvider,
-} from '@tanstack/react-query';
-import { Toaster } from "@/components/ui/sonner"
+import {  QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/sonner';
 
-import { router } from './lib/route';
-export const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			retry: false,
-		},
-	},
-});
+import { queryClient, router } from './lib/route';
+
 function App() {
 	return (
 		<QueryClientProvider client={queryClient}>

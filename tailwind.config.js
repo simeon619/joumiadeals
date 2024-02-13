@@ -68,6 +68,9 @@ export const theme = {
         to: { height: "0" },
       },
     },
+    width: {
+      app : "1040px"
+    },
     fontFamily: {
       roboto: ["Roboto", "sans-serif"],
       bebasneue: ["BebasNeue", "sans-serif"],

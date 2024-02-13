@@ -1,8 +1,8 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router';
 
 export default function Name() {
 	return (
-		<Link to="/" className="font-BlackOpsOne text-3xl font-extrabold text-blue">
+		<Link to="/" className="font-poppins text-3xl font-extrabold tracking-tighter text-blue">
 			Joumiadeals
 		</Link>
 	);

@@ -6,7 +6,11 @@ export default function ProfileLayout() {
 		<div>
 			<Header />
 			<hr />
-			<Outlet />
+			<div className="flex h-screen select-none justify-center">
+				<div className="w-app ">
+					<Outlet />
+				</div>
+			</div>
 		</div>
 	);
 }
