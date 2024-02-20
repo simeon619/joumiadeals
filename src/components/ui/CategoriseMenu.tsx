@@ -20,13 +20,36 @@ import {
 } from '@/components/ui/navigation-menu';
 import { twMerge } from 'tailwind-merge';
 import { useRouter } from '@tanstack/react-router';
-
+import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 // const MenuCat = await getMenu()
 export default function CategoriseMenu() {
 	const { state } = useRouter();
+	// const myRef = useRef<HTMLElement>(null);
+	// const [isOpen, setIsOpen] = useState(false);
+
+	// useEffect(() => {
+	// 	// window.onscroll = (e) => {
+	// 	// 	const scrollY = window.scrollY;
+	// 	// 	console.log('Quantité de défilement : ' + scrollY + ' pixels');
+
+	// 	// 	if (scrollY > 10) {
+	// 	// 		setIsOpen(true);
+	// 	// 	} else {
+	// 	// 		setIsOpen(false);
+	// 	// 	}
+	// 	// };
+	// 	if (myRef.current) {
+	// 		const observer = new IntersectionObserver((entries) => {
+	// 			entries.forEach((entry) => {
+	// 				console.log(entry);
+	// 			});
+	// 		});
+	// 		observer.observe(myRef.current);
+	// 	}
+	// }, [myRef]);
 
 	// state.location === ""
-
 	const iconKeys = {
 		immobilier: <Home size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />,
 		vehicules: <CarFront size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />,
@@ -40,12 +63,15 @@ export default function CategoriseMenu() {
 		Autres: <Layers3 size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />,
 	};
 	const UnderlineHover =
-		'absolute -bottom-1 block h-[2px] w-0 bg-blue opacity-0 transition-all duration-300 group-hover:w-2 group-hover:opacity-100 group-data-[active]:w-full group-data-[state=open]:w-full group-data-[active]:opacity-100 group-data-[state=open]:opacity-100';
+		'absolute -bottom-1 block h-[2px] w-0 bg-primary opacity-0 transition-all duration-300 group-hover:w-2 group-hover:opacity-100 group-data-[active]:w-full group-data-[state=open]:w-full group-data-[active]:opacity-100 group-data-[state=open]:opacity-100';
 
 	return (
 		<>
 			<NavigationMenu
-				className={twMerge(`w-full`, state.location.pathname.includes('/myprofile') ? 'hidden' : '')}
+				className={twMerge(
+					`w-app flex self-center`,
+					state.location.pathname.includes('/myprofile') ? 'hidden' : ''
+				)}
 			>
 				<NavigationMenuList className="gap-x-3 py-1 font-poppins">
 					{Object.keys(MenuCat).map((Categorie, i) => {
@@ -71,14 +97,14 @@ export default function CategoriseMenu() {
 										>
 											{Object.keys(data).map((Categorie) => (
 												<div key={Categorie} className="max-w-[200px] p-2">
-													<span className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-blue">
+													<span className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary">
 														{Categorie}
 													</span>
 													<span>
 														{data[Categorie].map((item) => (
 															<span
 																key={item}
-																className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-blue"
+																className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
 															>
 																{item}
 															</span>

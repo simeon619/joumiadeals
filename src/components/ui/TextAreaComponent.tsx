@@ -18,7 +18,6 @@ export default function TextAreaComponent({
 	placeholder: string;
 	defaultValue?: string;
 }) {
-
 	return (
 		<div className="mt-5 w-full">
 			<div>
@@ -33,7 +32,7 @@ export default function TextAreaComponent({
 					name={name}
 					defaultValue={defaultValue}
 					className={twMerge(
-						`mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-blue focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue sm:text-sm`,
+						`mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
 						errors?.[name] && 'border-red-500'
 					)}
 					placeholder={placeholder}

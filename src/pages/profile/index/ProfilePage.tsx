@@ -15,7 +15,7 @@ export default function ProfilePage() {
 				</div>
 				<div className="flex flex-row items-center justify-center gap-x-6">
 					<div className="flex flex-row items-center justify-center gap-x-1">
-						<MapPinned size={20} className="text-blue" />
+						<MapPinned size={20} className="text-primary" />
 						<span className="text-sm">{account?.location}</span>
 					</div>
 					<div className="flex flex-row items-center justify-center gap-x-1">

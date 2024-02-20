@@ -18,7 +18,7 @@ export async function getAcount   ({ accountId }: { accountId: string }) {
 	const response = await fetch(`${BASE_URL}/get_account`, {
 		method: 'POST',
 		headers: headers(),
-		body: JSON.stringify({ id: accountId }),
+		body: JSON.stringify({ account_id: accountId }),
 	});
 	const data = await response.json();
 	const infoUser = UserSchema.safeParse(data);

@@ -42,7 +42,7 @@ function createRandomProduct(): Product {
 			faker.image.urlLoremFlickr(),
 			faker.image.urlLoremFlickr(),
 			faker.image.urlLoremFlickr(),
-			faker.image.urlLoremFlickr(),
+			"https://images.pexels.com/photos/123335/pexels-photo-123335.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
 		],
 		_id: faker.string.uuid(),
 		avatar: faker.image.avatarGitHub(),

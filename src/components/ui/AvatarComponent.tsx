@@ -6,14 +6,14 @@ export default function AvatarComponent({
 	name,
 	style,
 }: {
-	url: string;
-	name: string;
+	url?: string;
+	name?: string;
 	style?: string;
 }) {
 	return (
 		<Avatar className={twMerge(style)}>
-			<AvatarImage  src={url} alt={name} />
-			<AvatarFallback>{name[0] + name[1]}</AvatarFallback>
+			<AvatarImage  src={url ? url : ''} alt={name ? name : 'avatar'} />
+			<AvatarFallback>{name ? name.slice(0, 2) : '??'}</AvatarFallback>
 		</Avatar>
 	);
 }

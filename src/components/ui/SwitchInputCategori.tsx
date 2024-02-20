@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge';
 export default function SwitchInputCategori({ item }: { item: FieldOptionsType[0] }) {
 	const { valueInput, setValueInputs } = useInputCategorie((state) => state);
 
-	const { name, require } = item;
+	const { name, require ,default : defaultValue } = item;
 
 	useEffect(() => {
 		if (require) {
@@ -29,7 +29,7 @@ export default function SwitchInputCategori({ item }: { item: FieldOptionsType[0
 				>
 					{name}
 				</span>
-				<Switch checked={!!valueInput[name]} onCheckedChange={handleChange} />
+				<Switch checked={!!valueInput[name]} defaultChecked={defaultValue ? true : false} onCheckedChange={handleChange} />
 			</div>
 		</div>
 	);

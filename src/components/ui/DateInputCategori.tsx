@@ -5,10 +5,10 @@ import { ChangeEvent, useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export default function DateInputCategori({ item }: { item: FieldOptionsType[0] }) {
-	const { valueInput, setValueInputs, errorInput, setErrorInputs } = useInputCategorie(
+	const { valueInput, setValueInputs, errorInput, setErrorInputs   } = useInputCategorie(
 		(state) => state
 	);
-	const { name, placeholder, type, require, icon } = item;
+	const { name, placeholder, type, require, icon ,default : defaultValue } = item;
 	useEffect(() => {
 		if (require) {
 			setValueInputs({ [name]: '' });
@@ -38,9 +38,10 @@ export default function DateInputCategori({ item }: { item: FieldOptionsType[0] 
 				<input
 					type={type}
 					name={name}
+					defaultValue={defaultValue}
 					value={valueInput[name]}
 					onChange={handleChange}
-					className="mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-blue focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue sm:text-sm"
+					className="mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
 					placeholder={placeholder}
 				/>
 			</div>

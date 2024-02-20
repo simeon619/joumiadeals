@@ -6,7 +6,7 @@ import {
 	isYesterday,
 } from 'date-fns';
 
-export const formatDate = (timestamp: Date) => {
+export const formatDate = (timestamp: Date | string) => {
 	const messageDate = new Date(timestamp);
 
 	let formattedDate;

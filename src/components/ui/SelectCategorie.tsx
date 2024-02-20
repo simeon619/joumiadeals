@@ -24,7 +24,7 @@ export default function SelectCategorieCategorie({
 		setValueInputs({ [label]: value });
 	};
 	useEffect(() => {
-		if(require){
+		if (require) {
 			setValueInputs({ [label]: values[0] });
 		}
 	}, []);
@@ -40,12 +40,12 @@ export default function SelectCategorieCategorie({
 				{label}
 			</span>
 			<Select name={label} defaultValue={defaultValue} onValueChange={handleChange}>
-				<SelectTrigger className="mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-blue focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue sm:text-sm">
+				<SelectTrigger className="mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
 					<SelectValue placeholder={values[0]} />
 				</SelectTrigger>
 				<SelectContent className="bg-white">
 					{values.map((value) => (
-						<SelectItem className="font-poppins focus:bg-blue" key={value} value={String(value)}>
+						<SelectItem className="font-poppins focus:bg-primary" key={value} value={String(value)}>
 							{value}
 						</SelectItem>
 					))}

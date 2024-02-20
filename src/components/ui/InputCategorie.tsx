@@ -1,11 +1,12 @@
 import { validField } from '@/lib/utils';
 import { FieldOptionsType } from '@/services/api/product_categorie';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-
+import { useFirstMountState } from 'react-use';
 export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) {
-	const { name, placeholder, type, require, icon } = item;
+	const { name, placeholder, type, require, icon, default: defaultValue } = item;
+	const isFirstMount = useFirstMountState();
 	const { valueInput, setValueInputs, errorInput, setErrorInputs } = useInputCategorie(
 		(state) => state
 	);
@@ -13,6 +14,10 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 	useEffect(() => {
 		if (require) {
 			setValueInputs({ [name]: type === 'number' ? 0 : '' });
+		}
+
+		if (isFirstMount) {
+			setValueInputs({ [name]: defaultValue });
 		}
 	}, []);
 
@@ -26,7 +31,7 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 		setValueInputs({ [name]: type === 'number' ? e.target.valueAsNumber : e.target.value });
 	};
 	return (
-		<div className="mt-5  w-full">
+		<div className="mt-5 w-full">
 			<div>
 				<span
 					className={twMerge(
@@ -39,12 +44,14 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 				<div className="flex items-center space-x-2">
 					<img src={icon} alt="logo" className="size-8 text-gray-400" />
 					<input
+						key={type + name}
 						type={type}
 						name={name}
 						value={valueInput[name]}
+						// value={valueInput[name]}
 						onChange={handleChange}
 						className={twMerge(
-							`mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-blue focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue sm:text-sm`,
+							`mt-1 flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
 							errorInput?.[name] && 'border-red-500',
 							type === 'number' && 'w-1/2'
 						)}

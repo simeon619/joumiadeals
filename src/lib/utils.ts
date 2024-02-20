@@ -14,9 +14,9 @@ export function getRandomInt(min: number, max: number) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function redirectToConnect  ()  {
+export function redirectToConnect() {
 	window.location.href = 'http://localhost:3000/google_connexion';
-};
+}
 export function truncateFirstName(name: string | undefined | null) {
 	if (!name) {
 		return '*_*';
@@ -25,17 +25,17 @@ export function truncateFirstName(name: string | undefined | null) {
 	return firstName.slice(0, 8);
 }
 
-export function setToken (value: string): void {
+export function setToken(value: string): void {
 	localStorage.setItem('token', value);
-};
+}
 
-export function getToken (): string{
+export function getToken(): string {
 	const item = localStorage.getItem('yoken');
 	if (!item) {
 		return '';
 	}
 	return item;
-};
+}
 
 export function validField(
 	rule: FieldOptionsType[0],
@@ -51,7 +51,7 @@ export function validField(
 					throw new Error(`ERROR ${rule.name}:${value}, is not in Enumeration`);
 				if (rule.max && value.length > rule.max)
 					throw new Error(
-						`ERROR ${rule.name}:${value},  must be a value between [${rule.min ?? 0} , ${rule.max} ]`
+						`ERROR ${rule.name}:${value},  must be a value between [${rule.min ?? 0} , ${rule.max}]`
 					);
 				if (rule.min && value.length < rule.min)
 					throw new Error(`ERROR ${rule.name}:${value},  must be a value > ${rule.min}`);
@@ -108,13 +108,7 @@ function isDate(a: any): a is string {
 	return true;
 }
 
-export function isEmail(email: string) {
-	const re =
-		/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test(String(email).toLowerCase());
-}
-
-export function ToastError  (message: string) {
+export function ToastError(message: string) {
 	toast.error(message, {
 		position: 'top-center',
 		style: {
@@ -124,9 +118,9 @@ export function ToastError  (message: string) {
 			color: '#fff',
 		},
 	});
-};
+}
 
-export function ToastSuccess  (message: string) {
+export function ToastSuccess(message: string) {
 	toast.success(message, {
 		position: 'top-center',
 		style: {
@@ -136,9 +130,9 @@ export function ToastSuccess  (message: string) {
 			color: '#713200',
 		},
 	});
-};
+}
 
-export function ToastWarn  (message: string) {
+export function ToastWarn(message: string) {
 	toast.info(message, {
 		position: 'top-center',
 		style: {
@@ -147,9 +141,9 @@ export function ToastWarn  (message: string) {
 			color: '#713200',
 		},
 	});
-};
+}
 
-export function ToastInfo  (message: string) {
+export function ToastInfo(message: string) {
 	toast.info(message, {
 		position: 'top-center',
 		style: {
@@ -158,4 +152,14 @@ export function ToastInfo  (message: string) {
 			color: '#713200',
 		},
 	});
-};
+}
+
+export function formatPrice(price: number) {
+	return price.toLocaleString('fr-FR', {
+		style: 'currency',
+		currency: 'CFA',
+		compactDisplay: 'long',
+		maximumFractionDigits: 0,
+		currencySign: 'accounting',
+	});
+}

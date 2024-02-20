@@ -11,7 +11,7 @@ export default function HomePage() {
 	return (
 		// <div className="flex flex-row justify-center gap-2 p-2">
 		<>
-			<div className="py-1">
+			<div className="flex w-app flex-col  self-center py-1">
 				<div className="mt-2 flex flex-col items-center justify-center rounded-md bg-slate-200 p-2">
 					<h1 className="text-center font-poppins text-xl">Faites vos premiers revenue en vendant</h1>
 					<SetAdvert />
@@ -52,7 +52,7 @@ export default function HomePage() {
 							<h1 className="mt-12 text-center font-poppins text-2xl">
 								Le meilleur site de pettite annonce en cote d&apos;ivoire.
 							</h1>
-							<span className="cursor-pointer font-poppins text-sm hover:text-blue">
+							<span className="cursor-pointer font-poppins text-sm hover:text-primary">
 								Voir toutes les annonces &gt;&gt;&gt;
 							</span>
 						</div>

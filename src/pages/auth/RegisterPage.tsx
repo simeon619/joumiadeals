@@ -6,10 +6,11 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/services/state/User/auth';
 import { redirectToConnect, truncateFirstName } from '@/lib/utils';
-import { useLayoutEffect, useRouter } from '@tanstack/react-router';
+import { useLayoutEffect, useNavigate, useRouter } from '@tanstack/react-router';
 import InputComponent from '@/components/ui/InputComponent';
 import { useState } from 'react';
 import SelectComponent from '@/components/ui/SelectComponent';
+import { myprofileRoot } from '@/lib/route';
 const RegisterSchema = z.object({
 	phone: z
 		.string()
@@ -28,6 +29,7 @@ export default function RegisterPage() {
 	});
 	const router = useRouter();
 	const [city, setCity] = useState<string>(cities[0]);
+	const navigate = useNavigate()
 	const searchParams = router.latestLocation.search as {
 		name: string;
 		email: string;
@@ -35,7 +37,7 @@ export default function RegisterPage() {
 		oauth_provider_name: string;
 		oauth_client_id: string;
 	};
-	const { register: registerUser, isAuth } = useAuth();
+	const { register: registerUser, isAuth , InfoUser } = useAuth();
 	const name = searchParams.name;
 	const email = searchParams.email!;
 	const avatar_url = searchParams.avatar_url as string;
@@ -49,10 +51,13 @@ export default function RegisterPage() {
 	}, []);
 
 	useLayoutEffect(() => {
-		if (isAuth) {
-			router.history.push('/myprofile');
+		if (isAuth && InfoUser.id) {
+			navigate({
+				to : myprofileRoot.to,
+				search: { provider_id: InfoUser.id },
+			})
 		}
-	}, [isAuth]);
+	}, [isAuth,InfoUser]);
 	const onSubmit: SubmitHandler<RegisterSchemaType> = (data) => {
 		const dataToSend = {
 			location: city,
@@ -72,7 +77,7 @@ export default function RegisterPage() {
 				<div className="mt-5 flex w-full flex-col gap-y-4">
 					<div className="flex flex-row gap-x-4">
 						<h1 className="font-poppins text-3xl">Bonjour {truncateFirstName(name)}</h1>
-						<Avatar className="bg-blue text-blue">
+						<Avatar className="bg-primary text-primary">
 							<AvatarImage src={avatar_url} alt={name} />
 							<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
 						</Avatar>
@@ -90,11 +95,12 @@ export default function RegisterPage() {
 						type="number"
 						placeholder="00 06 00 00 78"
 					/>
-					<SelectComponent 	values={cities} setValues={setCity} label='Choisir adresse de vente'	/>
-					<button type="submit" className="mt-5 w-full rounded-2xl bg-blue p-2 text-white">Enregistrez</button>
+					<SelectComponent values={cities} setValues={setCity} label="Choisir adresse de vente" />
+					<button type="submit" className="mt-5 w-full rounded-2xl bg-primary p-2 text-white">
+						Enregistrez
+					</button>
 				</form>
 			</div>
 		</div>
 	);
 }
-

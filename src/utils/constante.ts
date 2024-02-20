@@ -1,4 +1,7 @@
 export const BASE_URL = import.meta.env.VITE_BASE_URL;
+export const URL_IMAGE = "http://localhost:3000/fs/";
+export const Nbr_Image_Upload = 7
+export const LimitItemPaginate = 15
 
 export const headers = () => {
 	const myHeaders = new Headers();

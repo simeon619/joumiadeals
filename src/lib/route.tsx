@@ -2,10 +2,8 @@ import HomePage from '@/pages/index/HomePage';
 import AuthLayout from '@/pages/_layout/AuthLayout';
 import IndexLayout from '@/pages/_layout/IndexLayout';
 import ProfileLayout from '@/pages/_layout/ProfileLayout';
-import ProfilePage from '@/pages/profile/ProfilePage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 // import { useAuth } from '@/services/state/User/auth';
-// import { z } from 'zod';
 import {
 	ErrorComponent,
 	createRootRouteWithContext,
@@ -15,27 +13,43 @@ import {
 } from '@tanstack/react-router';
 import { Outlet } from '@tanstack/react-router';
 import LoginPage from '@/pages/auth/LoginPage';
-import MyprofilePage from '@/pages/profile/MyprofilePage';
+import MyprofilePage from '@/pages/profile/index/MyprofilePage';
 import { QueryClient } from '@tanstack/react-query';
 import ProductsPage from '@/pages/index/ProductsPage';
 import ProductDetailsPage from '@/pages/index/ProductDetailsPage';
-import { accountQueryOptions, getAllChildCategoriesOptions } from '@/utils/queryOptions';
+import {
+	RequestDataSchema,
+	accountQueryOptions,
+	getAllChildCategoriesOptions,
+	getAllFavouriteProductIds,
+	getOptionsFavouriteProduct,
+	getProductOptions,
+	getProductsByfiltrOptions,
+} from '@/utils/queryOptions';
 import CreateProduct from '@/pages/index/CreateProduct';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useAuth } from '@/services/state/User/auth';
+import ProfilePage from '@/pages/profile/index/ProfilePage';
+import Myannounce from '@/pages/profile/Myannounce';
+import MyFavourite from '@/pages/profile/MyFavourite';
+import { pageSchema } from '@/services/api/product_categorie';
+import { Suspense } from 'react';
+
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
 	component: () => (
 		<>
-			<ScrollRestoration  getKey={(location) => location.pathname}/>
-			<Outlet />
+			<ScrollRestoration getKey={(location) => location.pathname} />
+			<Suspense fallback={<div>Loading...</div>}>
+				<Outlet />
+			</Suspense>
 			{/* <TanStackRouterDevtools position="bottom-right" /> */}
 			<ReactQueryDevtools initialIsOpen={false} />
 		</>
 	),
 	beforeLoad() {
-		useAuth.getState().verifToken()
+		if (useAuth.getState().isConnect) useAuth.getState().verifToken();
 	},
 });
 
@@ -76,13 +90,34 @@ export const myprofileRoot = createRoute({
 
 export const announceRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
+
 	path: '/',
-	component: () => <div>announce</div>,
+	validateSearch: (params) => RequestDataSchema.parse(params),
+	// preSearchFilters: [(search)=>({...search,filter:{...search.filter, text: undefined}})],
+
+	loaderDeps: ({ search: { provider_id, filter, limit, page } }) => ({
+		provider_id,
+		filter,
+		limit,
+		page,
+	}),
+	loader: (opts) => {
+		opts.context.queryClient.ensureQueryData(getProductsByfiltrOptions(opts.deps));
+		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
+	},
+	wrapInSuspense: true,
+	component: Myannounce,
+	// shouldReload: true,
 });
+
 export const favouriteRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
 	path: 'favourite',
-	component: () => <div>favourite</div>,
+	validateSearch: (params) => pageSchema.parse(params),
+	loaderDeps: ({ search: { page } }) => ({ page }),
+	loader: ({ context: { queryClient }, deps: { page } }) =>
+		queryClient.ensureQueryData(getOptionsFavouriteProduct({ page })),
+	component: MyFavourite,
 });
 export const visitedRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
@@ -130,11 +165,12 @@ export const createProductRoot = createRoute({
 export const productDetailsRoot = createRoute({
 	getParentRoute: () => indexLayout,
 	path: 'product/$productId',
-	
 	parseParams: (params) => ({
 		productId: params.productId,
 	}),
-	errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR : product don&apos;t exist</h1>,
+	loader: ({ context: { queryClient }, params: { productId } }) =>
+		queryClient.ensureQueryData(getProductOptions(productId)),
+	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR : product don&apos;t exist</h1>,
 	component: ProductDetailsPage,
 });
 const routeTree = rootRoute.addChildren([
@@ -154,13 +190,14 @@ const routeTree = rootRoute.addChildren([
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
-			retry: false,
+			retry: 2,
+			refetchOnWindowFocus: false,
 		},
 	},
 });
 export const router = createRouter({
 	routeTree,
-	defaultPreload: 'intent',
+	// defaultPreload: 'intent',
 	defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
 	context: {
 		queryClient,

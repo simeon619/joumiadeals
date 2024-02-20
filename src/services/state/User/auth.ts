@@ -15,6 +15,7 @@ const userSchema = z.object({
 	phone: z.any(),
 	updated_at: z.string(),
 	token: z.string(),
+	use_whatsapp: z.number(),
 });
 
 const userUpdateSchema = z.object({
@@ -24,6 +25,7 @@ const userUpdateSchema = z.object({
 	id: z.string(),
 	location: z.string(),
 	name: z.string(),
+	use_whatsapp: z.number(),
 	phone: z.any(),
 	updated_at: z.string(),
 });
@@ -31,6 +33,7 @@ const userUpdateSchema = z.object({
 const userUpdateToserverSchema = z.object({
 	avatar_url: z.string().nullable(),
 	location: z.string(),
+	use_whatsapp: z.number(),
 	name: z.string(),
 	phone: z.any(),
 });
@@ -41,6 +44,7 @@ export type UserData = z.infer<typeof userSchema>;
 export const dataToSendSchema = z.object({
 	phone: z.string(),
 	location: z.string(),
+	use_whatsapp: z.string().optional(),
 	name: z.string(),
 	avatar_url: z.string().nullable(),
 	email: z.string(),
@@ -51,13 +55,19 @@ export const dataToSendSchema = z.object({
 export type UserType = z.infer<typeof userSchema>;
 export type dataToSendType = z.infer<typeof dataToSendSchema>;
 
+export function getHeadersWithFormData() {
+	const token = localStorage.getItem('token');
+	return {
+		Authorization: `Bearer ${token}`,
+	};
+}
+
 export function getHeaders() {
 	const myHeader = new Headers();
 	const token = localStorage.getItem('token');
 	myHeader.append('Accept', 'application/json');
 	myHeader.append('Content-Type', 'application/json');
 	myHeader.append('Authorization', `Bearer ${token}`);
-
 	return myHeader;
 }
 
@@ -68,6 +78,7 @@ export const useAuth = create(
 				isAuth: false,
 				InfoUser: {} as UserType,
 				loading: false,
+				isConnect: false,
 			},
 			(set) => ({
 				register: async (dataS: dataToSendType) => {
@@ -92,11 +103,12 @@ export const useAuth = create(
 						return;
 					}
 					toast.success(' Connexion reussie', { position: 'top-center' });
-					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false }));
+					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 					setToken(infoUser.data.token);
 				},
 
 				login: (dataS: UserType) => {
+					console.log("🚀 ~ dataS:", dataS)
 					const infoUser = userSchema.safeParse(dataS);
 					if (!infoUser.success) {
 						console.log(infoUser.error);
@@ -111,7 +123,7 @@ export const useAuth = create(
 						position: 'top-center',
 						style: { background: 'green', color: 'white' },
 					});
-					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false }));
+					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
 
 				me: async () => {
@@ -140,6 +152,7 @@ export const useAuth = create(
 						body: JSON.stringify(dataS),
 					});
 					const data = await response.json();
+					console.log('🚀 ~ editMe: ~ dataddsd:', data);
 					const infoUser = userUpdateSchema.safeParse(data);
 					if (!infoUser.success) {
 						console.log(infoUser.error);
@@ -171,7 +184,7 @@ export const useAuth = create(
 						return;
 					}
 					localStorage.removeItem('token');
-					set(() => ({ isAuth: false, InfoUser: {} as UserType }));
+					set(() => ({ isAuth: false, InfoUser: {} as UserType, isConnect: false }));
 					toast.success(' Deconnexion reussie', {
 						position: 'top-center',
 						style: { background: 'green', color: 'white' },
@@ -183,8 +196,9 @@ export const useAuth = create(
 						headers: getHeaders(),
 					});
 					const data = await response.json();
-					if (!data.valid) {
-						localStorage.removeItem('token');
+					console.log('🚀 ~ verifToken: ~ data:', data);
+					if (data.errors) {
+						// localStorage.removeItem('token');
 						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
 					}
 				},
