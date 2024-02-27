@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Bell, Heart, MessageSquareText, Search, User } from 'lucide-react';
+import { Bell, Heart, Mail, MessageSquareText, Search, User } from 'lucide-react';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
 import { Link } from '@tanstack/react-router';
@@ -38,7 +38,7 @@ export default function Header() {
 		};
 	}, []);
 
-		const [isShadow, setIsShadow] = useState(false);
+	const [isShadow, setIsShadow] = useState(false);
 
 	useEffect(() => {
 		window.onscroll = (e) => {
@@ -56,7 +56,12 @@ export default function Header() {
 	);
 
 	return (
-		<div className={twMerge("sticky top-0 z-50 flex w-full justify-center bg-white", isShadow && 'shadow-md')}>
+		<div
+			className={twMerge(
+				'sticky top-0 z-50 flex w-full justify-center flex-col items-center duration-300 bg-white',
+				isShadow && 'shadow-md'
+			)}
+		>
 			<div className="flex flex-col bg-white py-2">
 				<div className={`relative flex items-center justify-between gap-x-3`}>
 					<Name />
@@ -66,7 +71,7 @@ export default function Header() {
 							ref={refInput}
 							type="text"
 							placeholder="Rechercher sur joumiadeals"
-							className="w-full border-0 bg-transparent p-2 placeholder:text-slate-600 focus:outline-none"
+							className="w-full border-0 bg-transparent text-base p-2 placeholder:text-slate-600 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
 							inputMode="text"
@@ -96,7 +101,7 @@ export default function Header() {
 						</Link>
 
 						<Link to="/" className={wrapIcon}>
-							<MessageSquareText size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
+							<Mail size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Messages</span>
 							<div className={UnderlineHover} />
 						</Link>
@@ -114,7 +119,6 @@ export default function Header() {
 						)}
 					</div>
 				</div>
-			
 			</div>
 			{/* <FilterProduct /> */}
 		</div>

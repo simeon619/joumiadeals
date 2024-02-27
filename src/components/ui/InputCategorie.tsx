@@ -31,7 +31,7 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 		setValueInputs({ [name]: type === 'number' ? e.target.valueAsNumber : e.target.value });
 	};
 	return (
-		<div className="mt-5 w-full">
+		<div className="mt-4 w-full">
 			<div>
 				<span
 					className={twMerge(
@@ -42,7 +42,7 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 					{name}
 				</span>
 				<div className="flex items-center space-x-2">
-					<img src={icon} alt="logo" className="size-8 text-gray-400" />
+					{/* <img src={icon} alt="logo" className="size-8 text-gray-400" /> */}
 					<input
 						key={type + name}
 						type={type}
@@ -58,7 +58,13 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 						placeholder={placeholder}
 					/>
 				</div>
-				{errorInput[name] && <p className="text-red-500">{errorInput[name]}</p>}
+				{
+					<p
+						className={twMerge('text-red-500 text-xs h-3 opacity-0', errorInput?.[name] && 'opacity-100')}
+					>
+						{errorInput[name]}
+					</p>
+				}
 			</div>
 		</div>
 	);

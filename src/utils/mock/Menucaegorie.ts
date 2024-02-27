@@ -22,10 +22,10 @@ export type MenuCategories = {
 export const MenuCat: MenuCategories = {
 	immobilier: {
 		'tout Immobilier': [''],
-		'ventes Immobilières': ['appartement', 'maison', 'terrain', 'voir tout'],
-		locations: ['appartement', 'maison', 'terrain', 'voir tout'],
-		colocations: [''],
-		'local & Magasin': [''],
+		'ventes Immobilières': ['appartement', 'maison', 'Magasin & Local', 'terrain', 'voir tout'],
+		locations: ['appartement', 'maison', 'terrain', 'Magasin & Local', 'voir tout'],
+		// colocations: [''],
+		// 'local & Magasin': [''],
 	},
 
 	vehicules: {
@@ -185,31 +185,32 @@ export const MenuCat: MenuCategories = {
 	},
 };
 
-let categories: any = null;
-const getFetchCat = async () => {
-	const response = await fetch(`${BASE_URL}/get_category_all_child_list`, {
-		method: 'POST',
-		body: JSON.stringify({ id: null }),
-		headers: {
-			'Content-Type': 'application/json',
-			Accept: 'application/json',
-		},
-	});
-	const data = await response.json();
-	console.log('🚀 ~ getFetchCat ~ data:', data);
-	return data;
-};
+// let categories: any = null;
+// const getFetchCat = async () => {
+// 	const response = await fetch(`${BASE_URL}/get_category_all_child_list`, {
+// 		method: 'POST',
+// 		body: JSON.stringify({ id: null }),
+// 		headers: {
+// 			'Content-Type': 'application/json',
+// 			Accept: 'application/json',
+// 		},
+// 	});
+// 	if (!response.ok) throw new Error('Failed to fetch');
+// 	const data = await response.json();
+// 	console.log('🚀 ~ getFetchCat ~ data:', data);
+// 	return data;
+// };
 
-export async function getMenu() {
-	if (!categories) categories = await getFetchCat();
-	const result = {};
-	recursive(null, result, 0);
-	console.log(result);
-	return result;
-}
+// export async function getMenu() {
+// 	if (!categories) categories = await getFetchCat();
+// 	const result = {};
+// 	recursive(null, result, 0);
+// 	console.log(result);
+// 	return result;
+// }
 
 export function get_children(parent_id: string | null, cats: CategoryType) {
-	console.log("🚀 ~ get_children ~ parent_id:", parent_id)
+	if (!cats) return [];
 	return cats.filter((category) => category.parent_category_id == parent_id);
 }
 
@@ -217,22 +218,73 @@ export const get_parent = (id: string | null, cats: CategoryType) => {
 	const cat = cats.find((category) => {
 		return category.id == id;
 	});
-
-	return cat
+	return cat;
 };
 
-export const getCategorieById = (id: string, cats: CategoryType) =>{
+export function get_old_parent(id: string | null, cats: CategoryType) {
+	const accu: CategoryType = [];
+		const cat = cats.filter((category) => category.parent_category_id == id);
+		if (cat) {
+			cat.forEach((c) => {
+				if (c.is_parentable) accu.push(c);
+				else if(!c.parent_category_id){
+					get_old_parent(c.id, cats)
+				}
+			});
+		}
+
+	return accu;
+}
+
+export function get_first_cat_icon(id: string | null, cats: CategoryType) {
+	const cat = cats.find((category) => {
+		return category.id == id;
+	});
+
+	if(cat?.parent_category_id){
+		return get_first_cat_icon(cat.parent_category_id, cats)
+	} else {
+		return cat?.icon
+	}
+	
+}
+
+
+export function get_all_parents(parent_id: string | null, cats: CategoryType) {
+	if (!cats) return [];
+	let first = true;
+	const parents: CategoryType = [];
+	while (true) {
+		const cat = cats.find((category) => category.id == parent_id);
+		if (first && cat) {
+			parents.push(cat);
+			first = false;
+		}
+		const parent = cats.find((c) => c.id == cat?.parent_category_id);
+		if (parent) {
+			parents.push(parent);
+			parent_id = parent.id;
+		} else {
+			break;
+		}
+	}
+	if (!parents || parents.length == 0) return [];
+	return parents.map((p) => p.label);
+}
+
+export const getCategorieById = (id: string, cats: CategoryType) => {
 	return cats.find((category) => {
 		return category.id == id;
 	});
-}
+};
 
 export function get_caracteristique_child(child_id: string | null, cats: CategoryType) {
-	const parents: any[] = [];
+	const parents: CategoryType = [];
+	if (!cats) return [];
 	let first = true;
 	while (true) {
 		const cat = cats.find((category) => category.id == child_id);
-		if (first) {
+		if (first && cat) {
 			parents.push(cat);
 			first = false;
 		}
@@ -244,26 +296,25 @@ export function get_caracteristique_child(child_id: string | null, cats: Categor
 			break;
 		}
 	}
+	if (!parents || parents.length == 0) return [];
 	return parents.map((p) => p.caracteristique_field);
 }
 
 // const cat = await getFetchCat()
-function recursive(id: string | null, obj: any, count: number) {
+export function BuildMenu(id: string | null, obj: any, count: number, categories: CategoryType) {
 	const categoryChild = categories.filter(
 		(category: { parent_category_id: string | null }) => category.parent_category_id == id
 	);
-	categoryChild.forEach((child: { label: string | number; id: string | null }) => {
-		if (count == 0) {
-			obj[child.label] = {};
-			console.log({ id, obj, count });
-			recursive(child.id, obj[child.label], count + 1);
-		} else if (count == 1) {
-			obj[child.label] = [];
-			console.log({ id, obj, count });
-			recursive(child.id, obj[child.label], count + 1);
-		} else if (count == 2) {
-			console.log({ id, obj, count });
-			obj.push(child.label);
+	categoryChild.forEach((child, index) => {
+		if (count === 0) {
+			const dr = (obj[child.label + ':' + child.id] = { icon: child.icon });
+			BuildMenu(child.id, dr, count + 1, categories);
+		} else if (count === 1) {
+			const nameId = child.label + ':' + child.id;
+			const arr = (obj[nameId] = []);
+			BuildMenu(child.id, arr, count + 1, categories);
+		} else if (count === 2 && index <= 6) {
+			obj.push(child.label + ':' + child.id);
 		}
 	});
 }

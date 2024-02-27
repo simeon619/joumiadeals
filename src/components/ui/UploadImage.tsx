@@ -38,20 +38,19 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 		setDraggedIndex(null);
 	};
 	return (
-		<div className="mt-3 flex h-auto flex-row flex-wrap justify-center gap-3">
+		<div className="mt-3 flex h-auto flex-row flex-wrap justify-start gap-3">
 			{images.map((image, i) => {
 				return (
 					<div
-						className={twMerge('h-[120px] w-[150px] cursor-grab  overflow-hidden bg-slate-400/10')}
+						className={twMerge('h-[120px] w-[155px] cursor-grab  overflow-hidden bg-slate-400/10')}
 						key={i}
 						draggable="true"
 						onDragStart={() => handleDragStart(i)}
 						onDragOver={() => handleDragOver(i)}
 						onDragEnd={handleDragEnd}
-						// onDragEnter={() => handleDragOver(i)}
 					>
 						<div
-							className={`relative rounded-sm bg-contain bg-center bg-no-repeat object-contain`}
+							className={`relative rounded-sm bg-cover bg-center bg-no-repeat object-contain`}
 							style={{
 								backgroundImage: `url(${typeof image === 'string' ? URL_IMAGE + image : image.buffer})`,
 								width: '100%',

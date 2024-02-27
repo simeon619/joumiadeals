@@ -6,7 +6,7 @@ export const useInputCategorie = create(
 	combine(
 		{
 			valueInput: {} as { [k: string]: string | number | undefined },
-			filesData: [] as ({file :File , buffer : string } | string)[],
+			filesData: [] as ({ file: File; buffer: string } | string)[],
 			errorInput: {} as { [k: string]: string },
 		},
 		(set) => ({
@@ -18,8 +18,8 @@ export const useInputCategorie = create(
 					},
 				}));
 			},
-			setFilesData: async (value: {file :File , buffer : string  }, max?: number) => {
-				if (!value.buffer && !value.file ) return;
+			setFilesData: async (value: { file: File; buffer: string }, max?: number) => {
+				if (!value.buffer && !value.file) return;
 				set((state) => {
 					if (state.filesData.length >= (max || 5)) {
 						ToastWarn("Vous avez atteint le nombre maximum d'image");
@@ -31,16 +31,15 @@ export const useInputCategorie = create(
 				});
 			},
 
-			setFile : async (value: ({file :File , buffer : string} | string)[]) => {
+			setFile: async (value: ({ file: File; buffer: string } | string)[]) => {
 				set(() => ({
-					filesData:value,
+					filesData: value,
 				}));
 			},
-			removeFile: async (index : number) => {
+			removeFile: async (index: number) => {
 				set((state) => ({
 					filesData: state.filesData.filter((_, i) => i !== index),
 				}));
-				
 			},
 			setErrorInputs: async (value: { [k: string]: string }) => {
 				set((state) => ({
@@ -50,7 +49,9 @@ export const useInputCategorie = create(
 					},
 				}));
 			},
-			resetAll: () => set({ valueInput: {}, filesData: [], errorInput: {} }),
+			resetAll: () => {
+				return set({ valueInput: {}, filesData: [], errorInput: {} });
+			}
 		})
 	)
 );

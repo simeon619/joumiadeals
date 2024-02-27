@@ -13,6 +13,7 @@ import { twMerge } from 'tailwind-merge';
 import PopUpComponent from '@/components/ui/PopUpComponent';
 import SwitchInputComponent from '@/components/ui/SwitchInputComponent';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
+import HeaderProfile from '@/components/profile/HeaderProfile';
 const RegisterSchema = z.object({
 	phone: z
 		.string()
@@ -24,7 +25,7 @@ const RegisterSchema = z.object({
 });
 export type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 export default function MyprofilePage() {
-	useResetScrollBar()
+	useResetScrollBar();
 	const { isAuth, InfoUser, editMe, logout } = useAuth();
 	const [city, setCity] = useState<string>(cities[0]);
 	const [isOpen, setIsOpen] = useState(false);
@@ -63,61 +64,22 @@ export default function MyprofilePage() {
 
 	return (
 		<>
-			<div className="relative mt-4 flex flex-col items-center justify-center gap-y-5 rounded-sm border-2 border-gray-100 bg-slate-50 p-2">
-				<div className="flex flex-col items-center gap-y-1">
-					<AvatarComponent name={InfoUser.name} url={InfoUser.avatar_url || ''} style="size-15" />
-
-					<div className="flex flex-row items-center justify-center gap-x-1">
-						<span className="text-base">{InfoUser?.name}</span>
-						<button
-							onClick={openDialog}
-							className="group flex flex-row items-center justify-center gap-x-1 rounded-2xl border-b-[1px] border-primary p-1 transition-colors hover:bg-slate-200"
-						>
-							<span className="text-center text-xs text-black group-hover:text-primary ">
-								Edit Profile
-							</span>
-							<Pen size={12} className="text-black group-hover:text-primary" />
-						</button>
-					</div>
-				</div>
-				<div className="flex flex-row gap-x-6">
-					<div className="flex flex-row items-center justify-center gap-x-1">
-						<Mail size={20} className="text-slate-700" />
-						<span className="text-sm">{InfoUser?.email}</span>
-					</div>
-					<div className="flex flex-row items-center justify-center gap-x-1">
-						<MapPinned size={20} className="text-slate-700" />
-						<span className="text-sm">{InfoUser?.location}</span>
-					</div>
-					<div className="flex flex-row items-center justify-center gap-x-1">
-						<PhoneCall size={20} className="text-slate-700" />
-						<span className="text-sm">{InfoUser?.phone} </span>
-					</div>
-				</div>
-				<button
-					aria-label="deconnexion"
-					onClick={logout}
-					className="absolute right-2 top-2 flex flex-row items-center gap-x-1"
-				>
-					<span className="text-sm text-red-600">Deconnexion</span>
-					<LogOut className="cursor-pointer text-red-600" />
-				</button>
-				<button
-					aria-label="parametre"
-					onClick={() => {}}
-					className="absolute left-2 top-2 flex flex-row items-center gap-x-1"
-				>
-					<Sliders className="cursor-pointer text-gray-900" />
-					<span className="text-sm text-gray-900">Parametre</span>
-				</button>
-			</div>
+			<HeaderProfile
+				avatar_url={InfoUser?.avatar_url}
+				name={InfoUser?.name}
+				openDialog={openDialog}
+				logout={logout}
+				location={city}
+				phone={InfoUser?.phone}
+				email={InfoUser?.email}
+			/>
 			<div className="flex flex-wrap divide-x  py-2 text-[.85rem]">
 				{(
 					[
 						['/myprofile', 'Mes annonces', true, InfoUser?.id],
-						['/myprofile/historique', 'Mon historique'],
+						['/myprofile/report', 'Discussions'],
 						['/myprofile/favourite', 'Favoris'],
-						['/myprofile/report', 'Signalement'],
+						['/myprofile/historique', 'Mon historique'],
 					] as const
 				).map(([to, label, exact, provider_id]) => {
 					return (
@@ -127,7 +89,8 @@ export default function MyprofilePage() {
 							activeOptions={{ includeSearch: exact }}
 							activeProps={{ className: `text-primary rounded-2xl p-1` }}
 							className="p-2"
-							search={provider_id ? { provider_id: provider_id } : {page :1}}
+							// target='haut'	
+							search={provider_id ? { provider_id: provider_id } : { page: 1 }}
 						>
 							{label}
 						</Link>

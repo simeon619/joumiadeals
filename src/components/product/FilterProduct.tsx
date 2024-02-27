@@ -30,45 +30,29 @@ export default function FilterProduct() {
 		setOpen(false);
 		document.body.style.overflow = 'auto';
 	};
-	const myRef = useRef<HTMLDivElement>(null);
-	const { toggleValue } = useHideFilter((state) => state);
+	const { value } = useHideFilter((state) => state);
 
-	useEffect(() => {
-		if (myRef.current) {
-			const observer = new IntersectionObserver(
-				(entries) => {
-					entries.forEach((entry) => {
-						if (entry.isIntersecting && entry.intersectionRatio === 1) {
-							toggleValue(true);
-						} else if (!entry.isIntersecting && entry.intersectionRatio === 0) {
-							toggleValue(false);
-						}
-					});
-				},
-				{
-					threshold: 0,
-				}
-			);
-			observer.observe(myRef.current);
-		}
-	}, [myRef]);
 	const cityFilter = [...["Partout en cote d'ivoire"], ...cities];
 
 	return (
 		<>
-			<div ref={myRef} className={'mt-8 '}>
-				<div className={'flex items-center gap-x-3'}>
-					<div className={twMerge('w-[280px]')}>
-						<label htmlFor="city" className={className.titleFilter}>
-							Choisir une localisation
+			<div className={twMerge('my-2 relative', value ? '' : 'h-auto')}>
+				<div className={'flex items-center gap-x-10'}>
+					<div className={twMerge('w-[230px]')}>
+						<label
+							htmlFor="city"
+							className={twMerge([className.titleFilter, 'flex items-center gap-x-2'])}
+						>
+							<MapPinned size={22} className="text-slate-500" />
+							<span className="text-slate-700">Choisir un lieu</span>
 						</label>
 						<Select
 							name="city"
 							defaultValue={cityFilter[0]}
 							onValueChange={(value) => setLocalisation(value)}
 						>
-							<SelectTrigger className="flex rounded-xl border border-slate-300 bg-white px-3 py-5 text-slate-700 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
-								<MapPinned className="text-slate-500" /> <SelectValue placeholder={cities[0]} />
+							<SelectTrigger className="flex rounded-xl border border-slate-300 bg-white  py-5 text-slate-700 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
+								<SelectValue placeholder={cities[0]} />
 							</SelectTrigger>
 							<SelectContent className="bg-white">
 								{cityFilter.map((value) => (
@@ -83,26 +67,26 @@ export default function FilterProduct() {
 							</SelectContent>
 						</Select>
 					</div>
-					<div className={twMerge('')}>
+					<div className={twMerge('flex flex-col items-start justify-center')}>
 						<span className={twMerge([className.titleFilter, 'flex items-center gap-x-2'])}>
 							<HandCoins size={22} className="text-slate-500" />
 							<span>Choisir un prix</span>
 						</span>
 						<div className="flex">
-							<button className={twMerge([className.priceButton, 'w-[80px] rounded-s-xl'])}>min</button>
-							<button className={twMerge([className.priceButton, ' w-[80px] rounded-e-xl'])}>max</button>
+							<button className={twMerge([className.priceButton, 'w-[50px] rounded-s-xl'])}>min</button>
+							<button className={twMerge([className.priceButton, ' w-[50px] rounded-e-xl'])}>max</button>
 						</div>
 					</div>
-					<div className="w-[380px]">
-						<span className={className.titleFilter}>Affiner vos recherches</span>
+					<div className="flex flex-col items-start justify-center">
+						<span className={twMerge([className.titleFilter, 'flex items-center gap-x-2'])}>
+							<SlidersHorizontal size={20} className="text-slate-500" />
+							<span>Affiner vos recherches</span>
+						</span>
+
 						<button
 							onClick={handleOpen}
-							className={twMerge([
-								className.priceButton,
-								'flex py-[7px] justify-center gap-x-4 items-center rounded-xl ',
-							])}
+							className={twMerge([className.priceButton, ' w-[100px] rounded-xl '])}
 						>
-							<SlidersHorizontal className="text-slate-500" />
 							<span className="">Filtres</span>
 						</button>
 					</div>

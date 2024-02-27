@@ -21,7 +21,6 @@ export default function InputComponent({
 	defaultValue?: string | number;
 	style?: string;
 }) {
-	console.log("🚀 ~ name:", name)
 	return (
 		<div className={twMerge('w-full', style)}>
 			<div>

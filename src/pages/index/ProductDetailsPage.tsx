@@ -71,7 +71,7 @@ export default function ProductDetailPage() {
 											openPopUp(i);
 										}}
 										aria-label="product image"
-										className={`group flex justify-center rounded-sm bg-gray-50 bg-contain bg-center bg-no-repeat`}
+										className={`group flex justify-center rounded-sm bg-gray-50 bg-cover bg-center bg-no-repeat`}
 										style={{
 											backgroundImage: `url(${URL_IMAGE}${image})`,
 											width: '100%',

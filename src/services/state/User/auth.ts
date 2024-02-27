@@ -77,12 +77,12 @@ export const useAuth = create(
 			{
 				isAuth: false,
 				InfoUser: {} as UserType,
-				loading: false,
+				// loading: false,
 				isConnect: false,
 			},
-			(set) => ({
+			(set, get) => ({
 				register: async (dataS: dataToSendType) => {
-					set(() => ({ loading: true }));
+					// set(() => ({ loading: true }));
 					const response = await fetch(`${BASE_URL}/create_user`, {
 						method: 'POST',
 						headers: {
@@ -108,7 +108,7 @@ export const useAuth = create(
 				},
 
 				login: (dataS: UserType) => {
-					console.log("🚀 ~ dataS:", dataS)
+					console.log('🚀 ~ dataS:', dataS);
 					const infoUser = userSchema.safeParse(dataS);
 					if (!infoUser.success) {
 						console.log(infoUser.error);
@@ -135,7 +135,6 @@ export const useAuth = create(
 					const infoUser = userSchema.safeParse(data);
 
 					if (!infoUser.success) {
-						console.log(infoUser.error);
 						toast.error('Une erreur est survenue, veuillez reessayer', {
 							position: 'top-center',
 							style: { background: '#f87171', color: 'white' },
@@ -191,6 +190,7 @@ export const useAuth = create(
 					});
 				},
 				verifToken: async () => {
+					if (!get().isConnect) return;
 					const response = await fetch(`${BASE_URL}/try_token`, {
 						method: 'GET',
 						headers: getHeaders(),
@@ -198,7 +198,6 @@ export const useAuth = create(
 					const data = await response.json();
 					console.log('🚀 ~ verifToken: ~ data:', data);
 					if (data.errors) {
-						// localStorage.removeItem('token');
 						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
 					}
 				},

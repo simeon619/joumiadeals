@@ -8,7 +8,7 @@ import {
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
-export default function SelectCategorieCategorie({
+export default function SelectCategorie({
 	values,
 	label,
 	defaultValue,
@@ -25,9 +25,10 @@ export default function SelectCategorieCategorie({
 	};
 	useEffect(() => {
 		if (require) {
-			setValueInputs({ [label]: values[0] });
+			setValueInputs({ [label]: '' });
 		}
 	}, []);
+	console.log("🚀 ~ useEffect ~ require:", require)
 
 	return (
 		<div className="mt-5 w-full">
@@ -44,11 +45,14 @@ export default function SelectCategorieCategorie({
 					<SelectValue placeholder={values[0]} />
 				</SelectTrigger>
 				<SelectContent className="bg-white">
-					{values.map((value) => (
-						<SelectItem className="font-poppins focus:bg-primary" key={value} value={String(value)}>
-							{value}
-						</SelectItem>
-					))}
+					{values.map((value, i) => {
+						if(i == 0) return null
+						return (
+							<SelectItem className="font-poppins focus:bg-primary" key={i} value={String(value)}>
+								{value}
+							</SelectItem>
+						);
+					})}
 				</SelectContent>
 			</Select>
 		</div>

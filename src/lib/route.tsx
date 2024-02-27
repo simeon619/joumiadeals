@@ -34,6 +34,7 @@ import Myannounce from '@/pages/profile/Myannounce';
 import MyFavourite from '@/pages/profile/MyFavourite';
 import { pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
+import Discussion from '@/pages/profile/Discussion';
 
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -45,11 +46,11 @@ const rootRoute = createRootRouteWithContext<{
 				<Outlet />
 			</Suspense>
 			{/* <TanStackRouterDevtools position="bottom-right" /> */}
-			<ReactQueryDevtools initialIsOpen={false} />
+			<ReactQueryDevtools initialIsOpen={false} buttonPosition='bottom-left' />
 		</>
 	),
 	beforeLoad() {
-		if (useAuth.getState().isConnect) useAuth.getState().verifToken();
+		useAuth.getState().verifToken();
 	},
 });
 
@@ -128,7 +129,7 @@ export const visitedRoot = createRoute({
 export const report = createRoute({
 	getParentRoute: () => myprofileRoot,
 	path: 'report',
-	component: () => <div>report</div>,
+	component: 	Discussion,
 });
 
 const homeRoot = createRoute({

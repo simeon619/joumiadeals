@@ -3,7 +3,6 @@ import { BASE_URL, LimitItemPaginate } from '@/utils/constante';
 import { z } from 'zod';
 import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
 import { RequestDataType } from '@/utils/queryOptions';
-import { log } from 'console';
 const FieldSchema = z.enum([
 	'button',
 	'checkbox',
@@ -54,10 +53,12 @@ const CategorySchema = z.array(
 	z.object({
 		id: z.string(),
 		label: z.string(),
-		caracteristique_field: z.string().transform((data) => {
-			const field = JSON.parse(data) as FieldOptionsType;
-			return field;
-		}),
+		icon: z.string().nullable(),
+		// caracteristique_field: z.string().transform((data) => {
+		// 	const field = JSON.parse(data) as FieldOptionsType;
+		// 	return field;
+		// }),
+		caracteristique_field: z.any(),
 		parent_category_id: z.string().nullable(),
 		is_parentable: z.number(),
 		created_at: z.string(),
@@ -77,6 +78,7 @@ export async function getAllChildCategories() {
 			throw new Error('Erreur lors de la récupération des catégories');
 		}
 		const data = await response.json();
+		console.log("🚀 ~ getAllChildCategories ~ data:", data)
 		const validationResult = CategorySchema.safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -117,7 +119,6 @@ export async function createProduct(data: {
 			headers: getHeadersWithFormData(),
 			body: formData,
 		});
-		console.log('🚀 ~ createProduct ~ response:', response);
 
 		if (!response.ok) {
 			throw new Error('Erreur lors de la création du produit');
@@ -131,30 +132,7 @@ export async function createProduct(data: {
 	}
 }
 
-const ProductSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-	price: z.number(),
-	description: z.string(),
-	status: z.number(),
-	photos: z.array(z.string()),
-	express_time: z.string().nullable(),
-	last_appearance: z.string().nullable(),
-	caracteristique: z.any(),
-	moderator_id: z.string().nullable(),
-	category_id: z.string(),
-	account_id: z.string(),
-	created_at: z.string(),
-	updated_at: z.string(),
-	name: z.string(),
-	location: z.string(),
-	email: z.string(),
-	use_whatsapp: z.number(),
-	avatar_url: z.string(),
-	access_id: z.string(),
-	phone: z.string(),
-	acl_id: z.string().nullable(),
-});
+
 
 const ProductMinSchema = z.object({
 	avatar_url: z.string(),
@@ -245,7 +223,6 @@ export async function getProduct(id: string) {
 }
 
 export async function deleteProduct(id: string) {
-	console.log('🚀 ~ deleteProduct ~ id:', id);
 	const response = await fetch(`${BASE_URL}/delete_product`, {
 		method: 'DELETE',
 		headers: getHeaders(),
@@ -338,7 +315,6 @@ const addFavouriteProductSchema = z.object({
 	updated_at: z.string(),
 });
 export async function addFavouriteProduct(id: string) {
-	console.log('🚀 ~ addFavouriteProduct ~ id:', id);
 	try {
 		const response = await fetch(`${BASE_URL}/add_favorite_product`, {
 			method: 'POST',
@@ -420,7 +396,6 @@ export const reportProduct = async ({
 			body: JSON.stringify({ product_id, message }),
 		});
 		const data = await response.json();
-		console.log('🚀 ~ reportProduct ~ data:', data);
 		return data;
 	} catch (error) {
 		console.error('add produit favorit error :', error);

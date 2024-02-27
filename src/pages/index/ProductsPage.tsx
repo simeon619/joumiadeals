@@ -1,3 +1,4 @@
+import EmptyObserver from '@/components/product/EmptyObserver';
 import FilterProduct from '@/components/product/FilterProduct';
 import { formatDate } from '@/utils/formating';
 import { products } from '@/utils/mock/product';
@@ -7,6 +8,7 @@ import { Heart } from 'lucide-react';
 export default function ProductsPage() {
 	return (
 		<div className="flex w-app flex-col self-center">
+			<EmptyObserver />
 			<FilterProduct />
 			<div className="grid grid-cols-5 gap-1">
 				<div className="col-start-1 col-end-5 gap-5">
