@@ -226,9 +226,9 @@ export default function CreateProduct() {
 			search: { provider_id: account.id, filter: { order_by: 'date_desc' } },
 		});
 	}
-	if (mutation.isError) {
-		ToastError('Une erreur est survenue lors de la création du produit');
-	}
+	// if (mutation.isError) {
+	// 	ToastError('Une erreur est survenue lors de la création du produit');
+	// }
 
 	return (
 		<div className="mt-8 flex w-app self-center">

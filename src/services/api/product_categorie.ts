@@ -131,9 +131,6 @@ export async function createProduct(data: {
 		throw error;
 	}
 }
-
-
-
 const ProductMinSchema = z.object({
 	avatar_url: z.string(),
 	photos: z.array(z.string()),
@@ -168,7 +165,6 @@ export async function getProductsByFiltr(requestData: RequestDataType) {
 		body: JSON.stringify(requestData),
 	});
 	const data = await response.json();
-	console.log('🚀 ~ getProductsByFiltr ~ data:', data);
 	const products = ProductShemaPaginate.safeParse(data);
 	if (!products.success) {
 		console.log(products.error);
@@ -359,7 +355,7 @@ const FavouriteShemaPaginate = z.object({
 });
 
 export type FavouriteDataType = z.infer<typeof FavouriteShemaPaginate>;
-export const pageSchema = z.object({ page: z.number() }).default({ page: 1 });
+export const pageSchema = z.object({ page: z.number(), limit: z.number().optional() }).default({ page: 1 , limit: LimitItemPaginate});
 export type pageType = z.infer<typeof pageSchema>;
 export async function getFavouriteProduct(paginate: pageType) {
 	try {

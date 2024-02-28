@@ -22,6 +22,8 @@ import {
 	accountQueryOptions,
 	getAllChildCategoriesOptions,
 	getAllFavouriteProductIds,
+	getDiscussionsQueryOptions,
+	getMessagesQueryOptions,
 	getOptionsFavouriteProduct,
 	getProductOptions,
 	getProductsByfiltrOptions,
@@ -35,6 +37,7 @@ import MyFavourite from '@/pages/profile/MyFavourite';
 import { pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
 import Discussion from '@/pages/profile/Discussion';
+import { getDiscussions } from '@/services/api/discussions';
 
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -128,8 +131,11 @@ export const visitedRoot = createRoute({
 
 export const report = createRoute({
 	getParentRoute: () => myprofileRoot,
-	path: 'report',
+	path: 'discussion',
 	component: 	Discussion,
+	// validateSearch: (params) => pageSchema.parse(params),
+	// loaderDeps: ({ search: { page , limit} }) => ({ page , limit }),
+	loader : ({ context: { queryClient }}) => queryClient.ensureQueryData(getDiscussionsQueryOptions()),
 });
 
 const homeRoot = createRoute({
@@ -171,7 +177,6 @@ export const productDetailsRoot = createRoute({
 	}),
 	loader: ({ context: { queryClient }, params: { productId } }) =>
 		queryClient.ensureQueryData(getProductOptions(productId)),
-	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR : product don&apos;t exist</h1>,
 	component: ProductDetailsPage,
 });
 const routeTree = rootRoute.addChildren([

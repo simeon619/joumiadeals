@@ -16,7 +16,7 @@ import { getAcount } from '@/services/api/user';
 import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
-import { getDiscussions } from '@/services/api/discussions';
+import { getDiscussions, getMessages, sendMessage } from '@/services/api/discussions';
 
 //user
 export function accountQueryOptions(accountId: string) {
@@ -190,11 +190,31 @@ export function useReportProductMutation() {
 
 //*****DISCUSSIONS */
 
+export function useSendMessageMutation() {
+	return useMutation({
+		mutationFn: sendMessage,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['getMessages'] });
+			ToastSuccess('Merci pour votre aide');
+		},
+		onError: (err) => {
+			ToastError(err.message);
+		},
+	});
+}
 
 export function getDiscussionsQueryOptions() {
 	return queryOptions({
 		queryKey: ['getDiscussions'],
 		queryFn: getDiscussions,
+		placeholderData: keepPreviousData,
+	});
+}
+
+export function getMessagesQueryOptions({limit = 10, page = 1}) {
+	return queryOptions({
+		queryKey: ['getMessages', {limit, page}],
+		queryFn: () => getMessages({limit, page}),
 		placeholderData: keepPreviousData,
 	});
 }
