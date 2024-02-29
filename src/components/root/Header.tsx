@@ -1,16 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Bell, Heart, Mail, MessageSquareText, Search, User } from 'lucide-react';
+import { Bell, Heart, Mail, Search, User } from 'lucide-react';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
 import { Link } from '@tanstack/react-router';
-import CategoriseMenu from '../ui/CategoriseMenu';
 import { useAuth } from '@/services/state/User/auth';
 import { redirectToConnect } from '@/lib/utils';
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import AvatarComponent from '../ui/AvatarComponent';
-import FilterProduct from '../product/FilterProduct';
 const SIZE_ICON = 20;
 const wrapIcon = 'group relative flex flex-col justify-center items-center gap-2';
 const contentIcon = 'whitespace-nowrap text-xs';
@@ -71,7 +69,7 @@ export default function Header() {
 							ref={refInput}
 							type="text"
 							placeholder="Rechercher sur joumiadeals"
-							className="w-full border-0 bg-transparent text-base p-2 placeholder:text-slate-600 focus:outline-none"
+							className="w-full border-0 bg-transparent p-2 text-base placeholder:text-slate-600 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
 							inputMode="text"
@@ -89,18 +87,18 @@ export default function Header() {
 						}
 					></div>
 					<div className=" flex justify-between gap-x-3">
-						<button className={wrapIcon}>
+						<Link to='/myprofile/historique' className={wrapIcon}>
 							<Bell size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Mon historique</span>
 							<div className={UnderlineHover} />
-						</button>
+						</Link>
 						<Link to="/myprofile/favourite" search={{ page: 1 }} className={wrapIcon}>
 							<Heart size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Favoris</span>
 							<div className={UnderlineHover} />
 						</Link>
 
-						<Link to="/" className={wrapIcon}>
+						<Link to="/discussion" className={wrapIcon}>
 							<Mail size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Messages</span>
 							<div className={UnderlineHover} />

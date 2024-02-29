@@ -77,7 +77,7 @@ export default function MyprofilePage() {
 				{(
 					[
 						['/myprofile', 'Mes annonces', true, InfoUser?.id],
-						['/myprofile/discussion', 'Discussions'],
+						// ['/myprofile/discussion', 'Discussions'],
 						['/myprofile/favourite', 'Favoris'],
 						['/myprofile/historique', 'Mon historique'],
 					] as const

@@ -1,16 +1,5 @@
 // import { MenuCat } from '@/utils/mock/Menucaegorie';
-import {
-	Baby,
-	Bike,
-	Briefcase,
-	CarFront,
-	Home,
-	Layers3,
-	Shirt,
-	Smartphone,
-	Sofa,
-} from 'lucide-react';
-const SIZE_ICON = 20;
+
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -20,8 +9,7 @@ import {
 } from '@/components/ui/navigation-menu';
 import { twMerge } from 'tailwind-merge';
 import { useRouter } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
-import { useRef } from 'react';
+import {  useMemo } from 'react';
 import { BuildMenu } from '@/utils/mock/Menucaegorie';
 import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';

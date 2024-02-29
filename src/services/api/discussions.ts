@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { getHeaders } from '../state/User/auth';
+import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
 import { ToastError } from '@/lib/utils';
 import { BASE_URL } from '@/utils/constante';
-
 
 const AccountSchema = z.object({
 	id: z.string(),
@@ -16,9 +15,9 @@ const AccountSchema = z.object({
 	acl_id: z.string().nullable(),
 	created_at: z.string(),
 	updated_at: z.string(),
-  });
-  
-  const ProductSchema = z.object({
+});
+
+const ProductSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	price: z.number(),
@@ -33,18 +32,18 @@ const AccountSchema = z.object({
 	account_id: z.string(),
 	created_at: z.string(),
 	updated_at: z.string(),
-  });
-  
-  const DiscussionSchema = z.object({
+});
+
+const DiscussionSchema = z.object({
 	provider: AccountSchema,
 	client: AccountSchema,
 	product: ProductSchema,
-	discussion_id: z.string()
-  });
-  
-  const DiscussionsSchema = z.array(DiscussionSchema);
+	discussion_id: z.string(),
+});
 
-  export type DiscussionSchemaType = z.infer<typeof DiscussionSchema>;
+const DiscussionsSchema = z.array(DiscussionSchema);
+
+export type DiscussionSchemaType = z.infer<typeof DiscussionSchema>;
 
 export const getDiscussions = async () => {
 	const response = await fetch('http://localhost:3000/get_discussions', {
@@ -56,24 +55,40 @@ export const getDiscussions = async () => {
 	if (!discussions.success) {
 		ToastError(discussions.error.message);
 		throw new Error(discussions.error.message);
-
 	}
 	return discussions.data;
 };
+const MessageSchema = z.object({
+	id: z.string(),
+	text: z.string(),
+	files:  z.string().transform((data) => JSON.parse(data) as string[]),
+	account_id: z.string(),
+	discussion_id: z.string(),
+	created_at: z.string(),
+	updated_at: z.string(),
+});
 
-export  const getMessages = async ({limit = 35, page = 1}) => {
+const ResponseSchema = z.object({
+	total: z.number(),
+	messages: z.array(MessageSchema),
+});
+export const getMessages = async (page = 1, discussion_id: string) => {
+	console.log(page, discussion_id);
+
 	const response = await fetch('http://localhost:3000/get_messages', {
 		method: 'POST',
 		headers: getHeaders(),
-		body: JSON.stringify({limit, page}),
+		body: JSON.stringify({ limit: 16, page, discussion_id }),
 	});
 	const data = await response.json();
-	const messages = DiscussionsSchema.safeParse(data);
+	console.log('🚀 ~ getMessages ~ data:', data);
+	const messages = ResponseSchema.safeParse(data);
 	if (!messages.success) {
+		console.log("🚀 ~ getMessages ~ messages.success):", messages.error.message)
 		throw new Error(messages.error.message);
 	}
 	return messages.data;
-}
+};
 // export async function createProduct(data: {
 // 	dataProduct: Record<string, any>;
 // 	photos: (
@@ -115,24 +130,50 @@ export  const getMessages = async ({limit = 35, page = 1}) => {
 // 		throw error;
 // 	}
 // }
+const getMessageSchema = z.object({
+	id: z.string(),
+	text: z.string(),
+	discussion_id: z.string(),
+	files: z.array(z.string()),
+	account_id: z.string(),
+	created_at: z.string(),
+	updated_at: z.string(),
+});
 
-export const sendMessage = async ({text, discussion_id, files} : { text: string, discussion_id: string, files?: File[]}) => {
+export const sendMessage = async ({
+	text,
+	discussion_id,
+	files,
+}: {
+	text?: string;
+	discussion_id: string;
+	files?: File | null;
+}) => {
+	console.log({ text, discussion_id, files });
+
 	const formData = new FormData();
-	formData.append('text', text);
+	if (text) {
+		formData.append('text', text);
+	}
 	formData.append('discussion_id', discussion_id);
-	files?.forEach((file, index) => {
-		formData.append(`files_${index}`, file, `file_${index}.${file.type.split('/')[1]}`);
-	});
-	const response = await fetch(`${BASE_URL}/send_messages`, {
+	// files?.forEach((file, index) => {
+	// });
+	if (files) {
+		formData.append(`files_${0}`, files, `file_${0}.${files.type.split('/')[1]}`);
+	}
+	const response = await fetch(`${BASE_URL}/send_message`, {
 		method: 'POST',
-		headers: getHeaders(),
+		headers: getHeadersWithFormData(),
 		body: formData,
 	});
+	if (!response.ok) {
+		throw new Error("Erreur lors de l'envoi du message");
+	}
 	const data = await response.json();
-	const messages = DiscussionsSchema.safeParse(data);
+	console.log('🚀 ~ sendMessage ~ data:', data);
+	const messages = getMessageSchema.safeParse(data);
 	if (!messages.success) {
 		throw new Error(messages.error.message);
 	}
 	return messages.data;
-}
-
+};

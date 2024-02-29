@@ -311,16 +311,16 @@ export default function CreateProduct() {
 									}}
 									type="button"
 									className={twMerge(
-										'flex items-start text-sm text-primary bg-gray-100 p-2',
+										'flex items-center text-center text-sm text-primary bg-gray-100 p-2',
 										suggestCategory.length > 0 && 'my-1'
 									)}
 								>
 									Cliquez ici pour choisir votre categorie
 								</button>
 								{suggestCategory?.length > 0 && (
-									<span className="font-semibold text-gray-700">Ou choisissez une categorie suggere</span>
+									<span className="font-semibold text-gray-700 underline">Ou choisissez une categorie suggere:</span>
 								)}
-								<div className="my-2 flex flex-col   items-start gap-y-3">
+								<div className="my-2 flex flex-col items-center gap-y-3">
 									{suggestCategory?.map((c, i) => {
 										return (
 											<button
@@ -332,7 +332,7 @@ export default function CreateProduct() {
 													setSuggestCategory(() => []);
 													e.preventDefault();
 												}}
-												className="flex max-w-[300px] items-start  gap-x-2 text-sm text-gray-700 hover:text-primary"
+												className="flex items-start  gap-x-2 text-sm text-gray-700 hover:text-primary"
 												key={i}
 											>
 												{c?.icon && <img src={c?.icon} alt="logo" className=" size-5" />}

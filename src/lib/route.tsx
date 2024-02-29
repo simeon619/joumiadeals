@@ -23,7 +23,7 @@ import {
 	getAllChildCategoriesOptions,
 	getAllFavouriteProductIds,
 	getDiscussionsQueryOptions,
-	getMessagesQueryOptions,
+	// getMessagesQueryOptions,
 	getOptionsFavouriteProduct,
 	getProductOptions,
 	getProductsByfiltrOptions,
@@ -37,7 +37,7 @@ import MyFavourite from '@/pages/profile/MyFavourite';
 import { pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
 import Discussion from '@/pages/profile/Discussion';
-import { getDiscussions } from '@/services/api/discussions';
+// import { getDiscussions } from '@/services/api/discussions';
 
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -130,7 +130,7 @@ export const visitedRoot = createRoute({
 });
 
 export const report = createRoute({
-	getParentRoute: () => myprofileRoot,
+	getParentRoute: () => indexLayout,
 	path: 'discussion',
 	component: 	Discussion,
 	// validateSearch: (params) => pageSchema.parse(params),

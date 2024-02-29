@@ -187,15 +187,15 @@ export function useReportProductMutation() {
 	});
 }
 
-
 //*****DISCUSSIONS */
 
 export function useSendMessageMutation() {
 	return useMutation({
 		mutationFn: sendMessage,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['getMessages'] });
-			ToastSuccess('Merci pour votre aide');
+
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['getMessages', data.discussion_id] });
+			ToastSuccess('ok');
 		},
 		onError: (err) => {
 			ToastError(err.message);
@@ -211,10 +211,12 @@ export function getDiscussionsQueryOptions() {
 	});
 }
 
-export function getMessagesQueryOptions({limit = 10, page = 1}) {
-	return queryOptions({
-		queryKey: ['getMessages', {limit, page}],
-		queryFn: () => getMessages({limit, page}),
-		placeholderData: keepPreviousData,
-	});
-}
+// export function getMessagesQueryOptions({ page = 1}) {
+// 	return queryOptions({
+// 		queryKey: ['getMessages', {page}],
+// 		queryFn: () => getMessages({ page}),
+// 		initi
+
+// 		placeholderData: keepPreviousData,
+// 	});
+// }
