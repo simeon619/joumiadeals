@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import PopUpComponent from './PopUpComponent';
 import { X } from 'lucide-react';
@@ -16,28 +17,21 @@ export default function ModalViewImage({
 	showPopUp,
 	closePopUp,
 	product,
+	api,
+	setApi,
+	current
 }: {
 	showPopUp: boolean;
 	closePopUp: () => void;
 	product: ProductDetailType;
+	api: any;
+	setApi:  any;
+	current : number
 }) {
-	const [current, setCurrent] = useState(0);
-	const [api, setApi] = useState<CarouselApi>();
+	// const [current, setCurrent] = useState(0);
+	// const [api, setApi] = useState<CarouselApi>();
 
-	useEffect(() => {
-		if (!api) {
-			return;
-		}
-		setCurrent(() => {
-			return isNaN(api.selectedScrollSnap() + 1) ? 1 : api.selectedScrollSnap() + 1;
-		});
 
-		api.on('select', () => {
-			setCurrent(() => {
-				return isNaN(api.selectedScrollSnap() + 1) ? 1 : api.selectedScrollSnap() + 1;
-			});
-		});
-	}, [api]);
 	return (
 		<PopUpComponent styleContainer="relative h-full w-full overflow-scroll " isOpen={showPopUp}>
 			<div className={`absolute inset-0 flex  flex-col items-center justify-center bg-white `}>

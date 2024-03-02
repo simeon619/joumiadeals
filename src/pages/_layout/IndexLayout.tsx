@@ -1,4 +1,3 @@
-import PopMessage from '@/components/message/PopMessage';
 import Header from '@/components/root/Header';
 import CategoriseMenu from '@/components/ui/CategoriseMenu';
 import { Outlet } from '@tanstack/react-router';
@@ -14,7 +13,7 @@ export default function IndexLayout() {
 					<Outlet />
 				</div>
 			</div>
-		<PopMessage/>
+			{/* <PopMessage/> */}
 		</>
 	);
 }

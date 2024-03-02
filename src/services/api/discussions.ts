@@ -61,7 +61,7 @@ export const getDiscussions = async () => {
 const MessageSchema = z.object({
 	id: z.string(),
 	text: z.string(),
-	files:  z.string().transform((data) => JSON.parse(data) as string[]),
+	files: z.string().transform((data) => JSON.parse(data) as string[]),
 	account_id: z.string(),
 	discussion_id: z.string(),
 	created_at: z.string(),
@@ -72,7 +72,8 @@ const ResponseSchema = z.object({
 	total: z.number(),
 	messages: z.array(MessageSchema),
 });
-export const getMessages = async (page = 1, discussion_id: string) => {
+export const getMessages = async (page = 1, discussion_id: string | undefined) => {
+	if (!discussion_id) return { total: 0, messages: [] };
 	console.log(page, discussion_id);
 
 	const response = await fetch('http://localhost:3000/get_messages', {
@@ -81,10 +82,8 @@ export const getMessages = async (page = 1, discussion_id: string) => {
 		body: JSON.stringify({ limit: 16, page, discussion_id }),
 	});
 	const data = await response.json();
-	console.log('🚀 ~ getMessages ~ data:', data);
 	const messages = ResponseSchema.safeParse(data);
 	if (!messages.success) {
-		console.log("🚀 ~ getMessages ~ messages.success):", messages.error.message)
 		throw new Error(messages.error.message);
 	}
 	return messages.data;
@@ -146,11 +145,10 @@ export const sendMessage = async ({
 	files,
 }: {
 	text?: string;
-	discussion_id: string;
+	discussion_id: string | undefined;
 	files?: File | null;
 }) => {
-	console.log({ text, discussion_id, files });
-
+	if (!discussion_id) return;
 	const formData = new FormData();
 	if (text) {
 		formData.append('text', text);
@@ -170,10 +168,38 @@ export const sendMessage = async ({
 		throw new Error("Erreur lors de l'envoi du message");
 	}
 	const data = await response.json();
-	console.log('🚀 ~ sendMessage ~ data:', data);
 	const messages = getMessageSchema.safeParse(data);
 	if (!messages.success) {
 		throw new Error(messages.error.message);
 	}
 	return messages.data;
+};
+
+const MessageCreateSchema = z.object({
+	id: z.string(),
+	client_id: z.string(),
+	provider_id: z.string(),
+	product_id: z.string(),
+	created_at: z.string(),
+	updated_at: z.string(),
+  });
+  
+//   type MessageCreateType = z.infer<typeof MessageCreateSchema>;
+
+export const createDiscussion = async ({ product_id }: { product_id: string }) => {
+	const response = await fetch(`${BASE_URL}/create_discussion`, {
+		method: 'POST',
+		headers: getHeaders(),
+		body: JSON.stringify({ product_id }),
+	});
+
+	if (!response.ok) {
+		throw new Error('Erreur lors de la création de la discussion');
+	}
+	const data = await response.json();
+	const discussion = MessageCreateSchema.safeParse(data);
+	if (!discussion.success) {
+		throw new Error(discussion.error.message);
+	}
+	return discussion.data;
 };

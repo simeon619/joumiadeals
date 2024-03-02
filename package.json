@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dhaiwat10/react-link-preview": "^1.15.0",
     "@faker-js/faker": "^8.4.0",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -35,6 +36,7 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.50.0",
     "react-select": "^5.8.0",
+    "react-tooltip": "^5.26.3",
     "react-use": "^17.5.0",
     "sonner": "^1.4.0",
     "tailwind-merge": "^2.2.1",

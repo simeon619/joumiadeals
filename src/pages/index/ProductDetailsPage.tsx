@@ -1,24 +1,44 @@
 // import { useRouter } from "@tanstack/react-router"
-import { productDetailsRoot } from '@/lib/route';
+import { discussionRoot, productDetailsRoot } from '@/lib/route';
 import { formatDate } from '@/utils/formating';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Expand, MessageSquareText, Phone, Share2, X } from 'lucide-react';
+import { Expand, Loader2, MessageSquareText, Phone, Share2, X } from 'lucide-react';
 import { Suspense, useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { getProductOptions } from '@/utils/queryOptions';
+import { getProductOptions, useCreateDiscussionMutaton } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { URL_IMAGE } from '@/utils/constante';
 import { formatPrice } from '@/lib/utils';
+import { type CarouselApi } from '@/components/ui/carousel';
 import ActionFavourite from '@/components/ui/ActionFavourite';
 
 import ModalViewImage from '@/components/ui/ModalViewImage';
 import ModalReport from '@/components/ui/ModalReport';
+import { useNavigate } from '@tanstack/react-router';
 const shareText = 'Check out this awesome content!';
 const shareUrl = 'https://yourwebsite.com/awesome-content';
 
 export default function ProductDetailPage() {
 	const { productId } = productDetailsRoot.useParams();
 	const { data: productPromise } = useSuspenseQuery(getProductOptions(productId));
+	const { mutate, isSuccess, isPending, data: discussion } = useCreateDiscussionMutaton();
+	const navigate = useNavigate();
 	const product = useDeferredValue(productPromise);
+	const [current, setCurrent] = useState(0);
+	const [api, setApi] = useState<CarouselApi>();
+	useEffect(() => {
+		if (!api) {
+			return;
+		}
+		setCurrent(() => {
+			return isNaN(api.selectedScrollSnap() + 1) ? 1 : api.selectedScrollSnap() + 1;
+		});
+
+		api.on('select', () => {
+			setCurrent(() => {
+				return isNaN(api.selectedScrollSnap() + 1) ? 1 : api.selectedScrollSnap() + 1;
+			});
+		});
+	}, [api]);
 
 	const [showPopUp, setShowPopUp] = useState(false);
 	const openPopUp = (i?: number) => {
@@ -48,6 +68,14 @@ export default function ProductDetailPage() {
 		setModalReport(false);
 		document.body.style.overflow = 'visible';
 	};
+
+	const handleCreateMessage = (e: { preventDefault: () => void; }) => {
+		e.preventDefault();
+		mutate({ product_id: productId });
+	};
+	if (isSuccess) {
+		navigate({ to: discussionRoot.to, search: { discussionId: discussion?.id } });
+	}
 
 	const images = useMemo(() => {
 		if (product && product?.photos.length >= 3) {
@@ -89,7 +117,6 @@ export default function ProductDetailPage() {
 								className="absolute left-3 top-3 flex flex-col items-center justify-between rounded-md bg-gray-400 px-2 py-1 hover:text-slate-600"
 							>
 								<Expand role="img" aria-label="expand" size={20} color={'white'} />
-								{/* <span> Voir les autres </span> */}
 							</button>
 							<div className={`absolute right-3 top-3 flex flex-row gap-x-3`}>
 								<Popover>
@@ -154,7 +181,7 @@ export default function ProductDetailPage() {
 							</button>
 							<div>
 								<div className="flex flex-col gap-y-2 p-5">
-									<p>Contactez via</p>
+									<p>Contactez via :</p>
 									{product.provider.phone && (
 										<div className={`flex items-center gap-x-2 rounded-md bg-slate-600 px-8 py-2`}>
 											<img
@@ -162,8 +189,9 @@ export default function ProductDetailPage() {
 												alt=""
 												className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
 											/>
+
 											<a
-												href={`https://wa.me/${product.provider.phone}?text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
+												href={`https://api.whatsapp.com/send?phone=+225${product.provider.phone}&text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
 												target="_blank"
 												rel="noreferrer"
 												className={`text-white`}
@@ -176,10 +204,14 @@ export default function ProductDetailPage() {
 										<Phone color="white" />
 										<span className={` text-white`}>Telephone</span>
 									</div>
-									<div className={`flex gap-x-2 rounded-md bg-primary px-8 py-2`}>
+									<button
+										onClick={handleCreateMessage}
+										className={`flex gap-x-2 rounded-md bg-primary px-8 py-2`}
+									>
 										<MessageSquareText color="white" />
 										<span className={` text-white`}>Message Direct</span>
-									</div>
+										{isPending && <Loader2 color="white" />}
+									</button>
 								</div>
 							</div>
 						</div>
@@ -220,7 +252,7 @@ export default function ProductDetailPage() {
 								</div>
 							</div>
 							<div>
-								<button onClick={() => openModalReport()} className={`text-xs	underline`}>
+								<button onClick={() => openModalReport()} className={`text-xs underline`}>
 									signalez l&apos;annonce
 								</button>
 							</div>
@@ -229,7 +261,14 @@ export default function ProductDetailPage() {
 					<div className={`col-start-9 col-end-13`}></div>
 				</div>
 			</div>
-			<ModalViewImage showPopUp={showPopUp} product={product} closePopUp={closePopUp} />
+			<ModalViewImage
+				showPopUp={showPopUp}
+				product={product}
+				closePopUp={closePopUp}
+				api={api}
+				setApi={setApi}
+				current={current}
+			/>
 			<ModalReport showPopUp={modalReport} productId={product.id} closePopUp={closeModalReport} />
 		</Suspense>
 	);

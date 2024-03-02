@@ -42,7 +42,7 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 			{images.map((image, i) => {
 				return (
 					<div
-						className={twMerge('h-[120px] w-[155px] cursor-grab  overflow-hidden bg-slate-400/10')}
+						className={twMerge('h-[120px] w-[155px] cursor-grab overflow-hidden bg-slate-400/10')}
 						key={i}
 						draggable="true"
 						onDragStart={() => handleDragStart(i)}

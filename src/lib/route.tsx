@@ -37,6 +37,7 @@ import MyFavourite from '@/pages/profile/MyFavourite';
 import { pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
 import Discussion from '@/pages/profile/Discussion';
+import { z } from 'zod';
 // import { getDiscussions } from '@/services/api/discussions';
 
 const rootRoute = createRootRouteWithContext<{
@@ -128,13 +129,17 @@ export const visitedRoot = createRoute({
 	path: 'historique',
 	component: () => <div>historique</div>,
 });
+export const discussionSchema = z.object({  discussionId: z.string().optional() })
 
-export const report = createRoute({
+export const discussionRoot = createRoute({
 	getParentRoute: () => indexLayout,
 	path: 'discussion',
 	component: 	Discussion,
-	// validateSearch: (params) => pageSchema.parse(params),
-	// loaderDeps: ({ search: { page , limit} }) => ({ page , limit }),
+	// parseParams: (params) => ({
+	// 	discussionId: z.string().optional().parse(params),
+	// }),
+	validateSearch: (params) =>  discussionSchema.parse(params),
+	// loaderDeps: ({ search: { } }) => ({ page , limit }),
 	loader : ({ context: { queryClient }}) => queryClient.ensureQueryData(getDiscussionsQueryOptions()),
 });
 
@@ -189,7 +194,7 @@ const routeTree = rootRoute.addChildren([
 	]),
 	authLayout.addChildren([registerRoot, loginRoot]),
 	profileLayout.addChildren([
-		myprofileRoot.addChildren([announceRoot, visitedRoot, favouriteRoot, report]),
+		myprofileRoot.addChildren([announceRoot, visitedRoot, favouriteRoot, discussionRoot]),
 	]),
 ]);
 

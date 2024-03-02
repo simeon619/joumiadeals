@@ -1,3 +1,4 @@
+import { createDiscussion } from './../services/api/discussions';
 import {
 	addFavouriteProduct,
 	createProduct,
@@ -194,11 +195,25 @@ export function useSendMessageMutation() {
 		mutationFn: sendMessage,
 
 		onSuccess: (data) => {
-			queryClient.invalidateQueries({ queryKey: ['getMessages', data.discussion_id] });
+			queryClient.invalidateQueries({ queryKey: ['getMessages', data?.discussion_id] });
 			ToastSuccess('ok');
 		},
 		onError: (err) => {
-			ToastError(err.message);
+			ToastError("Une erreur est survenue lors de l'envoi du message");
+		},
+	});
+}
+
+export function useCreateDiscussionMutaton() {
+	return useMutation({
+		mutationFn: createDiscussion,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['getDiscussions'] });
+			ToastSuccess('ok');
+		},
+		onError: (err) => {
+			console.log(err);
+			ToastError("Une erreur est survenue lors de la création de la discussion");
 		},
 	});
 }
