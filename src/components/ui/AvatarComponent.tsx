@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { memo } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-export default function AvatarComponent({
+export default memo(function AvatarComponent({
 	url,
 	name,
 	style,
@@ -16,4 +17,4 @@ export default function AvatarComponent({
 			<AvatarFallback>{name ? name.slice(0, 2) : '??'}</AvatarFallback>
 		</Avatar>
 	);
-}
+})

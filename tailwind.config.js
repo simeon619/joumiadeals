@@ -83,7 +83,25 @@ export const theme = {
 			'accordion-down': 'accordion-down 0.2s ease-out',
 			'accordion-up': 'accordion-up 0.2s ease-out',
 		},
+		gridTemplateColumns: {
+			16: 'repeat(16, minmax(0, 1fr))',
+			footer: '200px minmax(900px, 1fr) 100px',
+		},
+		gridColumnStart: {
+			13: '13',
+			14: '14',
+			15: '15',
+			16: '16',
+			17: '17',
+		},
+		gridColumnEnd: {
+			13: '13',
+			14: '14',
+			15: '15',
+			16: '16',
+			17: '17',
+		},
 	},
 };
 // eslint-disable-next-line no-undef
-export const plugins = [require('tailwindcss-animate'),require('tailwind-scrollbar')];
+export const plugins = [require('tailwindcss-animate'), require('tailwind-scrollbar')];

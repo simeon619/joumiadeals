@@ -2,7 +2,7 @@
 import { discussionRoot, productDetailsRoot } from '@/lib/route';
 import { formatDate } from '@/utils/formating';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Expand, Loader2, MessageSquareText, Phone, Share2, X } from 'lucide-react';
+import { BadgeInfo, Expand, Loader2, MessageSquareText, Phone, Share2, X } from 'lucide-react';
 import { Suspense, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { getProductOptions, useCreateDiscussionMutaton } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -69,7 +69,7 @@ export default function ProductDetailPage() {
 		document.body.style.overflow = 'visible';
 	};
 
-	const handleCreateMessage = (e: { preventDefault: () => void; }) => {
+	const handleCreateMessage = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		mutate({ product_id: productId });
 	};
@@ -164,6 +164,9 @@ export default function ProductDetailPage() {
 								/>
 							</div>
 						</div>
+						<span className="text-sm font-light lowercase text-gray-500">
+							mise en ligne {formatDate(product.created_at)}
+						</span>
 					</div>
 					<div className={`col-start-9 col-end-13`}>
 						<div className="m-3 shadow-md">
@@ -210,47 +213,51 @@ export default function ProductDetailPage() {
 									>
 										<MessageSquareText color="white" />
 										<span className={` text-white`}>Message Direct</span>
-										{isPending && <Loader2 color="white" />}
+										{isPending && <Loader2 color="white animate-spin" />}
 									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div className={`mt-1 grid grid-cols-12`}>
+				<div className={`mt-4 grid grid-cols-12`}>
 					<div className={`col-start-1 col-end-9 h-full`}>
 						<div className={`flex  flex-col gap-y-3`}>
 							<div className={`flex flex-col gap-y-1 py-3`}>
-								<div className={`flex items-baseline gap-x-2`}>
-									<h1 className={`text-xl`}>{product.title}</h1>
-									<span className="text-xs  font-light text-gray-500">{formatDate(product.created_at)}</span>
-								</div>
-								<div className={`flex flex-row items-center gap-x-1`}>
-									<span>{formatPrice(Number(product.price))}</span>
+								<div className={`flex flex-wrap items-baseline  gap-x-2`}>
+									<h1 className={`text-2xl`}>{product.title}</h1>
 									<span
-										className={`rounded-md bg-slate-300 px-1 font-roboto text-[13px] font-light text-gray-600 shadow-sm`}
+										className={`rounded-md bg-slate-200 px-1  py-0.5 font-roboto text-base font-light text-gray-600 shadow-sm`}
 									>
-										{product.status}
+										{formatPrice(Number(product.price))}
 									</span>
 								</div>
 							</div>
-							<div>
-								<h1 className={`text-base `}>Description</h1>
-								<pre className={`pt-1 text-base`}>{product.description}</pre>
-							</div>
-							<div className={`py-2`}>
-								<h1 className={`text-base`}>Caractéristique</h1>
-								<div className={`flex flex-wrap gap-x-3 py-1`}>
-									{Object.keys(JSON.parse(product.caracteristique)).map((key) => {
+							<div className="">
+								<div className="text-base font-bold text-slate-900">Caracteristiques</div>
+								<div className={`flex h-1/2 flex-wrap items-center gap-x-3 py-1`}>
+									{Object.keys(JSON.parse(product?.caracteristique || '{}')).map((key) => {
 										return (
-											<div key={key} className={'text-sm text-gray-800'}>
-												<span className={`font-semibold`}>{key}:</span>
-												<span className={`font-light`}>{JSON.parse(product.caracteristique)[key]} </span>
+											<div key={key} className={'flex flex-row items-start gap-x-1 p-2 text-sm text-gray-800'}>
+												<div className={` items-center gap-x-1`}>
+													<BadgeInfo size={21} strokeWidth={0.75} className={``} />
+												</div>
+												<span className={`flex flex-col text-xs font-light`}>
+													<span className={` font-semibold capitalize text-gray-400`}>{key}</span>
+													<span className={`text-base capitalize text-gray-800`}>
+														{JSON.parse(product?.caracteristique || '{}')[key]}{' '}
+													</span>
+												</span>
 											</div>
 										);
 									})}
 								</div>
 							</div>
+							<div>
+								<h1 className="text-base font-bold text-slate-900">Description</h1>
+								<pre className={`whitespace-pre-wrap  font-poppins`}>{product.description}</pre>
+							</div>
+
 							<div>
 								<button onClick={() => openModalReport()} className={`text-xs underline`}>
 									signalez l&apos;annonce

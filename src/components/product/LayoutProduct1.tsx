@@ -6,9 +6,7 @@ import { URL_IMAGE } from '@/utils/constante';
 import { formatDate } from '@/utils/formating';
 import {
 	getAllChildCategoriesOptions,
-	getAllFavouriteProductIds,
-	useAddProductFavouriteMutation,
-	useDeleteProductFavouriteMutation,
+
 	useDeleteProductMutation,
 } from '@/utils/queryOptions';
 import { Link } from '@tanstack/react-router';

@@ -1,25 +1,42 @@
 /// Date
 import {
 	format,
-	isThisYear,
 	isToday,
-	isYesterday,
+	isThisWeek,
+	isThisYear,
+	startOfWeek,
+	subDays,
+	startOfDay,
 } from 'date-fns';
+import fr from 'date-fns/locale/fr';
 
-export const formatDate = (timestamp: Date | string) => {
+export const formatDate = (timestamp: Date | string | undefined) => {
+	if (!timestamp) return 'Maintenant';
 	const messageDate = new Date(timestamp);
 
-	let formattedDate;
+	const today = new Date();
+	const startOfToday = startOfDay(today);
+	const startOfYesterday = subDays(startOfToday, 1);
+	const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 });
 
 	if (isToday(messageDate)) {
-		formattedDate = format(messageDate, 'HH:mm');
-	} else if (isYesterday(messageDate)) {
-		formattedDate = 'Hier';
-	} else if (isThisYear(messageDate)) {
-		formattedDate = format(messageDate, 'dd/MM');
-	} else {
-		formattedDate = format(messageDate, 'dd/MM/yyyy');
+		//ts-ignore 
+		return `Aujourd'hui à ${format(messageDate, 'HH:mm', { locale: fr })}`;
 	}
 
-	return formattedDate;
+	if (messageDate >= startOfYesterday && messageDate < startOfToday) {
+		//ts-expect-error is not typed
+
+		return `Hier à ${format(messageDate, 'HH:mm', { locale: fr })}`;
+	}
+
+	if (messageDate >= startOfWeekDate && isThisWeek(messageDate)) {
+		return format(messageDate, "EEEE 'à' HH:mm", { locale: fr });
+	}
+
+	if (isThisYear(messageDate)) {
+		return format(messageDate, "dd MMMM 'à' HH:mm", { locale: fr });
+	}
+
+	return format(messageDate, "dd MMMM yyyy 'à' HH:mm", { locale: fr });
 };

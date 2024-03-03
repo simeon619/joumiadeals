@@ -21,7 +21,7 @@ export default function ModalReport({
 }: {
 	showPopUp: boolean;
 	closePopUp: () => void;
-	productId: string;
+	productId: string | undefined;
 }) {
 	const {
 		register,
@@ -30,10 +30,10 @@ export default function ModalReport({
 	} = useForm<reportSchemaType>({
 		resolver: zodResolver(reportSchema),
 	});
-  const reportMutation = useReportProductMutation()
+	const reportMutation = useReportProductMutation();
 	const onSubmit: SubmitHandler<reportSchemaType> = (e) => {
-		console.log('e.target', e);
-    reportMutation.mutate({ message: e.message, product_id: productId });
+		if (!productId) return;
+		reportMutation.mutate({ message: e.message, product_id: productId });
 		closePopUp();
 	};
 	return (
@@ -42,7 +42,7 @@ export default function ModalReport({
 			isOpen={showPopUp}
 		>
 			<div className={`absolute w-[500px] rounded-md bg-white p-4 `}>
-      <CloseModal closePopUp={closePopUp}/>
+				<CloseModal closePopUp={closePopUp} />
 				<form className="mt-4 flex flex-col justify-end">
 					<TextAreaComponent
 						label="Decrivez votre preocupation"

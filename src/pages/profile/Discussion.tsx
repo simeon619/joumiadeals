@@ -2,8 +2,10 @@
 import { DiscussionSchemaType, getMessages } from '@/services/api/discussions';
 import { getDiscussionsQueryOptions, useSendMessageMutation } from '@/utils/queryOptions';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { FileImage, Search, Send } from 'lucide-react';
+import { BadgeInfo, FileImage, Phone, Search, Send } from 'lucide-react';
 import { Key, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from '@tanstack/react-router';
+
 import 'react-tooltip/dist/react-tooltip.css';
 import {
 	Carousel,
@@ -12,13 +14,15 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from '@/components/ui/carousel';
-import { URL_IMAGE } from '@/utils/constante';
+import { SeeAnnounce, URL_IMAGE } from '@/utils/constante';
 import { twMerge } from 'tailwind-merge';
 import { formatDate } from '@/utils/formating';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { discussionRoot } from '@/lib/route';
+import AvatarComponent from '@/components/ui/AvatarComponent';
+import ModalReport from '@/components/ui/ModalReport';
 const MessageSchema = z.object({
 	message: z.string(),
 });
@@ -51,6 +55,16 @@ export default function Discussion() {
 		const disc = Discussions.find((d) => d.discussion_id === discussionId);
 		setDiscSelect(disc);
 	}, [Discussions, discussionId]);
+	const [modalReport, setModalReport] = useState(false);
+
+	const openModalReport = () => {
+		setModalReport(true);
+		document.body.style.overflow = 'hidden';
+	};
+	const closeModalReport = () => {
+		setModalReport(false);
+		document.body.style.overflow = 'visible';
+	};
 	useEffect(() => {
 		const timeOut = setTimeout(() => {
 			if (messagesEndRef.current) {
@@ -60,7 +74,7 @@ export default function Discussion() {
 		return () => {
 			clearTimeout(timeOut);
 		};
-	}, [isSuccess]);
+	}, [isSuccess, discSelect?.discussion_id]);
 
 	const { register, handleSubmit, setValue } = useForm<MessageSchemaType>({
 		resolver: zodResolver(MessageSchema),
@@ -106,9 +120,9 @@ export default function Discussion() {
 	}, [Discussions, search]);
 
 	return (
-		<div className={'flex max-h-screen w-app self-center overflow-y-auto bg-zinc-300'}>
-			<div className="grid grid-cols-12 gap-x-2 p-2 ">
-				<div className="col-start-1 col-end-3 h-full overflow-y-auto rounded-xl  bg-white  scrollbar-thin">
+		<div className={'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-black'}>
+			<div className="grid h-[85dvh] max-h-[85dvh] grid-cols-16 gap-x-2 p-2 ">
+				<div className="col-start-1 col-end-4 h-full overflow-y-auto rounded-xl  bg-white  scrollbar-thin">
 					<div className={'sticky top-0 flex items-center justify-around py-2'}>
 						<div
 							className={'m-1 flex items-center overflow-hidden rounded-xl border border-slate-300 pl-1'}
@@ -128,13 +142,17 @@ export default function Discussion() {
 							return (
 								<button
 									className={twMerge(
-										'flex w-full flex-row p-1 gap-x-2 outline-0 border-[0px] truncate items-start transition-colors duration-300',
+										'flex w-full flex-row p-1 gap-x-2 outline-0 truncate items-start transition-colors duration-300',
 										discSelect?.discussion_id === discussion.discussion_id && 'bg-zinc-300 rounded-e-lg'
 									)}
 									key={discussion.discussion_id}
 									onClick={() => setDiscSelect(discussion)}
 								>
-									<img src={discussion.client.avatar_url} alt="" className="size-10 rounded-md" />
+									<AvatarComponent
+										url={discSelect?.client.avatar_url}
+										style="size-10 rounded-md border-2 border-slate-300"
+										name={discSelect?.client.name}
+									/>
 									<div className={'flex w-full flex-col items-start'}>
 										<span className="text-sm">{discussion.client.name}</span>
 										<span className=" text-sm font-black">{discussion.product.title}</span>
@@ -144,167 +162,203 @@ export default function Discussion() {
 						})}
 					</div>
 				</div>
-				<div className="relative col-start-3 col-end-9 rounded-xl bg-white px-2">
-					<div className={'sticky top-0 py-2 pl-4'}>
+				<div className="col-start-4 col-end-12 grid h-[100%] grid-rows-12 overflow-y-auto  rounded-xl bg-white px-2">
+					<div className={'row-start-1 row-end-2 py-2  pl-4'}>
 						<div className={'flex items-center gap-x-2'}>
-							<img src={discSelect?.client.avatar_url} alt="" className="size-8 rounded-full" />
-							<span className="whitespace-pre-wrap text-base">{discSelect?.client.name}</span>
-						</div>
-					</div>
-					<div className="">
-						<div
-							className="flex h-[70dvh] max-h-[80dvh] flex-col gap-y-4 overflow-y-auto py-4"
-							onScroll={handleScroll}
-							style={{ scrollbarWidth: 'thin' }}
-							ref={messagesEndRef}
-						>
-							<ul className="flex flex-col gap-y-3">
-								{messages.reverse().map((message) => {
-									const right = message.account_id === discSelect?.provider.id;
-									return (
-										<li key={message.id} className={twMerge('flex', right ? 'self-end' : 'self-start')}>
-											<div className={twMerge('flex gap-x-1')}>
-												{!right && (
-													<img
-														src={discSelect?.client.avatar_url}
-														alt="user profile"
-														className="size-10 rounded-full"
-													/>
-												)}
-												<div className={twMerge('flex mt-6  flex-col', right ? 'items-end' : 'items-start')}>
-													<span
-														className={twMerge(
-															'text-white text-sm whitespace-pre-wrap py-1 px-2',
-															right
-																? 'bg-primary rounded-ee-2xl rounded-s-2xl text-right ml-44'
-																: 'bg-gray-600 rounded-e-2xl rounded-ss-2xl text-left mr-44'
-														)}
-													>
-														<RenderMessage message={message.text} />
-
-														{/* {message.text} */}
-														{message.files.length > 0 && ' 📷'}
-														{message.files.length > 0 && (
-															<>
-																<img
-																	src={URL_IMAGE + message.files[0]}
-																	alt="message files"
-																	className="mx-auto h-[200px]  bg-contain bg-center bg-no-repeat object-cover pb-4"
-																/>
-															</>
-														)}
-													</span>
-													<span
-														className={twMerge('text-[10px] text-black', right ? 'text-right' : 'text-left')}
-													>
-														{formatDate(message.created_at)}
-													</span>
-												</div>
-												{right && (
-													<img
-														src={discSelect.client.avatar_url}
-														alt="user profile"
-														className="size-10 rounded-full"
-													/>
-												)}
-											</div>
-										</li>
-									);
-								})}
-							</ul>
-							{isFetchingNextPage && <div>Chargement...</div>}
-						</div>
-						<div className="flex flex-col border-t-2 bg-white">
-							{photo && (
-								<div className=" relative text-xs text-slate-400">
-									<img src={photo} alt="" className="size-14" />
-									<button className="absolute left-0 top-0 text-red-600" onClick={() => setFiles(null)}>
-										x
-									</button>
+							<AvatarComponent
+								url={discSelect?.client.avatar_url}
+								style="w-10 rounded-md border-2 border-slate-300"
+								name={discSelect?.client.name}
+							/>
+							<div className={'flex flex-col'}>
+								<span className="whitespace-pre-wrap text-base">{discSelect?.client.name}</span>
+								<div className="text-xs">
+									<span className="text-zinc-500">produit mise en ligne </span>
+									<span className={'font-semibold'}>{formatDate(discSelect?.product.created_at)}</span>
 								</div>
-							)}
-							<div className="flex items-center justify-center bg-slate-100 ">
-								<label className="p-2" htmlFor="input_file">
-									<FileImage size={20} strokeWidth={1.5} className="cursor-pointer" />
-									<span className="text-[0px] text-slate-400">file</span>
-									<input
-										type="file"
-										onChange={(e) => setFiles(e.target.files)}
-										name=""
-										accept="image/*"
-										max={1024 * 1024 * 2}
-										id="input_file"
-										hidden
-									/>
-								</label>
-								<textarea
-									{...register('message')}
-									onKeyPress={(e) => {
-										if (e.key === 'Enter') {
-											e.preventDefault();
-											handleSubmit(handleMutate)();
-										}
-									}}
-									placeholder="Ecrivez votre message"
-									rows={1}
-									cols={1}
-									className="m-1 w-[80%] resize-none rounded-xl border-none py-2 pl-2 outline-none"
-								/>
-								<button
-									onClick={handleSubmit(handleMutate)}
-									className="flex items-center justify-center rounded-full bg-slate-100 p-2"
-								>
-									<Send size={22} strokeWidth={1.5} className=" " />
-								</button>
 							</div>
 						</div>
 					</div>
+					<div
+						className="row-start-2  row-end-12 flex flex-col gap-y-4 overflow-y-auto py-4"
+						onScroll={handleScroll}
+						style={{ scrollbarWidth: 'thin' }}
+						ref={messagesEndRef}
+					>
+						<ul className="flex flex-col gap-y-3">
+							{messages.reverse().map((message) => {
+								const right = message.account_id === discSelect?.provider.id;
+								return (
+									<li key={message.id} className={twMerge('flex ', right ? 'self-end' : 'self-start')}>
+										<div className={twMerge('flex gap-x-1')}>
+											{!right && (
+												<AvatarComponent url={discSelect?.client.avatar_url} name={discSelect?.client.name} />
+											)}
+											<div className={twMerge('flex mt-6  flex-col', right ? 'items-end' : 'items-start')}>
+												<span
+													className={twMerge(
+														'max-w-[70%] text-sm whitespace-pre-wrap break-words py-1 px-2',
+														right
+															? 'bg-lime-300 rounded-ee-2xl rounded-s-2xl text-right'
+															: 'bg-gray-600 rounded-e-2xl rounded-es-2xl text-white text-left'
+													)}
+												>
+													<RenderMessage message={message.text} />
+
+													{message.files.length > 0 && (
+														<img
+															src={URL_IMAGE + message.files[0]}
+															alt=""
+															className="mx-auto h-[200px]  bg-cover bg-center  bg-no-repeat object-cover pb-4"
+														/>
+													)}
+												</span>
+												<span className={twMerge('text-[10px] text-black', right ? 'text-right' : 'text-left')}>
+													{formatDate(message.created_at)}
+												</span>
+											</div>
+											{right && (
+												<AvatarComponent url={discSelect?.client.avatar_url} name={discSelect?.client.name} />
+											)}
+										</div>
+									</li>
+								);
+							})}
+						</ul>
+						{isFetchingNextPage && <div>Chargement...</div>}
+					</div>
+					<div className=" row-start-13  row-end-12 flex flex-col border-t-2 ">
+						{photo && (
+							<div className=" relative text-xs text-slate-400">
+								<img src={photo} alt="" className="size-14" />
+								<button className="absolute left-0 top-0 text-red-600" onClick={() => setFiles(null)}>
+									x
+								</button>
+							</div>
+						)}
+						<div className="flex items-center justify-center bg-slate-100 ">
+							<label className="cursor-pointer p-2" htmlFor="input_file">
+								<FileImage size={20} strokeWidth={1.5} className="cursor-pointer" />
+								<span className="text-[0px] text-slate-400">file</span>
+								<input
+									type="file"
+									onChange={(e) => setFiles(e.target.files)}
+									name=""
+									accept="image/*"
+									max={1024 * 1024 * 1}
+									id="input_file"
+									hidden
+								/>
+							</label>
+							<textarea
+								{...register('message')}
+								onKeyPress={(e) => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										handleSubmit(handleMutate)();
+									}
+								}}
+								placeholder="Ecrivez votre message"
+								rows={1}
+								cols={1}
+								className="m-1 w-[80%] resize-none rounded-xl border-none py-2 pl-2 outline-none"
+							/>
+							<button
+								onClick={handleSubmit(handleMutate)}
+								className="flex items-center justify-center rounded-full bg-slate-100 p-2"
+							>
+								<Send size={22} strokeWidth={1.5} className=" " />
+							</button>
+						</div>
+					</div>
 				</div>
-				<div className="col-start-9 col-end-13 overflow-y-auto overflow-x-hidden rounded-xl bg-white px-1 scrollbar-thin">
-					<div className={'sticky top-0 flex items-center justify-around py-2'}>
-						{discSelect && <div>{discSelect.product.title}</div>}
+				<div className="col-start-12 col-end-17 overflow-y-auto overflow-x-hidden rounded-xl bg-white px-3 scrollbar-thin">
+					<div className={'sticky top-0 bg-white'}>
+						<div className={'mx-auto justify-around break-words bg-white p-2'}>
+							{discSelect && <div>{discSelect.product.title}</div>}
+						</div>
+						<div>
+							<Carousel className="max-h-[300px] w-full bg-black">
+								<CarouselContent>
+									{discSelect?.product.photos.map((image: any, index: Key) => (
+										<CarouselItem key={index}>
+											<div
+												aria-label="product image"
+												className="h-[300px] w-full rounded-sm bg-contain bg-center bg-no-repeat"
+												style={{
+													backgroundImage: `url(${URL_IMAGE}${image})`,
+												}}
+												role="img"
+											></div>
+										</CarouselItem>
+									))}
+								</CarouselContent>
+								<CarouselPrevious />
+								<CarouselNext />
+							</Carousel>
+						</div>
 					</div>
-					<div>
-						<Carousel className="max-h-[300px] w-full bg-black">
-							<CarouselContent>
-								{discSelect?.product.photos.map((image: any, index: Key | null | undefined) => (
-									<CarouselItem key={index}>
-										<div
-											aria-label="product image"
-											className="h-[300px] w-full rounded-sm bg-contain bg-center bg-no-repeat"
-											style={{
-												backgroundImage: `url(${URL_IMAGE}${image})`,
-											}}
-											role="img"
-										></div>
-									</CarouselItem>
-								))}
-							</CarouselContent>
-							<CarouselPrevious />
-							<CarouselNext />
-						</Carousel>
-					</div>
-					<div className="overflow-hidden p-2 ">
-						<div className="text-xs text-slate-400">Description</div>
-						<pre className="whitespace-pre-wrap break-all">{discSelect?.product.description}</pre>
-					</div>
-					<div className="overflow-hidden p-2 ">
-						<div className="text-xs text-slate-400">Caracteristiques</div>
-						<div className={`flex flex-wrap items-center gap-x-3 py-1`}>
+
+					<div className="overflow-hidden  ">
+						<div className="mt-2 text-xs text-slate-400">Caracteristiques</div>
+						<div className={`flex h-1/2 flex-wrap items-center gap-x-3 py-1`}>
 							{Object.keys(JSON.parse(discSelect?.product?.caracteristique || '{}')).map((key) => {
 								return (
-									<div key={key} className={'text-sm text-gray-800'}>
-										<span className={`font-semibold`}>{key}:</span>
-										<span className={`font-light`}>
-											{JSON.parse(discSelect?.product?.caracteristique || '{}')[key]}{' '}
+									<div key={key} className={'flex flex-row items-center gap-x-1 p-2 text-sm text-gray-800'}>
+										<div className={` items-center gap-x-1`}>
+											<BadgeInfo size={21} strokeWidth={0.75} className={``} />
+										</div>
+										<span className={`flex flex-col items-start justify-center text-xs font-light`}>
+											<span>{JSON.parse(discSelect?.product?.caracteristique || '{}')[key]} </span>
+											<span className={` font-semibold`}>{key}</span>
 										</span>
 									</div>
 								);
 							})}
 						</div>
 					</div>
+					<div className="overflow-hidden">
+						<div className="text-xs text-slate-400">Description</div>
+						<pre className="whitespace-pre-wrap break-words p-1 font-poppins text-sm">
+							{discSelect?.product.description}
+						</pre>
+					</div>
+
+					<div className={`flex items-center justify-center gap-x-2 rounded-md bg-slate-600 px-8 py-2`}>
+						<a
+							href={`https://api.whatsapp.com/send?phone=+225${discSelect?.provider.phone}&text=${encodeURIComponent(SeeAnnounce)}`}
+							target="_blank"
+							rel="noreferrer"
+							className={`text-white`}
+						>
+							<img
+								src={'/img/WhatsApp.webp'}
+								alt=""
+								className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
+							/>
+						</a>
+						<div className={`flex gap-x-2 rounded-md bg-green-600 p-1`}>
+							<Phone color="white" />
+						</div>
+						<Link
+							to={`/product/$productId`}
+							// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+							params={{ productId: discSelect?.product.id! }}
+							className="my-2 grid h-[210px] grid-rows-10"
+						>
+							voir product
+						</Link>
+					</div>
+					<button onClick={() => openModalReport()} className={`text-xs underline`}>
+						signalez l&apos;annonce
+					</button>
 				</div>
 			</div>
+			<ModalReport
+				showPopUp={modalReport}
+				productId={discSelect?.product?.id}
+				closePopUp={closeModalReport}
+			/>
 		</div>
 	);
 }

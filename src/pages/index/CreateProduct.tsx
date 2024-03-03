@@ -42,7 +42,7 @@ export const ProductSchema = z.object({
 	description: z
 		.string()
 		.min(3, { message: 'description doit contenir au moins 3 caractere' })
-		.max(300, { message: 'description trop longue' }),
+		.max(1300, { message: 'description trop longue' }),
 	price: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
 		message: "le prix n'est pas valide",
 	}),

@@ -67,13 +67,27 @@ export default memo(function SearchFilter() {
 							...old,
 							filter: {
 								...old.filter,
-								price: [min, max] || undefined,
+								price: [min, max],
+							},
+						};
+					},
+					replace: true,
+				});
+			} else {
+				navigate({
+					search: (old) => {
+						return {
+							...old,
+							filter: {
+								...old.filter,
+								price: undefined,
 							},
 						};
 					},
 					replace: true,
 				});
 			}
+
 		},
 		500,
 		[navigate, price]

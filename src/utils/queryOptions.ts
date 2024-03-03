@@ -198,7 +198,7 @@ export function useSendMessageMutation() {
 			queryClient.invalidateQueries({ queryKey: ['getMessages', data?.discussion_id] });
 			ToastSuccess('ok');
 		},
-		onError: (err) => {
+		onError: () => {
 			ToastError("Une erreur est survenue lors de l'envoi du message");
 		},
 	});
