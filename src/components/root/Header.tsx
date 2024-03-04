@@ -9,6 +9,13 @@ import { redirectToConnect } from '@/lib/utils';
 import { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import AvatarComponent from '../ui/AvatarComponent';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+const SearchSchema = z.object({
+	message: z.string(),
+});
+type SearchSchemaType = z.infer<typeof SearchSchema>;	
 const SIZE_ICON = 20;
 const wrapIcon = 'group relative flex flex-col justify-center items-center gap-2';
 const contentIcon = 'whitespace-nowrap text-xs';
@@ -37,7 +44,9 @@ export default function Header() {
 	}, []);
 
 	const [isShadow, setIsShadow] = useState(false);
-
+	const { register, handleSubmit, setValue } = useForm<SearchSchemaType>({
+		resolver: zodResolver(SearchSchema),
+	});
 	useEffect(() => {
 		window.onscroll = (e) => {
 			const scrollY = window.scrollY;
@@ -49,8 +58,8 @@ export default function Header() {
 		};
 	}, []);
 	const serachContainer = twMerge(
-		'transition-all duration-300 ease-linear',
-		isOpen ? 'h-[240px] scale-x-100 rounded-xl border-[1px] border-gray-200' : 'h-0 scale-x-50'
+		'transition-all duration-200 ease-linear',
+		isOpen ? ' rounded-xl border-[1px] border-gray-200' : 'scale-0 invisible'
 	);
 
 	return (
@@ -83,11 +92,13 @@ export default function Header() {
 					</div>
 					<div
 						className={
-							`absolute w-[500px] translate-x-[60%] top-14 z-50 bg-white  shadow-2xl` + serachContainer
+							`absolute w-[500px] translate-x-[60%] top-12 z-50 bg-white  shadow-2xl` + serachContainer
 						}
-					></div>
+					>
+						rechercher
+					</div>
 					<div className=" flex justify-between gap-x-3">
-						<Link to='/myprofile/historique' className={wrapIcon}>
+						<Link to="/myprofile/historique" className={wrapIcon}>
 							<Bell size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Mon historique</span>
 							<div className={UnderlineHover} />

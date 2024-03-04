@@ -1,19 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { queryClient } from '@/lib/route';
-import { ProductsMinType } from '@/services/api/product_categorie';
-import { getAllFavouriteProductIds, useAddProductFavouriteMutation, useDeleteProductFavouriteMutation } from '@/utils/queryOptions';
+import {
+	getAllFavouriteProductIds,
+	useAddProductFavouriteMutation,
+	useDeleteProductFavouriteMutation,
+} from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-export default function ActionFavourite({ productId , style }: { productId: string , style?: string }) {
-    const deleteProductFavourite = useDeleteProductFavouriteMutation();
+export default function ActionFavourite({
+	productId,
+	style,
+}: {
+	productId: string;
+	style?: string;
+}) {
+	const deleteProductFavourite = useDeleteProductFavouriteMutation();
 	const { data: favouriteIds } = useSuspenseQuery(getAllFavouriteProductIds());
 	const [isFavourite, setIsFavourite] = useState(false);
 	const addProductFavourite = useAddProductFavouriteMutation();
-    const fnAddFavourite = (e: any) => {
+	const fnAddFavourite = (e: any) => {
 		e.preventDefault();
 		addProductFavourite.mutate(productId);
 		// e.stopPropagation();
@@ -40,16 +49,12 @@ export default function ActionFavourite({ productId , style }: { productId: stri
 	]);
 	return (
 		<button
+			className={twMerge(style)}
 			onClick={(e) => {
 				isFavourite ? fnDeleteFavourite(e) : fnAddFavourite(e);
 			}}
-			className={twMerge(style)}
 		>
-			<Heart
-				fill={isFavourite ? 'orange' : 'transparent'}
-				color={isFavourite ? 'orange' : 'white'}
-				className=""
-			/>
+			<Heart fill={isFavourite ? 'orange' : 'transparent'} color={isFavourite ? 'orange' : 'gray'} />
 		</button>
 	);
 }

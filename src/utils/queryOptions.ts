@@ -8,6 +8,7 @@ import {
 	getFavouriteProduct,
 	getFavouriteProductsId,
 	getProduct,
+	getProducts,
 	getProductsByFiltr,
 	reportProduct,
 	updateProduct,
@@ -17,7 +18,7 @@ import { getAcount } from '@/services/api/user';
 import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
-import { getDiscussions, getMessages, sendMessage } from '@/services/api/discussions';
+import { getDiscussions, sendMessage } from '@/services/api/discussions';
 
 //user
 export function accountQueryOptions(accountId: string) {
@@ -60,10 +61,18 @@ export function useDeleteProductMutation() {
 	});
 }
 
+
+
 const OrderBy = z.enum(['date_desc', 'date_asc', 'price_desc', 'price_asc']);
 
 const FilterSchema = z.object({
 	category_id: z.string().optional(),
+	order_by: OrderBy.optional(),
+	text: z.string().optional(),
+	price: z.tuple([z.number(), z.number()]).optional(),
+});
+const FilterProductSchema = z.object({
+	category_id: z.string(),
 	order_by: OrderBy.optional(),
 	text: z.string().optional(),
 	price: z.tuple([z.number(), z.number()]).optional(),
@@ -78,6 +87,24 @@ export const RequestDataSchema = z.object({
 
 export type RequestDataType = z.infer<typeof RequestDataSchema>;
 
+export const RequestFilterProductSchema = z.object({
+	limit: z.number().optional(),
+	page: z.number().optional(),
+	filter: FilterProductSchema,
+});
+
+export type RequestFilterProductType = z.infer<typeof RequestFilterProductSchema>;
+
+
+export function getProductsOptions(RequestData: RequestFilterProductType) {
+	return queryOptions({
+		queryKey: ['products', RequestData],
+		queryFn: () => getProducts(RequestData),
+		placeholderData: keepPreviousData,
+	});
+}
+
+
 export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
 	return queryOptions({
 		queryKey: ['productsByfiltr', Requestfiltre],
@@ -85,6 +112,7 @@ export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
 		placeholderData: keepPreviousData,
 	});
 }
+
 
 export function getProductOptions(id: string) {
 	return queryOptions({

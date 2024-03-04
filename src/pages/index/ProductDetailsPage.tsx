@@ -25,6 +25,15 @@ export default function ProductDetailPage() {
 	const product = useDeferredValue(productPromise);
 	const [current, setCurrent] = useState(0);
 	const [api, setApi] = useState<CarouselApi>();
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	const toggleDescription = () => {
+		setIsExpanded(!isExpanded);
+	};
+
+	const descriptionClass = `whitespace-pre-wrap font-poppins text-[.9rem] ${
+		isExpanded ? '' : 'line-clamp-4'
+	}`;
 	useEffect(() => {
 		if (!api) {
 			return;
@@ -224,27 +233,25 @@ export default function ProductDetailPage() {
 					<div className={`col-start-1 col-end-9 h-full`}>
 						<div className={`flex  flex-col gap-y-3`}>
 							<div className={`flex flex-col gap-y-1 py-3`}>
-								<div className={`flex flex-wrap items-baseline  gap-x-2`}>
+								<div className={`flex flex-wrap items-center  gap-x-2`}>
 									<h1 className={`text-2xl`}>{product.title}</h1>
-									<span
-										className={`rounded-md bg-slate-200 px-1  py-0.5 font-roboto text-base font-light text-gray-600 shadow-sm`}
-									>
+									<span className={`rounded-md font-roboto text-slate-900`}>
 										{formatPrice(Number(product.price))}
 									</span>
 								</div>
 							</div>
-							<div className="">
+							<div>
 								<div className="text-base font-bold text-slate-900">Caracteristiques</div>
 								<div className={`flex h-1/2 flex-wrap items-center gap-x-3 py-1`}>
 									{Object.keys(JSON.parse(product?.caracteristique || '{}')).map((key) => {
 										return (
 											<div key={key} className={'flex flex-row items-start gap-x-1 p-2 text-sm text-gray-800'}>
-												<div className={` items-center gap-x-1`}>
-													<BadgeInfo size={21} strokeWidth={0.75} className={``} />
+												<div className={` items-center rounded-full bg-slate-100 p-[.2rem]`}>
+													<BadgeInfo size={18} strokeWidth={0.75} color="black" />
 												</div>
 												<span className={`flex flex-col text-xs font-light`}>
-													<span className={` font-semibold capitalize text-gray-400`}>{key}</span>
-													<span className={`text-base capitalize text-gray-800`}>
+													<span className={`capitalize text-gray-500`}>{key}</span>
+													<span className={`text-[.83rem] capitalize text-slate-950`}>
 														{JSON.parse(product?.caracteristique || '{}')[key]}{' '}
 													</span>
 												</span>
@@ -255,7 +262,9 @@ export default function ProductDetailPage() {
 							</div>
 							<div>
 								<h1 className="text-base font-bold text-slate-900">Description</h1>
-								<pre className={`whitespace-pre-wrap  font-poppins`}>{product.description}</pre>
+								<pre className={`whitespace-pre-wrap  font-poppins text-[.85rem]`}>
+									{product.description}
+								</pre>
 							</div>
 
 							<div>

@@ -27,8 +27,10 @@ export default function SelectCategorie({
 		if (require) {
 			setValueInputs({ [label]: '' });
 		}
+		if (defaultValue){
+			setValueInputs({ [label]: defaultValue });
+		}
 	}, []);
-	console.log("🚀 ~ useEffect ~ require:", require)
 
 	return (
 		<div className="mt-5 w-full">
@@ -46,7 +48,7 @@ export default function SelectCategorie({
 				</SelectTrigger>
 				<SelectContent className="bg-white">
 					{values.map((value, i) => {
-						if(i == 0) return null
+						if (i == 0) return null;
 						return (
 							<SelectItem className="font-poppins focus:bg-primary" key={i} value={String(value)}>
 								{value}

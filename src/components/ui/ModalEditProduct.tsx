@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import  { memo, useEffect, useMemo } from 'react';
 import { twMerge } from 'tailwind-merge';
 import InputComponent from './InputComponent';
 import InputFileComponent from './InputFileComponent';
@@ -11,11 +11,10 @@ import SelectCategorie from './SelectCategorie';
 import SwitchInputCategori from './SwitchInputCategori';
 import { Nbr_Image_Upload } from '@/utils/constante';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
-import { FieldOptionsType, ProductsData, ProductsMinType } from '@/services/api/product_categorie';
+import { FieldOptionsType, ProductsMinType } from '@/services/api/product_categorie';
 import { useForm } from 'react-hook-form';
 import { ProductSchema, ProductSchemaType } from '@/pages/index/CreateProduct';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X } from 'lucide-react';
 import { useUpdateMutationproduct } from '@/utils/queryOptions';
 import { ToastWarn } from '@/lib/utils';
 import CloseModal from './CloseModal';
@@ -61,7 +60,7 @@ export default memo(function ModalEditProduct({
 			dataProduct: {
 				...data,
 				product_id: product.product_id,
-				caracteristique: JSON.stringify(valueInput),
+				caracteristique: JSON.stringify(valueInput)
 			},
 			photosFile: filesData,
 		});

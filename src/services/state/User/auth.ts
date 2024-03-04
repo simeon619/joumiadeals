@@ -195,8 +195,10 @@ export const useAuth = create(
 						method: 'GET',
 						headers: getHeaders(),
 					});
+					if(!response.ok) {
+						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
+					}
 					const data = await response.json();
-					console.log('🚀 ~ verifToken: ~ data:', data);
 					if (data.errors) {
 						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
 					}

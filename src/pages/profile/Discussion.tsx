@@ -5,8 +5,6 @@ import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { BadgeInfo, FileImage, Phone, Search, Send } from 'lucide-react';
 import { Key, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-
-import 'react-tooltip/dist/react-tooltip.css';
 import {
 	Carousel,
 	CarouselContent,
@@ -120,7 +118,7 @@ export default function Discussion() {
 	}, [Discussions, search]);
 
 	return (
-		<div className={'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-black'}>
+		<div className={'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-slate-400'}>
 			<div className="grid h-[85dvh] max-h-[85dvh] grid-cols-16 gap-x-2 p-2 ">
 				<div className="col-start-1 col-end-4 h-full overflow-y-auto rounded-xl  bg-white  scrollbar-thin">
 					<div className={'sticky top-0 flex items-center justify-around py-2'}>
@@ -143,7 +141,8 @@ export default function Discussion() {
 								<button
 									className={twMerge(
 										'flex w-full flex-row p-1 gap-x-2 outline-0 truncate items-start transition-colors duration-300',
-										discSelect?.discussion_id === discussion.discussion_id && 'bg-zinc-300 rounded-e-lg'
+										discSelect?.discussion_id === discussion.discussion_id &&
+											'bg-slate-400 rounded-e-lg text-white'
 									)}
 									key={discussion.discussion_id}
 									onClick={() => setDiscSelect(discussion)}
@@ -154,7 +153,7 @@ export default function Discussion() {
 										name={discSelect?.client.name}
 									/>
 									<div className={'flex w-full flex-col items-start'}>
-										<span className="text-sm">{discussion.client.name}</span>
+										<span className="text-sm ">{discussion.client.name}</span>
 										<span className=" text-sm font-black">{discussion.product.title}</span>
 									</div>
 								</button>
@@ -227,7 +226,7 @@ export default function Discussion() {
 						</ul>
 						{isFetchingNextPage && <div>Chargement...</div>}
 					</div>
-					<div className=" row-start-13  row-end-12 flex flex-col border-t-2 ">
+					<div className=" row-start-13 row-end-12 flex flex-col border-t-2 bg-white/90 ">
 						{photo && (
 							<div className=" relative text-xs text-slate-400">
 								<img src={photo} alt="" className="size-14" />
@@ -236,7 +235,7 @@ export default function Discussion() {
 								</button>
 							</div>
 						)}
-						<div className="flex items-center justify-center bg-slate-100 ">
+						<div className="flex items-center justify-center  ">
 							<label className="cursor-pointer p-2" htmlFor="input_file">
 								<FileImage size={20} strokeWidth={1.5} className="cursor-pointer" />
 								<span className="text-[0px] text-slate-400">file</span>
@@ -265,7 +264,7 @@ export default function Discussion() {
 							/>
 							<button
 								onClick={handleSubmit(handleMutate)}
-								className="flex items-center justify-center rounded-full bg-slate-100 p-2"
+								className="flex items-center justify-center rounded-full p-2"
 							>
 								<Send size={22} strokeWidth={1.5} className=" " />
 							</button>
@@ -298,19 +297,20 @@ export default function Discussion() {
 							</Carousel>
 						</div>
 					</div>
-
-					<div className="overflow-hidden  ">
-						<div className="mt-2 text-xs text-slate-400">Caracteristiques</div>
+					<div className="overflow-hidden">
+						<div className="text-base font-bold text-slate-900">Caracteristiques</div>
 						<div className={`flex h-1/2 flex-wrap items-center gap-x-3 py-1`}>
 							{Object.keys(JSON.parse(discSelect?.product?.caracteristique || '{}')).map((key) => {
 								return (
-									<div key={key} className={'flex flex-row items-center gap-x-1 p-2 text-sm text-gray-800'}>
-										<div className={` items-center gap-x-1`}>
-											<BadgeInfo size={21} strokeWidth={0.75} className={``} />
+									<div key={key} className={'flex flex-row items-start gap-x-1 p-2 text-sm text-gray-800'}>
+										<div className={` items-center rounded-full bg-slate-100 p-[.2rem]`}>
+											<BadgeInfo size={18} strokeWidth={0.75} color="black" />
 										</div>
-										<span className={`flex flex-col items-start justify-center text-xs font-light`}>
-											<span>{JSON.parse(discSelect?.product?.caracteristique || '{}')[key]} </span>
-											<span className={` font-semibold`}>{key}</span>
+										<span className={`flex flex-col text-xs font-light`}>
+											<span className={`capitalize text-gray-500`}>{key}</span>
+											<span className={`text-[.83rem] capitalize text-slate-950`}>
+												{JSON.parse(discSelect?.product?.caracteristique || '{}')[key]}
+											</span>
 										</span>
 									</div>
 								);
@@ -344,9 +344,9 @@ export default function Discussion() {
 							to={`/product/$productId`}
 							// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 							params={{ productId: discSelect?.product.id! }}
-							className="my-2 grid h-[210px] grid-rows-10"
+							className=""
 						>
-							voir product
+							retour au produit
 						</Link>
 					</div>
 					<button onClick={() => openModalReport()} className={`text-xs underline`}>

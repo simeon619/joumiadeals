@@ -19,6 +19,7 @@ import ProductsPage from '@/pages/index/ProductsPage';
 import ProductDetailsPage from '@/pages/index/ProductDetailsPage';
 import {
 	RequestDataSchema,
+	RequestFilterProductSchema,
 	accountQueryOptions,
 	getAllChildCategoriesOptions,
 	getAllFavouriteProductIds,
@@ -27,6 +28,7 @@ import {
 	getOptionsFavouriteProduct,
 	getProductOptions,
 	getProductsByfiltrOptions,
+	getProductsOptions,
 } from '@/utils/queryOptions';
 import CreateProduct from '@/pages/index/CreateProduct';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -34,7 +36,7 @@ import { useAuth } from '@/services/state/User/auth';
 import ProfilePage from '@/pages/profile/index/ProfilePage';
 import Myannounce from '@/pages/profile/Myannounce';
 import MyFavourite from '@/pages/profile/MyFavourite';
-import { pageSchema } from '@/services/api/product_categorie';
+import { getProducts, pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
 import Discussion from '@/pages/profile/Discussion';
 import { z } from 'zod';
@@ -162,7 +164,20 @@ export const profileRoot = createRoute({
 
 export const productsRoot = createRoute({
 	getParentRoute: () => indexLayout,
+	validateSearch: (params) => RequestFilterProductSchema.parse(params),
+	loaderDeps: ({ search: { filter, limit, page } }) => ({
+		filter,
+		limit,
+		page,
+	}),
 	path: 'products',
+	loader: (opts) => {
+		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
+		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
+	},
+	wrapInSuspense: true,
+	
+	
 	component: ProductsPage,
 });
 

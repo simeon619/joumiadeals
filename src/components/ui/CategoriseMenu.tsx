@@ -4,15 +4,17 @@ import {
 	NavigationMenu,
 	NavigationMenuContent,
 	NavigationMenuItem,
+	NavigationMenuLink,
 	NavigationMenuList,
 	NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { twMerge } from 'tailwind-merge';
-import { useRouter } from '@tanstack/react-router';
-import {  useMemo } from 'react';
+import { Link, useRouter } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import { BuildMenu } from '@/utils/mock/Menucaegorie';
 import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { productsRoot } from '@/lib/route';
 const MenuCat = {};
 export default function CategoriseMenu() {
 	const { state } = useRouter();
@@ -53,7 +55,9 @@ export default function CategoriseMenu() {
 												alt="logo"
 												className="col-start-1 col-end-2 size-8 border-l-2 border-l-primary pl-2"
 											/>
-											<span className="block text-center text-base capitalize text-black">{Categorie.split(':')[0]}</span>
+											<span className="block text-center text-base capitalize text-black">
+												{Categorie.split(':')[0]}
+											</span>
 										</div>
 										<div
 											className={twMerge(
@@ -66,17 +70,28 @@ export default function CategoriseMenu() {
 												if (Categorie === 'icon') return null;
 												return (
 													<div key={Categorie} className="max-w-[200px] p-2">
-														<span className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary">
-															{Categorie.split(':')[0]}
-														</span>
+														<NavigationMenuLink  asChild>
+															<Link
+																to={productsRoot.to}
+																search={{ filter: { category_id: Categorie.split(':')[1] } }}
+																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
+																// mask={{ search : Categorie.split(':')[0] }}
+															>
+																{Categorie.split(':')[0]}
+															</Link>
+														</NavigationMenuLink>
+
 														<span>
-															{data[Categorie].map((item) => (
-																<span
-																	key={item}
-																	className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
-																>
-																	{item.split(':')[0]}
-																</span>
+															{(data[Categorie] as string[]).map((item) => (
+																<NavigationMenuLink key={item} asChild>
+																	<Link
+																		to={productsRoot.to}
+																		search={{ filter: { category_id: item.split(':')[1] } }}
+																		className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
+																	>
+																		{item.split(':')[0]}
+																	</Link>
+																</NavigationMenuLink>
 															))}
 														</span>
 													</div>

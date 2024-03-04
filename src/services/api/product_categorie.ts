@@ -2,7 +2,7 @@
 import { BASE_URL, LimitItemPaginate } from '@/utils/constante';
 import { z } from 'zod';
 import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
-import { RequestDataType } from '@/utils/queryOptions';
+import { RequestDataType, RequestFilterProductType } from '@/utils/queryOptions';
 const FieldSchema = z.enum([
 	'button',
 	'checkbox',
@@ -159,6 +159,21 @@ const ProductShemaPaginate = z.object({
 export type ProductsData = z.infer<typeof ProductShemaPaginate>;
 
 export async function getProductsByFiltr(requestData: RequestDataType) {
+	const response = await fetch(`${BASE_URL}/filter_product`, {
+		method: 'POST',
+		headers: getHeaders(),
+		body: JSON.stringify(requestData),
+	});
+	const data = await response.json();
+	const products = ProductShemaPaginate.safeParse(data);
+	if (!products.success) {
+		console.log(products.error);
+		throw new Error(products.error.message);
+	}
+	return products.data;
+}
+
+export async function getProducts(requestData : RequestFilterProductType) {
 	const response = await fetch(`${BASE_URL}/filter_product`, {
 		method: 'POST',
 		headers: getHeaders(),
