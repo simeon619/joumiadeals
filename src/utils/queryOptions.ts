@@ -19,7 +19,7 @@ import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-que
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
 import { getDiscussions, sendMessage } from '@/services/api/discussions';
-
+export const LIMIT_PRODUCT_PAGE = 1;
 //user
 export function accountQueryOptions(accountId: string) {
 	return queryOptions({
@@ -61,8 +61,6 @@ export function useDeleteProductMutation() {
 	});
 }
 
-
-
 const OrderBy = z.enum(['date_desc', 'date_asc', 'price_desc', 'price_asc']);
 
 const FilterSchema = z.object({
@@ -88,13 +86,12 @@ export const RequestDataSchema = z.object({
 export type RequestDataType = z.infer<typeof RequestDataSchema>;
 
 export const RequestFilterProductSchema = z.object({
-	limit: z.number().optional(),
+	limit: z.number().optional().default(LIMIT_PRODUCT_PAGE),
 	page: z.number().optional(),
 	filter: FilterProductSchema,
 });
 
 export type RequestFilterProductType = z.infer<typeof RequestFilterProductSchema>;
-
 
 export function getProductsOptions(RequestData: RequestFilterProductType) {
 	return queryOptions({
@@ -104,7 +101,6 @@ export function getProductsOptions(RequestData: RequestFilterProductType) {
 	});
 }
 
-
 export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
 	return queryOptions({
 		queryKey: ['productsByfiltr', Requestfiltre],
@@ -112,7 +108,6 @@ export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
 		placeholderData: keepPreviousData,
 	});
 }
-
 
 export function getProductOptions(id: string) {
 	return queryOptions({
@@ -241,7 +236,7 @@ export function useCreateDiscussionMutaton() {
 		},
 		onError: (err) => {
 			console.log(err);
-			ToastError("Une erreur est survenue lors de la création de la discussion");
+			ToastError('Une erreur est survenue lors de la création de la discussion');
 		},
 	});
 }

@@ -223,32 +223,55 @@ export const get_parent = (id: string | null, cats: CategoryType) => {
 
 export function get_old_parent(id: string | null, cats: CategoryType) {
 	const accu: CategoryType = [];
-		const cat = cats.filter((category) => category.parent_category_id == id);
-		if (cat) {
-			cat.forEach((c) => {
-				if (c.is_parentable) accu.push(c);
-				else if(!c.parent_category_id){
-					get_old_parent(c.id, cats)
-				}
-			});
+	const cat = cats.filter((category) => category.parent_category_id == id);
+	cat.forEach((c) => {
+		if (c.is_parentable) accu.push(c);
+		else if (!c.parent_category_id) {
+			get_old_parent(c.id, cats);
 		}
-
+	});
+	console.log('🚀 ~ get_old_parent ~ accu:', accu);
 	return accu;
 }
+export function get_first_cat(id: string | null, cats: CategoryType) {
+	const cat = cats.find((category) => {
+		return category.id == id;
+	});
+	if (cat?.parent_category_id) {
+		return get_first_cat(cat.parent_category_id, cats);
+	} else {
+		return cat;
+	}
+}
+export function get_second_cat(id: string | null, cats: CategoryType) : {id : string, label : string} | null {
+	const cat = cats.find((category) => {
+		return category.id == id;
+	});
+  
+	if (!cat || cat?.parent_category_id === null) {
+	  return null;
+	}
+  
+	const parentCat = get_second_cat(cat.parent_category_id, cats);
+  
+	if (!parentCat) {
+	  return {id : cat.id, label : cat.label};
+	}
+  
+	return parentCat;
+  }
 
 export function get_first_cat_icon(id: string | null, cats: CategoryType) {
 	const cat = cats.find((category) => {
 		return category.id == id;
 	});
 
-	if(cat?.parent_category_id){
-		return get_first_cat_icon(cat.parent_category_id, cats)
+	if (cat?.parent_category_id) {
+		return get_first_cat_icon(cat.parent_category_id, cats);
 	} else {
-		return cat?.icon
+		return cat?.icon;
 	}
-	
 }
-
 
 export function get_all_parents(parent_id: string | null, cats: CategoryType) {
 	if (!cats) return [];

@@ -5,7 +5,7 @@ import { Link } from '@tanstack/react-router';
 import ActionFavourite from '../ui/ActionFavourite';
 import { formatPrice } from '@/lib/utils';
 
-export default function LayoutProduct1({ product }: { product: ProductsData['products'][0] }) {
+export default function LayoutProduct2({ product }: { product: ProductsData['products'][0] }) {
 	return (
 		<Link
 			to={`/product/$productId`}
@@ -38,11 +38,13 @@ export default function LayoutProduct1({ product }: { product: ProductsData['pro
 					<div className="col-start-5 col-end-13 flex h-full flex-col gap-2 p-1">
 						<div className="grid h-full  grid-cols-12 ">
 							<div className="col-start-1 col-end-12 flex h-full flex-col items-start justify-between">
-								<div className="flex flex-col">
-									<span className="text-base font-semibold text-slate-800 group-hover:text-primary">
+								<div className="flex flex-col gap-y-2">
+									<span className="text-[.975rem] font-semibold text-slate-900 group-hover:text-primary">
 										{product.title}
 									</span>
-									<span className="text-sm font-semibold text-slate-950">{formatPrice(product.price)}</span>
+									<span className="text-[.975rem] font-bold text-slate-900">
+										{formatPrice(product.price)}
+									</span>
 								</div>
 								<div className="flex gap-x-5">
 									{Object.keys(product.caracteristique)
@@ -50,8 +52,8 @@ export default function LayoutProduct1({ product }: { product: ProductsData['pro
 										.map((key) => {
 											return (
 												<span className="flex flex-col items-start justify-center text-xs" key={key}>
-													<span className="text-xs capitalize text-gray-500 shadow-sm">{key}</span>
-													<span className="text-xs font-light capitalize text-gray-900">
+													<span className="text-xs capitalize text-gray-500">{key}</span>
+													<span className="text-[.8rem] font-light capitalize text-gray-900">
 														{product.caracteristique[key]}
 													</span>
 												</span>

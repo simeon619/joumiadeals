@@ -11,6 +11,7 @@ export default function InputComponent({
 	placeholder,
 	defaultValue,
 	style,
+	autoComplete,
 }: {
 	register: any;
 	errors: any;
@@ -20,6 +21,7 @@ export default function InputComponent({
 	placeholder: string;
 	defaultValue?: string | number;
 	style?: string;
+	autoComplete?: 'on' | 'off';
 }) {
 	return (
 		<div className={twMerge('w-full', style)}>
@@ -38,6 +40,7 @@ export default function InputComponent({
 						type === 'number' && 'w-1/2'
 					)}
 					placeholder={placeholder}
+					autoComplete={autoComplete}
 				/>
 				{
 					<p className={twMerge(errors?.[name] ? 'text-xs text-red-300' : 'text-red-50/0', 'h-4')}>

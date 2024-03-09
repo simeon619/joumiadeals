@@ -34,6 +34,7 @@ import { announceRoot } from '@/lib/route';
 import { useAuth } from '@/services/state/User/auth';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
 import { useDebounce } from 'react-use';
+import { filterCategory } from '@/utils/helpers';
 export const ProductSchema = z.object({
 	title: z
 		.string()
@@ -87,41 +88,11 @@ export default function CreateProduct() {
 			if (!title) {
 				return setSuggestCategory([]);
 			}
-
-			const titleNormalized = title.normalize('NFD').replace(/[\u0300-\u036f\s()\-/,+'']/g, '');
-			// const titleRegex = new RegExp( titleNormalized , 'gi');
-			// const titleRegex = new RegExp('.*' + titleNormalized.split('').join('*') + '.*', 'gi');
-			// const titleRegex = new RegExp('.*' + titleNormalized + '.*', 'gi');
-			const titleRegex = new RegExp('.*' + titleNormalized + '.*', 'gi');
-
-			const filtered = data.filter((item) => {
-				const labelNormalized = item.label
-					.toLowerCase()
-					.normalize('NFD')
-					.replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
-
-				const labelMatch = titleRegex.test(labelNormalized);
-
-				const caracMatch = item.caracteristique_field.some((carac: { [x: string]: any[] }) => {
-					if (carac && carac['enum']) {
-						return carac['enum'].some((el: string) => {
-							const elNormalized = el.normalize('NFD').replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
-
-							const isMatch = titleRegex.test(elNormalized);
-							return isMatch;
-						});
-					}
-					return false;
-				});
-
-				return labelMatch || caracMatch;
-			});
-
+			const filtered = filterCategory(title, data);
 			const recup = filtered
 				.flatMap((item) => {
 					if (item.is_parentable === 0) {
-						const dataParent = get_old_parent(item.id, data)!;
-						return dataParent;
+						return get_old_parent(item.id, data)!;
 					}
 					return item;
 				})
@@ -137,7 +108,7 @@ export default function CreateProduct() {
 				setSuggestCategory(dataSuggest);
 			}
 		},
-		475,
+		405,
 		[watch('title')]
 	);
 
@@ -173,8 +144,6 @@ export default function CreateProduct() {
 		if (cat.is_parentable === 1) {
 			setProductSelect(cat);
 			setStep('one');
-			// const dataSA = get_all_parents(cat?.id, data);
-			// setLabelSuggest(dataSA.reverse().join(' > '))
 		}
 		setLabelList((prev) => {
 			if (!cat.parent_category_id) {
@@ -301,26 +270,15 @@ export default function CreateProduct() {
 								placeholder="titre de l'annonce"
 								register={register}
 								errors={errors}
+								autoComplete="off"
 							/>
 							<div className={twMerge('flex flex-col ', suggestCategory.length > 0 && 'bg-gray-100 p-2')}>
-								<button
-									onClick={() => {
-										setStep('two');
-										setLabelSuggest('');
-										setSuggestCategory([]);
-									}}
-									type="button"
-									className={twMerge(
-										'flex items-center text-center text-sm text-primary bg-gray-100 p-2',
-										suggestCategory.length > 0 && 'my-1'
-									)}
-								>
-									Cliquez ici pour choisir votre categorie
-								</button>
 								{suggestCategory?.length > 0 && (
-									<span className="font-semibold text-gray-700 underline">Ou choisissez une categorie suggere:</span>
+									<span className="font-semibold text-gray-700 underline">
+										Choisissez une categorie suggere:
+									</span>
 								)}
-								<div className="my-2 flex flex-col items-center gap-y-3">
+								<div className=" flex flex-col items-center gap-y-3">
 									{suggestCategory?.map((c, i) => {
 										return (
 											<button
@@ -332,15 +290,29 @@ export default function CreateProduct() {
 													setSuggestCategory(() => []);
 													e.preventDefault();
 												}}
-												className="flex items-start  gap-x-2 text-sm text-gray-700 hover:text-primary"
+												className="flex items-start gap-x-2 text-sm text-gray-700 hover:text-primary"
 												key={i}
 											>
-												{c?.icon && <img src={c?.icon} alt="logo" className=" size-5" />}
+												{c?.icon && <img src={c?.icon} alt="logo" className="size-5" />}
 												<span>{c.suggest}</span>
 											</button>
 										);
 									})}
 								</div>
+								<button
+									onClick={() => {
+										setStep('two');
+										setLabelSuggest('');
+										setSuggestCategory([]);
+									}}
+									type="button"
+									className={twMerge(
+										'flex items-center text-center text-sm mb-3  text-primary bg-gray-100 p-2',
+										suggestCategory.length > 0 && 'my-1'
+									)}
+								>
+									Ou cliquez ici pour choisir votre categorie.
+								</button>
 							</div>
 						</div>
 						<InputComponent

@@ -8,7 +8,7 @@ import {
 } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export default function ActionFavourite({
@@ -25,13 +25,12 @@ export default function ActionFavourite({
 	const fnAddFavourite = (e: any) => {
 		e.preventDefault();
 		addProductFavourite.mutate(productId);
-		// e.stopPropagation();
 	};
 	const fnDeleteFavourite = (e: any) => {
 		e.preventDefault();
 		deleteProductFavourite.mutate(productId);
 	};
-	useMemo(() => {
+	useEffect(() => {
 		const favourites = (queryClient.getQueryData(['getAllFavouriteProductIds']) as string[]) || [];
 		if (favourites.includes(productId)) {
 			setIsFavourite(true);

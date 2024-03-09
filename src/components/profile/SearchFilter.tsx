@@ -25,23 +25,76 @@ const filt = {
 	'prix croissant': 'price_asc',
 	'prix decroissant': 'price_desc',
 } as const;
-export default memo(function SearchFilter() {
-	// const searchParams = announceRoot.useSearch();
+export default function SearchFilter() {
+	const searchParams = announceRoot.useSearch();
 	const { register, watch } = useForm<FilterProductType>({
 		resolver: zodResolver(filterProductSchema),
 	});
-
+	function getKeyByValue(object: { [s: string]: unknown; } | ArrayLike<unknown>, value: unknown) {
+		return Object.entries(object).find(([key, val]) => val === value)?.[0];
+	}
 	const navigate = useNavigate({ from: announceRoot.fullPath });
 	const searchTerm = watch('search');
 	const price = watch(['price_min', 'price_max']);
-
-	const array = [
-		'date croissant',
-		'date decroissant',
-		'prix croissant',
-		'prix decroissant',
-	] as const;
+	const { filter: filtParams } = searchParams;
+	// const array = [
+	// 	'date croissant',
+	// 	'date decroissant',
+	// 	'prix croissant',
+	// 	'prix decroissant',
+	// ] as const;
 	const [orderBy, setOrderBy] = useState<keyof typeof filt>();
+
+	useEffect(() => {
+		if (filtParams?.price) {
+			navigate({
+				search: (old) => {
+					return {
+						...old,
+						filter: {
+							...old.filter,
+							price: filtParams?.price,
+						},
+					};
+				},
+				replace: true,
+			});
+		}
+	}, [filtParams?.price]);
+
+	useEffect(() => {
+		if (filtParams?.order_by) {
+			navigate({
+				search: (old) => {
+					return {
+						...old,
+						filter: {
+							...old.filter,
+							order: filtParams?.order_by,
+						},
+					};
+				},
+				replace: true,
+			});
+		}
+	}, [filtParams?.order_by]);
+
+	useEffect(() => {
+		if (filtParams?.text) {
+			navigate({
+				search: (old) => {
+					return {
+						...old,
+						filter: {
+							...old.filter,
+							text: filtParams?.text,
+						},
+					};
+				},
+				replace: true,
+			});
+		}
+	}, [filtParams?.text]);
 
 	useDebounce(
 		() => {
@@ -87,7 +140,6 @@ export default memo(function SearchFilter() {
 					replace: true,
 				});
 			}
-
 		},
 		500,
 		[navigate, price]
@@ -112,18 +164,33 @@ export default memo(function SearchFilter() {
 
 	useDebounce(
 		() => {
-			navigate({
-				search: (old) => {
-					return {
-						...old,
-						filter: {
-							...old.filter,
-							text: searchTerm || undefined,
-						},
-					};
-				},
-				replace: true,
-			});
+			if (searchTerm) {
+				navigate({
+					search: (old) => {
+						return {
+							...old,
+							filter: {
+								...old.filter,
+								text: searchTerm,
+							},
+						};
+					},
+					replace: true,
+				});
+			} else {
+				navigate({
+					search: (old) => {
+						return {
+							...old,
+							filter: {
+								...old.filter,
+								text: undefined,
+							},
+						};
+					},
+					replace: true,
+				});
+			}
 		},
 		500,
 		[navigate, searchTerm]
@@ -142,7 +209,7 @@ export default memo(function SearchFilter() {
 						`mt-1 flex rounded-md border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
 					)}
 					placeholder={'trouver une annonce'}
-					// defaultValue={searchParams.filter?.text}
+					defaultValue={filtParams?.text}
 				/>
 			</div>
 			<div className=" ">
@@ -157,6 +224,7 @@ export default memo(function SearchFilter() {
 							`mt-1 flex w-1/4 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
 						)}
 						placeholder={'Minimum'}
+						defaultValue={filtParams?.price?.[0]}
 					/>
 					<input
 						type={'number'}
@@ -167,6 +235,7 @@ export default memo(function SearchFilter() {
 							`mt-1 flex w-1/4 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
 						)}
 						placeholder={'Maximum'}
+						defaultValue={filtParams?.price?.[1]}
 					/>
 				</div>
 			</div>
@@ -175,17 +244,17 @@ export default memo(function SearchFilter() {
 				<span className=" text-sm font-medium text-slate-700 ">{'Classer par :'}</span>
 				<Select
 					name="order"
-					defaultValue={array[0]}
+					defaultValue={getKeyByValue(filt, filtParams?.order_by) || Object.keys(filt)[0]}
 					onValueChange={(value) => {
 						//@ts-expect-error value is string
 						setOrderBy(value);
 					}}
 				>
 					<SelectTrigger className="flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
-						<SelectValue placeholder={array[0]} />
+						<SelectValue placeholder={Object.keys(filt)[0]} />
 					</SelectTrigger>
 					<SelectContent className="bg-white">
-						{array.map((value) => (
+						{Object.keys(filt).map((value) => (
 							<SelectItem className="font-poppins focus:bg-primary" key={value} value={String(value)}>
 								{value}
 							</SelectItem>
@@ -195,4 +264,4 @@ export default memo(function SearchFilter() {
 			</div>
 		</div>
 	);
-});
+}

@@ -12,7 +12,7 @@ import { twMerge } from 'tailwind-merge';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { BuildMenu } from '@/utils/mock/Menucaegorie';
-import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
+import { LIMIT_PRODUCT_PAGE, getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { productsRoot } from '@/lib/route';
 const MenuCat = {};
@@ -73,7 +73,7 @@ export default function CategoriseMenu() {
 														<NavigationMenuLink  asChild>
 															<Link
 																to={productsRoot.to}
-																search={{ filter: { category_id: Categorie.split(':')[1] } }}
+																search={{ filter: { category_id: Categorie.split(':')[1] }, limit : LIMIT_PRODUCT_PAGE }}
 																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
 																// mask={{ search : Categorie.split(':')[0] }}
 															>
@@ -86,7 +86,7 @@ export default function CategoriseMenu() {
 																<NavigationMenuLink key={item} asChild>
 																	<Link
 																		to={productsRoot.to}
-																		search={{ filter: { category_id: item.split(':')[1] } }}
+																		search={{ filter: { category_id: item.split(':')[1] }, limit : LIMIT_PRODUCT_PAGE }}
 																		className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
 																	>
 																		{item.split(':')[0]}
