@@ -1,5 +1,3 @@
-// import { MenuCat } from '@/utils/mock/Menucaegorie';
-
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -12,15 +10,12 @@ import { twMerge } from 'tailwind-merge';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { BuildMenu } from '@/utils/mock/Menucaegorie';
-import { LIMIT_PRODUCT_PAGE, getAllChildCategoriesOptions } from '@/utils/queryOptions';
+import {  getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { productsRoot } from '@/lib/route';
 const MenuCat = {};
 export default function CategoriseMenu() {
 	const { state } = useRouter();
-	// const myRef = useRef<HTMLElement>(null);
-	// const [isOpen, setIsOpen] = useState(false);
-
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	useMemo(() => {
 		BuildMenu(null, MenuCat, 0, data);
@@ -70,10 +65,10 @@ export default function CategoriseMenu() {
 												if (Categorie === 'icon') return null;
 												return (
 													<div key={Categorie} className="max-w-[200px] p-2">
-														<NavigationMenuLink  asChild>
+														<NavigationMenuLink asChild>
 															<Link
 																to={productsRoot.to}
-																search={{ filter: { category_id: Categorie.split(':')[1] }, limit : LIMIT_PRODUCT_PAGE }}
+																search={{ filter: { category_id: Categorie.split(':')[1] }, page: 1 }}
 																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
 																// mask={{ search : Categorie.split(':')[0] }}
 															>
@@ -86,7 +81,7 @@ export default function CategoriseMenu() {
 																<NavigationMenuLink key={item} asChild>
 																	<Link
 																		to={productsRoot.to}
-																		search={{ filter: { category_id: item.split(':')[1] }, limit : LIMIT_PRODUCT_PAGE }}
+																		search={{ filter: { category_id: item.split(':')[1] }, page: 1 }}
 																		className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
 																	>
 																		{item.split(':')[0]}

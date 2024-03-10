@@ -251,7 +251,7 @@ export default function Discussion() {
 							</label>
 							<textarea
 								{...register('message')}
-								onKeyPress={(e) => {
+								onKeyUp={(e) => {
 									if (e.key === 'Enter') {
 										e.preventDefault();
 										handleSubmit(handleMutate)();

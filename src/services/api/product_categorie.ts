@@ -2,7 +2,11 @@
 import { BASE_URL, LimitItemPaginate } from '@/utils/constante';
 import { z } from 'zod';
 import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
-import { RequestDataType, RequestFilterProductType } from '@/utils/queryOptions';
+import {
+	LIMIT_PRODUCT_PAGE,
+	RequestDataType,
+	RequestFilterProductType,
+} from '@/utils/queryOptions';
 const FieldSchema = z.enum([
 	'button',
 	'checkbox',
@@ -78,7 +82,7 @@ export async function getAllChildCategories() {
 			throw new Error('Erreur lors de la récupération des catégories');
 		}
 		const data = await response.json();
-		console.log("🚀 ~ getAllChildCategories ~ data:", data)
+		console.log('🚀 ~ getAllChildCategories ~ data:', data);
 		const validationResult = CategorySchema.safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -162,7 +166,7 @@ export async function getProductsByFiltr(requestData: RequestDataType) {
 	const response = await fetch(`${BASE_URL}/filter_product`, {
 		method: 'POST',
 		headers: getHeaders(),
-		body: JSON.stringify(requestData),
+		body: JSON.stringify({ ...requestData, limit: LIMIT_PRODUCT_PAGE }),
 	});
 	const data = await response.json();
 	const products = ProductShemaPaginate.safeParse(data);
@@ -173,11 +177,18 @@ export async function getProductsByFiltr(requestData: RequestDataType) {
 	return products.data;
 }
 
-export async function getProducts(requestData : RequestFilterProductType) {
+export async function getProducts(requestData: RequestFilterProductType) {
 	const response = await fetch(`${BASE_URL}/filter_product`, {
 		method: 'POST',
 		headers: getHeaders(),
-		body: JSON.stringify(requestData),
+		body: JSON.stringify({
+			...requestData,
+			filter: {
+				...requestData.filter,
+				category_id: requestData.filter?.category_id === 'all' ? null : requestData.filter?.category_id,
+			},
+			limit: LIMIT_PRODUCT_PAGE,
+		}),
 	});
 	const data = await response.json();
 	const products = ProductShemaPaginate.safeParse(data);
@@ -240,7 +251,7 @@ export async function deleteProduct(id: string) {
 		body: JSON.stringify({ product_id: id }),
 	});
 	const data = await response.json();
-	console.log("🚀 ~ deleteProduct ~ data:", data)
+	console.log('🚀 ~ deleteProduct ~ data:', data);
 	if (!data.isDeleted) {
 		throw new Error('Erreur lors de la suppression du produit');
 	}
@@ -370,7 +381,9 @@ const FavouriteShemaPaginate = z.object({
 });
 
 export type FavouriteDataType = z.infer<typeof FavouriteShemaPaginate>;
-export const pageSchema = z.object({ page: z.number(), limit: z.number().optional() }).default({ page: 1 , limit: LimitItemPaginate});
+export const pageSchema = z
+	.object({ page: z.number(), limit: z.number().optional() })
+	.default({ page: 1, limit: LimitItemPaginate });
 export type pageType = z.infer<typeof pageSchema>;
 export async function getFavouriteProduct(paginate: pageType) {
 	try {

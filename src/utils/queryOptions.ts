@@ -19,7 +19,7 @@ import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-que
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
 import { getDiscussions, sendMessage } from '@/services/api/discussions';
-export const LIMIT_PRODUCT_PAGE = 1;
+export const LIMIT_PRODUCT_PAGE = 3;
 //user
 export function accountQueryOptions(accountId: string) {
 	return queryOptions({
@@ -79,14 +79,14 @@ const FilterProductSchema = z.object({
 export const RequestDataSchema = z.object({
 	provider_id: z.string(),
 	page: z.number().optional(),
-	limit: z.number().optional(),
+	// limit: z.number().optional(),
 	filter: FilterSchema.optional(),
 });
 
 export type RequestDataType = z.infer<typeof RequestDataSchema>;
 
 export const RequestFilterProductSchema = z.object({
-	limit: z.number().optional().default(LIMIT_PRODUCT_PAGE),
+	// limit: z.number().default(),
 	page: z.number().optional(),
 	filter: FilterProductSchema,
 });

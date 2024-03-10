@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -7,14 +8,14 @@ import SetAdvert from '../ui/setAdvert';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/services/state/User/auth';
 import { redirectToConnect } from '@/lib/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import AvatarComponent from '../ui/AvatarComponent';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { LIMIT_PRODUCT_PAGE, getAllChildCategoriesOptions } from '@/utils/queryOptions';
+import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { filterCategory } from '@/utils/helpers';
 import { useDebounce } from 'react-use';
 import { get_second_cat } from '@/utils/mock/Menucaegorie';
@@ -28,6 +29,7 @@ const wrapIcon = 'group relative flex flex-col justify-center items-center gap-2
 const contentIcon = 'whitespace-nowrap text-xs';
 const UnderlineHover =
 	'absolute -bottom-1 block h-[2px] w-0 bg-primary opacity-0 transition-all duration-300 group-hover:w-full group-hover:opacity-100';
+const ElementShowSerach = 6;
 
 export default function Header() {
 	const { isAuth, InfoUser } = useAuth();
@@ -40,13 +42,13 @@ export default function Header() {
 		resolver: zodResolver(SearchSchema),
 	});
 	const searchTerm = watch('search');
-	useEffect(() => {
-		console.log('🚀 ~ Header ~ searchTerm:', searchTerm);
-	}, [searchTerm]);
+	const [currentTab, setCurrentTab] = useState(0);
 	useDebounce(
 		() => {
 			if (searchTerm) {
 				const filtered = filterCategory(searchTerm, data);
+				setIsOpen(true);
+				setCurrentTab(0);
 				if (filtered.length !== 0) {
 					setSearchterms({});
 					filtered.forEach((item) => {
@@ -65,7 +67,7 @@ export default function Header() {
 			}
 		},
 		205,
-		[watch('search')]
+		[searchTerm]
 	);
 	useEffect(() => {
 		window.onscroll = (e) => {
@@ -87,9 +89,39 @@ export default function Header() {
 		event.preventDefault();
 		navigate({
 			to: productsRoot.to,
-			search: { filter: { category_id: id, text: searchTerm } , limit: LIMIT_PRODUCT_PAGE},
+			search: { filter: { category_id: id, text: searchTerm }, page: 1 },
 		});
+		handleBlurSearch();
 	}
+	const handleBlurSearch = () => {
+		const timeOut = setTimeout(() => {
+			setIsOpen(false);
+		}, 350);
+		return () => {
+			clearTimeout(timeOut);
+		};
+	};
+
+	useEffect(() => {
+		const handleKeyDown = (e: { keyCode: any }) => {
+			const keyCode = e.keyCode;
+			if (keyCode == 13) {
+				if (currentTab == 0) {
+					goSearchCategory(e, 'all');
+				}
+				const id = Object.keys(searchterms)[currentTab - 1];
+				goSearchCategory(e, id);
+			}
+			if (keyCode == 38 && currentTab >= 1) setCurrentTab(currentTab - 1);
+			if (
+				keyCode == 40 &&
+				currentTab <= Math.min(Object.keys(searchterms).length, ElementShowSerach) - 1
+			)
+				setCurrentTab(currentTab + 1);
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [searchterms, currentTab]);
 	return (
 		<div
 			className={twMerge(
@@ -105,18 +137,18 @@ export default function Header() {
 						<input
 							{...register('search')}
 							name={'search'}
+							// onKeyUp={(e) => {
+							// 	if (e.key === 'Enter') {
+							// 		goSearchCategory(e, 'all');
+							// 		e.preventDefault();
+							// 		// handleSubmit(handleMutate)();
+							// 	}
+							// }}
 							onFocus={() => {
 								setIsOpen(true);
 								//setSearchterms({});
 							}}
-							onBlur={() => {
-								const timeOut = setTimeout(() => {
-									setIsOpen(false);
-								}, 350);
-								return () => {
-									clearTimeout(timeOut);
-								};
-							}}
+							onBlur={handleBlurSearch}
 							type="text"
 							placeholder="Rechercher sur joumiadeals"
 							className="w-full border-0 bg-transparent p-2 text-[.9rem] placeholder:text-slate-600 focus:outline-none"
@@ -126,9 +158,10 @@ export default function Header() {
 						/>
 						<Search
 							size={30}
+							onClick={(event) => goSearchCategory(event, 'all')}
 							strokeWidth={2}
 							absoluteStrokeWidth
-							className="rounded-xl bg-primary p-1 text-white"
+							className="cursor-pointer rounded-xl bg-primary p-1 text-white"
 						/>
 					</div>
 					<div
@@ -138,7 +171,13 @@ export default function Header() {
 						}
 					>
 						{Boolean(searchTerm) && (
-							<button className="ml-6 flex w-[90%] items-center gap-x-1  rounded-md py-1 text-[.825rem] hover:bg-slate-300">
+							<button
+								className={twMerge(
+									'ml-6 flex w-[90%] items-center gap-x-1 rounded-md py-1 text-[.825rem] hover:bg-slate-300',
+									currentTab == 0 && 'bg-slate-300'
+								)}
+								onClick={(event) => goSearchCategory(event, 'all')}
+							>
 								<Search
 									size={25}
 									strokeWidth={2}
@@ -150,11 +189,14 @@ export default function Header() {
 							</button>
 						)}
 						{Object.keys(searchterms)
-							.slice(0, 5)
-							.map((id) => {
+							.slice(0, ElementShowSerach)
+							.map((id, index) => {
 								return (
 									<button
-										className="ml-6 flex w-[90%] items-center gap-x-1 rounded-md py-1 text-[.825rem] hover:bg-slate-300"
+										className={twMerge(
+											'ml-6 flex w-[90%] items-center gap-x-1  rounded-md py-1 text-[.825rem] hover:bg-slate-300',
+											currentTab == index + 1 && 'bg-slate-300'
+										)}
 										key={id}
 										onClick={(event) => goSearchCategory(event, id)}
 									>
@@ -164,14 +206,14 @@ export default function Header() {
 											absoluteStrokeWidth
 											className="min-h-[25px] min-w-[25px] rounded-xl bg-gray-300 p-1 text-black"
 										/>
-										<span className="truncate">{searchTerm}</span>{' '}
+										<span className="truncate">{searchTerm}</span>
 										<span className="text-slate-500">dans</span>
 										<span className="whitespace-nowrap text-primary">{searchterms[id]}</span>
 									</button>
 								);
 							})}
 					</div>
-					<div className=" flex justify-between gap-x-3">
+					<div className="flex justify-between gap-x-3">
 						<Link to="/myprofile/historique" className={wrapIcon}>
 							<Bell size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
 							<span className={contentIcon}>Mon historique</span>

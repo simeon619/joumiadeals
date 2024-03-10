@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import LayoutProduct1 from '@/components/product/LayoutProduct1';
 import SearchFilter from '@/components/profile/SearchFilter';
+import PaginatedComponent from '@/components/ui/PaginatedComponent';
 import { announceRoot } from '@/lib/route';
 import { getProductsByfiltrOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -17,6 +18,7 @@ export default function Myannounce() {
 	const searchParams = announceRoot.useSearch();
 	const { data: products } = useSuspenseQuery(getProductsByfiltrOptions(searchParams));
 	const deferredValue = useDeferredValue(products);
+	const totalProduct = deferredValue.total;
 	return (
 		<div className="mt-8 w-full">
 			<SearchFilter />
@@ -31,6 +33,8 @@ export default function Myannounce() {
 				</div>
 				<div className="col-start-5"></div>
 			</div>
+			<PaginatedComponent totalProduct={totalProduct} pageRoot={announceRoot} />
+
 		</div>
 	);
 }

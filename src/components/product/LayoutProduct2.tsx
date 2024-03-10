@@ -9,11 +9,13 @@ export default function LayoutProduct2({ product }: { product: ProductsData['pro
 	return (
 		<Link
 			to={`/product/$productId`}
+			color='gray'
 			params={{ productId: product.product_id }}
-			key={product.product_id}
+			// replace={false}
+			// key={product.product_id}
 			className="group my-2 grid h-[260px] grid-rows-12"
 		>
-			<div className="row-start-1  row-end-3 flex flex-row items-center  gap-x-2">
+			<div className="row-start-1 row-end-3 flex flex-row items-center  gap-x-2">
 				<img src={product.avatar_url} className="size-7 rounded-full" alt="" />
 				<span className="font-poppins text-xs">{product.name}</span>
 			</div>
