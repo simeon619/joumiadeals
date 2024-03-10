@@ -86,11 +86,11 @@ export default function Header() {
 			: 'scale-0 border-0 opacity-0 pointer-events-none'
 	);
 	function goSearchCategory(event: any, id: string) {
-		event.preventDefault();
 		navigate({
 			to: productsRoot.to,
 			search: { filter: { category_id: id, text: searchTerm }, page: 1 },
 		});
+		event.preventDefault();
 		handleBlurSearch();
 	}
 	const handleBlurSearch = () => {
@@ -107,10 +107,10 @@ export default function Header() {
 			const keyCode = e.keyCode;
 			if (keyCode == 13) {
 				if (currentTab == 0) {
-					goSearchCategory(e, 'all');
+					return goSearchCategory(e, 'all');
 				}
 				const id = Object.keys(searchterms)[currentTab - 1];
-				goSearchCategory(e, id);
+				return goSearchCategory(e, id);
 			}
 			if (keyCode == 38 && currentTab >= 1) setCurrentTab(currentTab - 1);
 			if (
