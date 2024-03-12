@@ -14,17 +14,23 @@ import ActionFavourite from '@/components/ui/ActionFavourite';
 import ModalViewImage from '@/components/ui/ModalViewImage';
 import ModalReport from '@/components/ui/ModalReport';
 import { useNavigate } from '@tanstack/react-router';
+import { useTitle } from 'react-use';
 const shareText = 'Check out this awesome content!';
 const shareUrl = 'https://yourwebsite.com/awesome-content';
 
 export default function ProductDetailPage() {
 	const { productId } = productDetailsRoot.useParams();
+	
 	const { data: productPromise } = useSuspenseQuery(getProductOptions(productId));
 	const { mutate, isSuccess, isPending, data: discussion } = useCreateDiscussionMutaton();
 	const navigate = useNavigate();
 	const product = useDeferredValue(productPromise);
 	const [current, setCurrent] = useState(0);
 	const [api, setApi] = useState<CarouselApi>();
+
+
+	useTitle(productPromise.title);
+	
 
 	useEffect(() => {
 		if (!api) {
@@ -187,33 +193,34 @@ export default function ProductDetailPage() {
 								<div className="flex flex-col gap-y-2 p-5">
 									<p>Contactez via :</p>
 									{product.provider.phone && (
-										<div className={`flex items-center gap-x-2 rounded-md bg-slate-600 px-8 py-2`}>
+										<a
+											href={`https://api.whatsapp.com/send?phone=+225${product.provider.phone}&text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
+											target="_blank"
+											rel="noreferrer"
+											className={`flex items-center gap-x-2 rounded-md bg-slate-600 px-8 py-2 text-white`}
+										>
 											<img
 												src={'/img/WhatsApp.webp'}
 												alt=""
 												className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
 											/>
-
-											<a
-												href={`https://api.whatsapp.com/send?phone=+225${product.provider.phone}&text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
-												target="_blank"
-												rel="noreferrer"
-												className={`text-white`}
-											>
-												Whatsapp
-											</a>
-										</div>
+											Whatsapp
+										</a>
 									)}
-									<div className={`flex gap-x-2 rounded-md bg-green-600 px-8 py-2`}>
+
+									<a
+										href={'tel:+225' + product.provider.phone}
+										className="flex gap-x-2 rounded-md bg-green-600 px-8 py-2 text-white"
+									>
 										<Phone color="white" />
-										<span className={`text-white`}>Telephone</span>
-									</div>
+										Telephone
+									</a>
 									<button
 										onClick={handleCreateMessage}
 										className={`flex gap-x-2 rounded-md bg-primary px-8 py-2`}
 									>
 										<MessageSquareText color="white" />
-										<span className={` text-white`}>Message Direct</span>
+										<span className={` text-white`}>Message direct</span>
 										{isPending && <Loader2 color="white animate-spin" />}
 									</button>
 								</div>

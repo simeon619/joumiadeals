@@ -102,10 +102,9 @@ export const announceRoot = createRoute({
 	validateSearch: (params) => RequestDataSchema.parse(params),
 	// preSearchFilters: [(search)=>({...search,filter:{...search.filter, text: undefined}})],
 
-	loaderDeps: ({ search: { provider_id, filter, limit, page } }) => ({
+	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
 		provider_id,
 		filter,
-		limit,
 		page,
 	}),
 	loader: (opts) => {
@@ -165,10 +164,9 @@ export const profileRoot = createRoute({
 export const productsRoot = createRoute({
 	getParentRoute: () => indexLayout,
 	validateSearch: (params) => RequestFilterProductSchema.parse(params),
-	loaderDeps: ({ search: { filter, limit, page } }) => ({
+	loaderDeps: ({ search: { filter, page } }) => ({
 		filter,
-		limit,
-		page,
+		page
 	}),
 	path: 'products',
 	loader: (opts) => {

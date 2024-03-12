@@ -15,7 +15,7 @@ import { useHideFilter } from '@/services/state/App/hideFilter';
 const className = {
 	titleFilter: 'block py-1 text-sm font-medium text-slate-600',
 	priceButton:
-		' border border-slate-300 bg-white w-1/3 py-[9px] text-slate-700  shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
+		' border border-slate-300 bg-white w-1/3 py-1.5 text-slate-700  shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
 };
 export default function FilterProduct() {
 	const [localisation, setLocalisation] = useState<string | number | undefined>();
@@ -51,7 +51,7 @@ export default function FilterProduct() {
 							defaultValue={cityFilter[0]}
 							onValueChange={(value) => setLocalisation(value)}
 						>
-							<SelectTrigger className="flex rounded-xl border border-slate-300 bg-white  py-5 text-slate-700 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
+							<SelectTrigger className="flex rounded-xl border border-slate-300/50 bg-white  py-0 text-slate-700 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
 								<SelectValue placeholder={cities[0]} />
 							</SelectTrigger>
 							<SelectContent className="bg-white">
@@ -85,7 +85,7 @@ export default function FilterProduct() {
 
 						<button
 							onClick={handleOpen}
-							className={twMerge([className.priceButton, ' w-[100px] rounded-xl '])}
+							className={twMerge([className.priceButton, ' w-[70px] rounded-xl '])}
 						>
 							<span className="">Filtres</span>
 						</button>

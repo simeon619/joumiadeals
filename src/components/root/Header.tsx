@@ -102,20 +102,23 @@ export default function Header() {
 		};
 	};
 
+	
+
 	useEffect(() => {
 		const handleKeyDown = (e: { keyCode: any }) => {
 			const keyCode = e.keyCode;
-			if (keyCode == 13) {
+			if (keyCode == 13 && isOpen) {
 				if (currentTab == 0) {
 					return goSearchCategory(e, 'all');
 				}
 				const id = Object.keys(searchterms)[currentTab - 1];
 				return goSearchCategory(e, id);
 			}
-			if (keyCode == 38 && currentTab >= 1) setCurrentTab(currentTab - 1);
+			if (keyCode == 38 && currentTab >= 1 && isOpen) setCurrentTab(currentTab - 1);
 			if (
 				keyCode == 40 &&
-				currentTab <= Math.min(Object.keys(searchterms).length, ElementShowSerach) - 1
+				currentTab <= Math.min(Object.keys(searchterms).length, ElementShowSerach) - 1 &&
+				isOpen
 			)
 				setCurrentTab(currentTab + 1);
 		};

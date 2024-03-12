@@ -51,8 +51,8 @@ export function useCreateProductMutation() {
 export function useDeleteProductMutation() {
 	return useMutation({
 		mutationFn: deleteProduct,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
 			ToastSuccess("L'annonce a bien été supprimée");
 		},
 		onError: () => {
@@ -116,25 +116,23 @@ export function getProductOptions(id: string) {
 	});
 }
 
-export function useUpdateMutationproduct() {
-	return useMutation({
-		mutationFn: updateProduct,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
-			queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
-			ToastSuccess('Annonce modifie avec success');
-		},
-	});
-}
-
-///****FAVOURITE PRODUCT */
-
 export function getAllFavouriteProductIds() {
 	return queryOptions({
 		queryKey: ['getAllFavouriteProductIds'],
 		queryFn: getFavouriteProductsId,
 		gcTime: Infinity,
 		staleTime: Infinity,
+	});
+}
+///****FAVOURITE PRODUCT */
+export function useUpdateMutationproduct() {
+	return useMutation({
+		mutationFn: updateProduct,
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
+			ToastSuccess('Annonce modifie avec success');
+		},
 	});
 }
 
@@ -153,11 +151,11 @@ export function useAddProductFavouriteMutation() {
 		onError: (_err, _newId, context) => {
 			queryClient.setQueryData(['getAllFavouriteProductIds'], context?.previousIds);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
+		onSettled: async() => {
+			await queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
 		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
 			ToastSuccess('Annonce ajoute au favoris');
 		},
 	});
@@ -166,8 +164,8 @@ export function useAddProductFavouriteMutation() {
 export function useDeleteProductFavouriteMutation() {
 	return useMutation({
 		mutationFn: deleteFavouriteProduct,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
 			ToastSuccess('Annonce supprime des favoris');
 		},
 		onMutate: async (newId) => {
@@ -182,9 +180,9 @@ export function useDeleteProductFavouriteMutation() {
 		onError: (_err, _newId, context) => {
 			queryClient.setQueryData(['getAllFavouriteProductIds'], context?.previousIds);
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
-			queryClient.invalidateQueries({ queryKey: ['getFavouriteProduct'] });
+		onSettled: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
+			await queryClient.invalidateQueries({ queryKey: ['getFavouriteProduct'] });
 		},
 	});
 }
@@ -216,9 +214,8 @@ export function useReportProductMutation() {
 export function useSendMessageMutation() {
 	return useMutation({
 		mutationFn: sendMessage,
-
-		onSuccess: (data) => {
-			queryClient.invalidateQueries({ queryKey: ['getMessages', data?.discussion_id] });
+		onSuccess: async (data) => {
+			await queryClient.invalidateQueries({ queryKey: ['getMessages', data?.discussion_id] });
 			ToastSuccess('ok');
 		},
 		onError: () => {
@@ -230,8 +227,8 @@ export function useSendMessageMutation() {
 export function useCreateDiscussionMutaton() {
 	return useMutation({
 		mutationFn: createDiscussion,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['getDiscussions'] });
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getDiscussions'] });
 			ToastSuccess('ok');
 		},
 		onError: (err) => {

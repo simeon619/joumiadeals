@@ -1,28 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CategoryType } from "@/services/api/product_categorie";
 
-export const filterCategory = (serachTerm : string , data :CategoryType)=>{
-    const titleNormalized = serachTerm.normalize('NFD').replace(/[\u0300-\u036f\s()\-/,+'']/g, '');
-    const titleRegex = new RegExp('.*' + titleNormalized.split(" ").join() + '.*', 'gi');
-    const filtered = data.filter((item) => {
-        const labelNormalized = item.label
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
-        const labelMatch = titleRegex.test(labelNormalized);
-        const caracMatch = item.caracteristique_field.some((carac: { [x: string]: any[] }) => {
-            if (carac && carac['enum']) {
-                return carac['enum'].some((el: string) => {
-                    const elNormalized = el.normalize('NFD').replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
-
-                    const isMatch = titleRegex.test(elNormalized);
-                    return isMatch;
-                });
-            }
-            return false;
-        });
-        return labelMatch || caracMatch;
+export const filterCategory = (searchTerm: string, data: CategoryType) => {
+    const searchTerms = searchTerm
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f\s()\-/,+'']/g, '')
+      .split(/\s+/);
+  
+    const titleRegexes = searchTerms.map(term => new RegExp('.*' + term + '.*', 'gi'));
+  
+    const filtered = data.filter(item => {
+      const labelNormalized = item.label
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
+  
+      const labelMatch = titleRegexes.some(regex => regex.test(labelNormalized));
+  
+      const caracMatch = item.caracteristique_field.some(carac => {
+        if (carac && carac['enum']) {
+          return carac['enum'].some(el => {
+            const elNormalized = el.normalize('NFD').replace(/[\u0300-\u036f\s()\-/,+'']/gi, '');
+            return titleRegexes.some(regex => regex.test(elNormalized));
+          });
+        }
+        return false;
+      });
+  
+      return labelMatch || caracMatch;
     });
-
-    return filtered
-}
+  
+    return filtered;
+  };
