@@ -33,7 +33,7 @@ export default function PopUpComponent({
 			>
 				<div
 					className={twMerge(
-						'duration-300 ease-out',
+						'duration-300 ease-linear',
 						styleContainer,
 						isOpen ? animation[animationName][0] : animation[animationName][1]
 					)}

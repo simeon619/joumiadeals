@@ -32,7 +32,6 @@ export default function MyprofilePage() {
 	const router = useRouter();
 	useEffect(() => {
 		if (!isAuth) {
-			console.log('🚀 ~ useEffect ~ isAuth:', isAuth);
 			router.history.push('/');
 		}
 	}, [isAuth, router.history]);

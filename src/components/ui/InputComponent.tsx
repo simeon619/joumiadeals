@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HTMLInputTypeAttribute } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { InputAdvice } from '../product/InputAdvice';
 
 export default function InputComponent({
 	register,
@@ -12,6 +13,7 @@ export default function InputComponent({
 	defaultValue,
 	style,
 	autoComplete,
+	advices,
 }: {
 	register: any;
 	errors: any;
@@ -22,11 +24,12 @@ export default function InputComponent({
 	defaultValue?: string | number;
 	style?: string;
 	autoComplete?: 'on' | 'off';
+	advices?: string[];
 }) {
 	return (
 		<div className={twMerge('w-full', style)}>
 			<div>
-				<span className="block text-sm font-medium text-slate-700 after:ml-0.5 after:text-gray-500 after:content-['*']">
+				<span className="after:ml-0.5 after:font-serif after:text-[.785rem] after:text-gray-500 after:content-['(obligatoire)']">
 					{label}
 				</span>
 				<input
@@ -43,10 +46,11 @@ export default function InputComponent({
 					autoComplete={autoComplete}
 				/>
 				{
-					<p className={twMerge(errors?.[name] ? 'text-xs text-red-300' : 'text-red-50/0', 'h-4')}>
+					<p className={twMerge(errors?.[name] ? 'text-xs text-red-300 py-1' : 'text-red-50/0', 'h-4')}>
 						{errors?.[name]?.message}
 					</p>
 				}
+				{advices && <InputAdvice advices={advices} />}
 			</div>
 		</div>
 	);

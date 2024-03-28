@@ -118,7 +118,7 @@ export default function Discussion() {
 	}, [Discussions, search]);
 
 	return (
-		<div className={'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-slate-400'}>
+		<div className={'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-slate-200'}>
 			<div className="grid h-[85dvh] max-h-[85dvh] grid-cols-16 gap-x-2 p-2 ">
 				<div className="col-start-1 col-end-4 h-full overflow-y-auto rounded-xl  bg-white  scrollbar-thin">
 					<div className={'sticky top-0 flex items-center justify-around py-2'}>
@@ -142,7 +142,7 @@ export default function Discussion() {
 									className={twMerge(
 										'flex w-full flex-row p-1 gap-x-2 outline-0 truncate items-start transition-colors duration-300',
 										discSelect?.discussion_id === discussion.discussion_id &&
-											'bg-slate-400 rounded-e-lg text-white'
+											'bg-slate-200 rounded-e-lg text-black'
 									)}
 									key={discussion.discussion_id}
 									onClick={() => setDiscSelect(discussion)}
@@ -332,13 +332,13 @@ export default function Discussion() {
 							className={`text-white`}
 						>
 							<img
-								src={'/img/WhatsApp.webp'}
+								src={'/img/whatsapp.png'}
 								alt=""
 								className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
 							/>
 						</a>
 						<div className={`flex gap-x-2 rounded-md bg-green-600 p-1`}>
-							<Phone color="white" />
+							<Phone color="white" size={20} />
 						</div>
 						<Link
 							to={`/product/$productId`}

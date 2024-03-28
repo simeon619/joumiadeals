@@ -1,10 +1,9 @@
-import HeaderAuth from '@/components/auth/HeaderAuth';
 import { Outlet } from '@tanstack/react-router';
 
 export default function AuthLayout() {
 	return (
 		<div className="select-none">
-			<HeaderAuth />
+			{/* <HeaderAuth /> */}
 			<div>
 				<hr />
 				<Outlet />

@@ -4,20 +4,19 @@ import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { ChangeEvent, useEffect, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { useFirstMountState } from 'react-use';
-export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) {
+export default function InputCategorie({ item, valueSave }: { item: FieldOptionsType[0] , valueSave?: string | number | undefined}) {
 	const { name, placeholder, type, require, icon, default: defaultValue } = item;
 	const isFirstMount = useFirstMountState();
 	const { valueInput, setValueInputs, errorInput, setErrorInputs } = useInputCategorie(
 		(state) => state
 	);
-
 	useEffect(() => {
 		if (require) {
 			setValueInputs({ [name]: type === 'number' ? 0 : '' });
 		}
 
 		if (isFirstMount) {
-			setValueInputs({ [name]: defaultValue });
+			setValueInputs({ [name]: valueSave || defaultValue });
 		}
 	}, []);
 
@@ -36,7 +35,7 @@ export default function InputCategorie({ item }: { item: FieldOptionsType[0] }) 
 				<span
 					className={twMerge(
 						`block text-sm font-medium text-slate-700 `,
-						Boolean(require) && "after:ml-0.5 after:text-red-500 after:content-['*']"
+						Boolean(require) && "after:ml-0.5 after:font-serif after:text-[.785rem] after:text-gray-500 after:content-['(obligatoire)']"
 					)}
 				>
 					{name}

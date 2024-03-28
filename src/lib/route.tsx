@@ -32,16 +32,15 @@ import {
 } from '@/utils/queryOptions';
 import CreateProduct from '@/pages/index/CreateProduct';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useAuth } from '@/services/state/User/auth';
+import { UserType, useAuth } from '@/services/state/User/auth';
 import ProfilePage from '@/pages/profile/index/ProfilePage';
 import Myannounce from '@/pages/profile/Myannounce';
 import MyFavourite from '@/pages/profile/MyFavourite';
-import { getProducts, pageSchema } from '@/services/api/product_categorie';
+import { pageSchema } from '@/services/api/product_categorie';
 import { Suspense } from 'react';
 import Discussion from '@/pages/profile/Discussion';
 import { z } from 'zod';
 // import { getDiscussions } from '@/services/api/discussions';
-
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
@@ -52,11 +51,15 @@ const rootRoute = createRootRouteWithContext<{
 				<Outlet />
 			</Suspense>
 			{/* <TanStackRouterDevtools position="bottom-right" /> */}
-			<ReactQueryDevtools initialIsOpen={false} buttonPosition='bottom-left' />
+			<ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
 		</>
 	),
 	beforeLoad() {
 		useAuth.getState().verifToken();
+		//@ts-expect-error dert
+		addEventListener('iui', (event : {detail :UserType}) => {
+			useAuth.getState().login(event.detail);
+		});
 	},
 });
 
@@ -113,6 +116,7 @@ export const announceRoot = createRoute({
 	},
 	wrapInSuspense: true,
 	component: Myannounce,
+	errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
 	// shouldReload: true,
 });
 
@@ -130,18 +134,19 @@ export const visitedRoot = createRoute({
 	path: 'historique',
 	component: () => <div>historique</div>,
 });
-export const discussionSchema = z.object({  discussionId: z.string().optional() })
+export const discussionSchema = z.object({ discussionId: z.string().optional() });
 
 export const discussionRoot = createRoute({
 	getParentRoute: () => indexLayout,
 	path: 'discussion',
-	component: 	Discussion,
+	component: Discussion,
 	// parseParams: (params) => ({
 	// 	discussionId: z.string().optional().parse(params),
 	// }),
-	validateSearch: (params) =>  discussionSchema.parse(params),
+	validateSearch: (params) => discussionSchema.parse(params),
 	// loaderDeps: ({ search: { } }) => ({ page , limit }),
-	loader : ({ context: { queryClient }}) => queryClient.ensureQueryData(getDiscussionsQueryOptions()),
+	loader: ({ context: { queryClient } }) =>
+		queryClient.ensureQueryData(getDiscussionsQueryOptions()),
 });
 
 const homeRoot = createRoute({
@@ -166,7 +171,7 @@ export const productsRoot = createRoute({
 	validateSearch: (params) => RequestFilterProductSchema.parse(params),
 	loaderDeps: ({ search: { filter, page } }) => ({
 		filter,
-		page
+		page,
 	}),
 	path: 'products',
 	loader: (opts) => {
@@ -174,8 +179,7 @@ export const productsRoot = createRoute({
 		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
 	},
 	wrapInSuspense: true,
-	
-	
+
 	component: ProductsPage,
 });
 

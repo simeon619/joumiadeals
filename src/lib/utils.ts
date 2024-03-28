@@ -108,6 +108,21 @@ function isDate(a: any): a is string {
 	return true;
 }
 
+export const handleConnect = (e: any) => {
+	e.preventDefault();
+	const screenWidth = window.screen.width;
+	const screenHeight = window.screen.height;
+	const windowWidth = Math.min(screenWidth * 0.8, 500);
+	const windowHeight = Math.min(screenHeight * 0.8, 600);
+	const windowLeft = Math.round((screenWidth - windowWidth) / 2);
+	const windowTop = Math.round((screenHeight - windowHeight) / 2);
+	window.open(
+		'/login',
+		'_blank',
+		`toolbar=yes,scrollbars=yes,resizable=yes,top=${windowTop},left=${windowLeft},width=${windowWidth},height=${windowHeight}`
+	);
+};
+
 export function ToastError(message: string) {
 	toast.error(message, {
 		position: 'top-center',

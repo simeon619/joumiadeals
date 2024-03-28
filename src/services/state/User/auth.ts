@@ -108,10 +108,8 @@ export const useAuth = create(
 				},
 
 				login: (dataS: UserType) => {
-					console.log('🚀 ~ dataS:', dataS);
 					const infoUser = userSchema.safeParse(dataS);
 					if (!infoUser.success) {
-						console.log(infoUser.error);
 						toast.error('Une erreur est survenue, veuillez reessayer', {
 							position: 'top-center',
 							style: { background: '#f87171', color: 'white' },
@@ -123,6 +121,7 @@ export const useAuth = create(
 						position: 'top-center',
 						style: { background: 'green', color: 'white' },
 					});
+					if(infoUser.success)
 					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
 
@@ -144,17 +143,14 @@ export const useAuth = create(
 					set(() => ({ InfoUser: infoUser.data, isAuth: true }));
 				},
 				editMe: async (dataS: UserUpdateType) => {
-					console.log('🚀 ~ editMe: ~ dataS:', dataS);
 					const response = await fetch(`${BASE_URL}/edit_me`, {
 						method: 'PUT',
 						headers: getHeaders(),
 						body: JSON.stringify(dataS),
 					});
 					const data = await response.json();
-					console.log('🚀 ~ editMe: ~ dataddsd:', data);
 					const infoUser = userUpdateSchema.safeParse(data);
 					if (!infoUser.success) {
-						console.log(infoUser.error);
 						toast.error('Une erreur est survenue, veuillez reessayer', {
 							position: 'top-center',
 							style: { background: '#f87171', color: 'white' },

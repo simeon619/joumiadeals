@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { Textarea } from '@/components/ui/textarea';
 import { twMerge } from 'tailwind-merge';
+import { InputAdvice } from '../product/InputAdvice';
 
 export default function TextAreaComponent({
 	register,
@@ -10,6 +11,7 @@ export default function TextAreaComponent({
 	name,
 	placeholder,
 	defaultValue,
+	advices,
 }: {
 	register: any;
 	errors: any;
@@ -17,11 +19,12 @@ export default function TextAreaComponent({
 	name: string;
 	placeholder: string;
 	defaultValue?: string;
+	advices?: string[];
 }) {
 	return (
 		<div className="mt-5 w-full">
 			<div>
-				<span className="block text-sm font-medium text-slate-700 after:ml-0.5 after:text-gray-500 after:content-['*']">
+				<span className="after:ml-0.5 after:font-serif after:text-[.785rem] after:text-gray-500 after:content-['(obligatoire)']">
 					{label}
 				</span>
 				<textarea
@@ -38,10 +41,11 @@ export default function TextAreaComponent({
 					placeholder={placeholder}
 				/>
 				{
-					<p className={twMerge(errors?.[name] && 'text-xs text-red-300', 'h-3')}>
+					<p className={twMerge(errors?.[name] && 'text-xs  text-red-300', 'h-3')}>
 						{errors?.[name]?.message}
 					</p>
 				}
+				{advices && <InputAdvice advices={advices} />}
 			</div>
 		</div>
 	);

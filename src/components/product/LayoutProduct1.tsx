@@ -4,11 +4,7 @@ import { formatPrice } from '@/lib/utils';
 import { FieldOptionsType, ProductsMinType } from '@/services/api/product_categorie';
 import { URL_IMAGE } from '@/utils/constante';
 import { formatDate } from '@/utils/formating';
-import {
-	getAllChildCategoriesOptions,
-
-	useDeleteProductMutation,
-} from '@/utils/queryOptions';
+import { getAllChildCategoriesOptions, useDeleteProductMutation } from '@/utils/queryOptions';
 import { Link } from '@tanstack/react-router';
 import {
 	BadgeX,
@@ -29,6 +25,7 @@ import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import ModalEditProduct from '../ui/ModalEditProduct';
 import ActionFavourite from '../ui/ActionFavourite';
 import ModalConfirmation from '../ui/ModalConfirmation';
+import ModalBoostAnnouce from '../ui/ModalBoostAnnouce';
 const size_icon = 19;
 const className = {
 	actionButton:
@@ -43,6 +40,18 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const [fieldCharac, setFieldCharac] = useState<FieldOptionsType>([]);
 	const [modalConfirm, setModalConfirm] = useState(false);
+	const [showModalBoost, setShowModalBoost] = useState(false);
+
+	const openModalBoost = (e: any) => {
+		e.preventDefault();
+		setShowModalBoost(true);
+		document.body.style.overflow = 'hidden';
+	};
+
+	const closeModalBoost = () => {
+		setShowModalBoost(false);
+		document.body.style.overflow = 'auto';
+	};
 	const openModalConfirm = (e: any) => {
 		e.preventDefault();
 		setModalConfirm(true);
@@ -143,6 +152,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 											className.actionButton,
 											'border-slate-40 bg-yellow-400 hover:bg-yellow-300',
 										])}
+										onClick={openModalBoost}
 									>
 										<Rocket size={size_icon} />
 										<span className={className.text}>Booster</span>
@@ -201,6 +211,12 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 				showPopUp={modalConfirm}
 				message={"Voulez vous supprimez l'annnoce"}
 				confirm={deleteAnnounce}
+			/>
+			<ModalBoostAnnouce
+				closePopUp={closeModalBoost}
+				showPopUp={showModalBoost}
+				product={product}
+				// confirm={boostAnnounce}
 			/>
 		</>
 	);

@@ -1,7 +1,7 @@
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { Nbr_Image_Upload, URL_IMAGE } from '@/utils/constante';
 import { X } from 'lucide-react';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 type Files = (
 	| string
@@ -42,7 +42,9 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 			{images.map((image, i) => {
 				return (
 					<div
-						className={twMerge('h-[120px] w-[155px] cursor-grab overflow-hidden bg-slate-400/10')}
+						className={twMerge(
+							'relative h-[120px] w-[155px]  cursor-grab overflow-hidden bg-slate-400/10'
+						)}
 						key={i}
 						draggable="true"
 						onDragStart={() => handleDragStart(i)}
@@ -50,7 +52,7 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 						onDragEnd={handleDragEnd}
 					>
 						<div
-							className={`relative rounded-sm bg-cover bg-center bg-no-repeat object-contain`}
+							className={` rounded-sm bg-cover bg-center bg-no-repeat object-contain`}
 							style={{
 								backgroundImage: `url(${typeof image === 'string' ? URL_IMAGE + image : image.buffer})`,
 								width: '100%',
@@ -60,12 +62,12 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 							aria-label={'image preview'}
 						>
 							<X
-								className="absolute right-1 top-1 z-10 cursor-pointer rounded-full bg-white/20 p-[1px] text-red-700"
+								className="absolute -right-0  cursor-pointer rounded-full bg-gray-800 p-[1px] text-red-700"
 								onClick={() => removeFiles(i)}
 								size={20}
 							/>
-							<span className="absolute bottom-1 right-1 bg-black/50 px-1 text-xs font-bold text-white">
-								{i + 1}/{Nbr_Image_Upload}
+							<span className="absolute bottom-1  left-1 z-20 bg-black/50 px-1 text-xs font-bold text-white">
+								{i === 0 ? 'photo principale' : i + 1 + '/' + Nbr_Image_Upload}
 							</span>
 						</div>
 					</div>

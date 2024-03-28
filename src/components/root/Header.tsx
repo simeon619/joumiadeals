@@ -7,7 +7,7 @@ import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/services/state/User/auth';
-import { redirectToConnect } from '@/lib/utils';
+import { handleConnect, redirectToConnect } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import AvatarComponent from '../ui/AvatarComponent';
@@ -39,7 +39,7 @@ export default function Header() {
 	const [searchterms, setSearchterms] = useState<Record<string, string>>({});
 	const navigate = useNavigate({ from: productsRoot.fullPath });
 	const { watch, register } = useForm<SearchSchemaType>({
-		resolver: zodResolver(SearchSchema),
+		resolver: zodResolver(SearchSchema)
 	});
 	const searchTerm = watch('search');
 	const [currentTab, setCurrentTab] = useState(0);
@@ -53,7 +53,6 @@ export default function Header() {
 					setSearchterms({});
 					filtered.forEach((item) => {
 						const searchT = get_second_cat(item.id, data);
-
 						if (searchT) {
 							setSearchterms((prev) => ({
 								...prev,
@@ -102,8 +101,6 @@ export default function Header() {
 		};
 	};
 
-	
-
 	useEffect(() => {
 		const handleKeyDown = (e: { keyCode: any }) => {
 			const keyCode = e.keyCode;
@@ -140,20 +137,12 @@ export default function Header() {
 						<input
 							{...register('search')}
 							name={'search'}
-							// onKeyUp={(e) => {
-							// 	if (e.key === 'Enter') {
-							// 		goSearchCategory(e, 'all');
-							// 		e.preventDefault();
-							// 		// handleSubmit(handleMutate)();
-							// 	}
-							// }}
 							onFocus={() => {
 								setIsOpen(true);
-								//setSearchterms({});
 							}}
 							onBlur={handleBlurSearch}
 							type="text"
-							placeholder="Rechercher sur joumiadeals"
+							placeholder="Rechercher sur adjameDeals"
 							className="w-full border-0 bg-transparent p-2 text-[.9rem] placeholder:text-slate-600 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
@@ -239,8 +228,14 @@ export default function Header() {
 								<div className={UnderlineHover} />
 							</Link>
 						) : (
-							<button className={wrapIcon} onClick={redirectToConnect}>
-								<User size={SIZE_ICON} strokeWidth={2} absoluteStrokeWidth />
+							<button className={wrapIcon} 
+							onClick={handleConnect}
+							>
+								<img
+									src={'/img/google.png'}
+									alt=""
+									className={`size-5 bg-cover bg-center bg-no-repeat text-white`}
+								/>
 								<span className={contentIcon}>{'Se connecter'}</span>
 								<div className={UnderlineHover} />
 							</button>

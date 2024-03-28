@@ -16,7 +16,7 @@ export default function SelectCategorie({
 }: {
 	values: (string | number)[];
 	label: string;
-	defaultValue?: string;
+	defaultValue?: string | number | undefined;
 	require?: boolean;
 }) {
 	const { setValueInputs } = useInputCategorie((state) => state);
@@ -27,7 +27,7 @@ export default function SelectCategorie({
 		if (require) {
 			setValueInputs({ [label]: '' });
 		}
-		if (defaultValue){
+		if (defaultValue) {
 			setValueInputs({ [label]: defaultValue });
 		}
 	}, []);
@@ -37,7 +37,8 @@ export default function SelectCategorie({
 			<span
 				className={twMerge(
 					`block text-sm font-medium text-slate-700 `,
-					Boolean(require) && "after:ml-0.5 after:text-red-500 after:content-['*']"
+					Boolean(require) &&
+						"after:ml-0.5 after:text-[.785rem] after:font-serif after:text-gray-500 after:content-100 after:content-['(obligatoire)']"
 				)}
 			>
 				{label}

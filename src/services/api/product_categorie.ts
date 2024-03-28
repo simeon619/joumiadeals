@@ -191,6 +191,7 @@ export async function getProducts(requestData: RequestFilterProductType) {
 		}),
 	});
 	const data = await response.json();
+	console.log('🚀 ~ getProducts ~ data:', data);
 	const products = ProductShemaPaginate.safeParse(data);
 	if (!products.success) {
 		console.log(products.error);

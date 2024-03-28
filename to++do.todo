@@ -23,3 +23,18 @@ mettre en favoris , cree recommendation, partageez , nombre de produit postez , 
 
 filter product don't work when not login
 supression foreign key
+
+
+/////////////////////////////////////
+
+
+1-faire la page de mettre annonce en urgence
+2-photo de profil de l'utilisateur
+3-responsivite media query
+
+
+
+server
+
+1) filterproduct work only with after login
+2) 

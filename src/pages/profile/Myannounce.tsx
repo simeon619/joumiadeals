@@ -34,7 +34,6 @@ export default function Myannounce() {
 				<div className="col-start-5"></div>
 			</div>
 			<PaginatedComponent totalProduct={totalProduct} pageRoot={announceRoot} />
-
 		</div>
 	);
 }

@@ -6,7 +6,8 @@ import InputComponent from '@/components/ui/InputComponent';
 import InputFileComponent from '@/components/ui/InputFileComponent';
 import SelectCategorie from '@/components/ui/SelectCategorie';
 import SwitchInputCategori from '@/components/ui/SwitchInputCategori';
-import { ToastError, ToastSuccess, ToastWarn } from '@/lib/utils';
+import { ToastError, ToastSuccess, ToastWarn, handleConnect } from '@/lib/utils';
+import { AlarmCheck } from 'lucide-react';
 import { CategoryType, FieldOptionsType } from '@/services/api/product_categorie';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { z } from 'zod';
@@ -35,6 +36,8 @@ import { useAuth } from '@/services/state/User/auth';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
 import { useDebounce } from 'react-use';
 import { filterCategory } from '@/utils/helpers';
+import { adviceTitleAnnouce } from '@/utils/constante';
+import { useDataInputState } from '@/services/state/App/dataInputState';
 export const ProductSchema = z.object({
 	title: z
 		.string()
@@ -42,9 +45,9 @@ export const ProductSchema = z.object({
 		.max(40, { message: 'titre trop long' }),
 	description: z
 		.string()
-		.min(3, { message: 'description doit contenir au moins 3 caractere' })
+		.min(10, { message: 'description doit contenir au moins 10 caractere' })
 		.max(1300, { message: 'description trop longue' }),
-	price: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
+	price: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)) && parseInt(val, 10) >= 0, {
 		message: "le prix n'est pas valide",
 	}),
 });
@@ -52,21 +55,33 @@ export type ProductSchemaType = z.infer<typeof ProductSchema>;
 export default function CreateProduct() {
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const account = useAuth((state) => state.InfoUser);
-	const [childsCategorie, setChildsCategorie] = useState<CategoryType>();
-	const [labelList, setLabelList] = useState<{ label: string; id: string }[]>([]);
-	const [lastChild, setLastChild] = useState<CategoryType[0]>();
-	const [fieldCharac, setFieldCharac] = useState<FieldOptionsType>([]);
-	const [productSelect, setProductSelect] = useState<CategoryType[0]>();
-	const [labelSuggest, setLabelSuggest] = useState<string>('');
-	const [suggestCategory, setSuggestCategory] = useState<
-		{ id: string; suggest: string; icon: string | null }[]
-	>([]);
+	const {
+		childsCategorie,
+		setChildsCategorie,
+		labelList,
+		setLabelList,
+		fieldCharac,
+		setFieldCharac,
+		productSelect,
+		setProductSelect,
+		labelSuggest,
+		setLabelSuggest,
+		suggestCategory,
+		step,
+		setStep,
+		lastChild,
+		setLastChild,
+		removeLabel,
+		setSuggestCategory,
+		mainInput,
+		setMainInput,
+	} = useDataInputState((state) => state);
 	const valueInput = useInputCategorie((state) => state.valueInput);
-	const [step, setStep] = useState<'one' | 'two' | 'three'>('one');
 	const resetAll = useInputCategorie((state) => state.resetAll);
 	const filesData = useInputCategorie((state) => state.filesData);
 	const errorInput = useInputCategorie((state) => state.errorInput);
 	const navigate = useNavigate();
+	const isAuth = useAuth((state) => state.isAuth);
 	useResetScrollBar();
 	const mutation = useCreateProductMutation();
 	useEffect(() => {
@@ -78,10 +93,23 @@ export default function CreateProduct() {
 		register,
 		handleSubmit,
 		watch,
+		setValue,
 		formState: { errors },
 	} = useForm<ProductSchemaType>({
 		resolver: zodResolver(ProductSchema),
 	});
+	useEffect(() => {
+		const title = watch('title');
+		const price = watch('price');
+		const description = watch('description');
+		setMainInput({ title: title, price: price, description: description });
+	}, [watch('title'), watch('price'), watch('description')]);
+
+	useEffect(() => {
+		setValue('title', mainInput.title);
+		setValue('price', mainInput.price);
+		setValue('description', mainInput.description);
+	}, []);
 	useDebounce(
 		() => {
 			const title = watch('title')?.trim();
@@ -97,7 +125,6 @@ export default function CreateProduct() {
 					return item;
 				})
 				.slice(0, 7);
-
 			const dataSuggest = recup.map((item) => {
 				const dataSA = get_all_parents(item?.id, data);
 				const icon = get_first_cat_icon(item?.id, data)!;
@@ -115,7 +142,6 @@ export default function CreateProduct() {
 	const getChildCategorie = (categorieId: string | null) => {
 		const allChild = get_children(categorieId, data);
 		if (allChild?.length == 0) {
-			// const cat = getCategorieById(categorieId || '', data);
 			const characteristics = get_caracteristique_child(categorieId, data);
 			const mergedArray = characteristics.reduce((acc, curr) => acc.concat(curr), []);
 			setFieldCharac(mergedArray);
@@ -131,9 +157,7 @@ export default function CreateProduct() {
 		setFieldCharac([]);
 		const parent = get_parent(lastChild?.parent_category_id || null, data);
 		setLastChild(parent);
-		setLabelList((prev) => {
-			return prev.slice(0, -1);
-		});
+		removeLabel();
 	};
 
 	const forwad = (id: string) => {
@@ -145,17 +169,7 @@ export default function CreateProduct() {
 			setProductSelect(cat);
 			setStep('one');
 		}
-		setLabelList((prev) => {
-			if (!cat.parent_category_id) {
-				return [{ label: cat.label, id: cat.id }];
-			}
-			const index = prev.findIndex((c) => c.label == cat.label);
-			if (index == -1 && cat.is_parentable === 0) {
-				return [...prev, { label: cat.label, id: cat.id }];
-			}
-
-			return prev;
-		});
+		setLabelList(cat);
 
 		const parent = get_parent(id, data);
 		const childs = getChildCategorie(id);
@@ -200,7 +214,7 @@ export default function CreateProduct() {
 	// }
 
 	return (
-		<div className="mt-8 flex w-app self-center">
+		<div className="mt-2 flex w-app self-center">
 			<div className="grid grid-cols-6 gap-x-5 border-slate-800">
 				<div
 					className={twMerge(
@@ -246,7 +260,18 @@ export default function CreateProduct() {
 				>
 					<div className="my-5 flex gap-x-2">
 						{labelSuggest ? (
-							<span>{labelSuggest}</span>
+							<span>
+								{labelSuggest.split(' > ').map((l, i, arr) => {
+									return (
+										<span
+											className={`${i == arr.length - 1 ? 'text-base font-semibold underline' : "text-sm after:mx-1 after:content-['>']"}`}
+											key={i}
+										>
+											{l}
+										</span>
+									);
+								})}
+							</span>
 						) : (
 							<>
 								{Object.values(labelList).map((cat) => {
@@ -256,12 +281,23 @@ export default function CreateProduct() {
 										</div>
 									);
 								})}
-								<span className="text-base underline">{productSelect?.label}</span>
+								<span className="text-base font-semibold underline">{productSelect?.label}</span>
 							</>
 						)}
 					</div>
 					{/* {fieldCharac.length == 0 && <p className="text-center">Aucune caractéristique</p>} */}
 					<form className="mb-10 flex flex-col justify-center">
+						{/* <div className={'my-3 flex items-center rounded-lg border  p-2 shadow-sm'}>
+							<AlarmCheck />
+							<div>
+								<h1>Info</h1>
+								<ul className="text-xs">
+									<li>one</li>
+									<li>two</li>
+									<li>three</li>
+								</ul>
+							</div>
+						</div> */}
 						<div className="flex flex-col">
 							<InputComponent
 								label="Titre de l'annonce"
@@ -271,26 +307,27 @@ export default function CreateProduct() {
 								register={register}
 								errors={errors}
 								autoComplete="off"
+								advices={adviceTitleAnnouce}
 							/>
 							<div className={twMerge('flex flex-col ', suggestCategory.length > 0 && 'bg-gray-100 p-2')}>
 								{suggestCategory?.length > 0 && (
-									<span className="font-semibold text-gray-700 underline">
+									<span className="mb-2 font-semibold text-gray-700 underline">
 										Choisissez une categorie suggere:
 									</span>
 								)}
-								<div className=" flex flex-col items-center gap-y-3">
+								<div className=" flex flex-col  gap-y-3">
 									{suggestCategory?.map((c, i) => {
 										return (
 											<button
 												type="button"
 												onClick={(e) => {
 													forwad(c.id);
-													setLabelSuggest(() => c.suggest);
+													setLabelSuggest(c.suggest);
 
-													setSuggestCategory(() => []);
+													setSuggestCategory([]);
 													e.preventDefault();
 												}}
-												className="flex items-start gap-x-2 text-sm text-gray-700 hover:text-primary"
+												className="ml-[5%] flex items-start gap-x-2 text-sm text-gray-700 hover:text-primary"
 												key={i}
 											>
 												{c?.icon && <img src={c?.icon} alt="logo" className="size-5" />}
@@ -315,6 +352,7 @@ export default function CreateProduct() {
 								</button>
 							</div>
 						</div>
+
 						<InputComponent
 							label="prix de l'annonce"
 							name="price"
@@ -329,11 +367,12 @@ export default function CreateProduct() {
 							placeholder="Description de l'annonce"
 							register={register}
 							errors={errors}
+							advices={adviceTitleAnnouce}
 						/>
 						<InputFileComponent name={"photo de l'annonce"} max={5} />
 						{fieldCharac.map((item, i) => {
 							if (item.field === 'text' || item.field === 'number') {
-								return <InputCategorie item={item} key={i} />;
+								return <InputCategorie valueSave={valueInput[item.name]} item={item} key={i} />;
 							}
 							if (item.field === 'select') {
 								return (
@@ -342,30 +381,47 @@ export default function CreateProduct() {
 										values={item.enum || []}
 										label={item.name}
 										require={item.require}
+										defaultValue={valueInput[item.name]}
 									/>
 								);
 							}
 							// if (item.field === 'file') {
 							// 	return <InputFileComponent name={item.name} max={item.max} key={i} />;
 							// }
-							if (item.field === 'date') {
-								return <DateInputCategori item={item} key={i} />;
-							}
-							if (item.field === 'checkbox') {
-								return <SwitchInputCategori item={item} key={i} />;
-							}
+							// if (item.field === 'date') {
+							// 	return <DateInputCategori item={item} key={i} />;
+							// }
+							// if (item.field === 'checkbox') {
+							// 	return <SwitchInputCategori item={item} key={i} />;
+							// }
 						})}
 						{fieldCharac.length !== 0 && (
-							<div className="my-4 flex w-full flex-row items-center justify-center gap-x-2">
-								<button
-									disabled={mutation.isPending}
-									className={twMerge('w-1/2 rounded-sm bg-primary p-2 text-white my-4')}
-									type="submit"
-									onClick={handleSubmit(onSubmit)}
-								>
-									{mutation.isPending ? 'Creation en cours...' : "creer l'annonce"}
-								</button>
-							</div>
+							<>
+								<div className="my-4 flex w-full flex-row items-center justify-center gap-x-2">
+									{!isAuth ? (
+										<button
+											onClick={handleConnect}
+											className="flex items-center gap-x-2 rounded-lg border bg-gray-200 px-3 py-2 shadow-lg"
+										>
+											<span className={''}>connecter vous pour continuer</span>
+											<img
+												src={'/img/google.png'}
+												alt=""
+												className={`size-5 bg-cover bg-center bg-no-repeat text-white`}
+											/>
+										</button>
+									) : (
+										<button
+											disabled={mutation.isPending}
+											className={twMerge('w-1/2 rounded-sm bg-primary p-2 text-white my-4')}
+											type="submit"
+											onClick={handleSubmit(onSubmit)}
+										>
+											{mutation.isPending ? 'Creation en cours...' : "creer l'annonce"}
+										</button>
+									)}
+								</div>
+							</>
 						)}
 					</form>
 				</div>

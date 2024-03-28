@@ -166,7 +166,7 @@ export default function ProductDetailPage() {
 									key={product.id}
 									productId={product.id}
 									style={
-										'flex flex-col items-center  justify-between rounded-xl   bg-gray-400   px-2 py-1 hover:text-slate-600'
+										'flex flex-col items-center justify-between rounded-xl bg-gray-400 px-2 py-1 hover:text-slate-600'
 									}
 								/>
 							</div>
@@ -200,7 +200,7 @@ export default function ProductDetailPage() {
 											className={`flex items-center gap-x-2 rounded-md bg-slate-600 px-8 py-2 text-white`}
 										>
 											<img
-												src={'/img/WhatsApp.webp'}
+												src={'/img/whatsapp.png'}
 												alt=""
 												className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
 											/>
