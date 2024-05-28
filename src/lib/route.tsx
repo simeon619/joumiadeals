@@ -57,7 +57,7 @@ const rootRoute = createRootRouteWithContext<{
 	beforeLoad() {
 		useAuth.getState().verifToken();
 		//@ts-expect-error dert
-		addEventListener('iui', (event : {detail :UserType}) => {
+		addEventListener('iui', (event: { detail: UserType }) => {
 			useAuth.getState().login(event.detail);
 		});
 	},
@@ -100,7 +100,6 @@ export const myprofileRoot = createRoute({
 
 export const announceRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
-
 	path: '/',
 	validateSearch: (params) => RequestDataSchema.parse(params),
 	// preSearchFilters: [(search)=>({...search,filter:{...search.filter, text: undefined}})],
@@ -116,7 +115,7 @@ export const announceRoot = createRoute({
 	},
 	wrapInSuspense: true,
 	component: Myannounce,
-	errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
+	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
 	// shouldReload: true,
 });
 
@@ -155,14 +154,27 @@ const homeRoot = createRoute({
 	component: HomePage,
 });
 export const profileRoot = createRoute({
-	getParentRoute: () => indexLayout,
-	path: 'profile/$profileId',
+	getParentRoute: () => profileLayout,
+	path: 'otherProfile',
+	validateSearch: (params) => RequestDataSchema.parse(params),
+	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
+		provider_id,
+		filter,
+		page,
+	}),
+	loader: (opts) => {
+		opts.context.queryClient.ensureQueryData(getProductsByfiltrOptions(opts.deps));
+		// opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
+		opts.context.queryClient.ensureQueryData(accountQueryOptions(opts.deps.provider_id));
+	},
+	wrapInSuspense: true,
 	// parseParams: (params) => ({
 	// 	profileId: z.string().parse(String(params.profileId)),
 	// }),
-	errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
-	loader: ({ context: { queryClient }, params: { profileId } }) =>
-		queryClient.ensureQueryData(accountQueryOptions(profileId)),
+	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
+	// loader: ({ context: { queryClient }, params: { profileId } }) =>
+	// 	queryClient.ensureQueryData(accountQueryOptions(profileId)),
+
 	component: ProfilePage,
 });
 
@@ -174,6 +186,7 @@ export const productsRoot = createRoute({
 		page,
 	}),
 	path: 'products',
+
 	loader: (opts) => {
 		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
 		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());

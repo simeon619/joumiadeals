@@ -12,7 +12,7 @@ const AccountSchema = z.object({
 	avatar_url: z.string().url(),
 	access_id: z.string(),
 	phone: z.string(),
-	acl_id: z.string().nullable(),
+	// acl_id: z.string().nullable(),
 	created_at: z.string(),
 	updated_at: z.string(),
 });
@@ -22,7 +22,7 @@ const ProductSchema = z.object({
 	title: z.string(),
 	price: z.number(),
 	description: z.string(),
-	status: z.number(),
+	status: z.string(),
 	photos: z.string().transform((data) => JSON.parse(data) as string[]),
 	express_time: z.string().nullable(),
 	last_appearance: z.string().nullable(),
@@ -182,8 +182,8 @@ const MessageCreateSchema = z.object({
 	product_id: z.string(),
 	created_at: z.string(),
 	updated_at: z.string(),
-  });
-  
+});
+
 //   type MessageCreateType = z.infer<typeof MessageCreateSchema>;
 
 export const createDiscussion = async ({ product_id }: { product_id: string }) => {

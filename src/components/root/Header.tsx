@@ -87,7 +87,7 @@ export default function Header() {
 	function goSearchCategory(event: any, id: string) {
 		navigate({
 			to: productsRoot.to,
-			search: { filter: { category_id: id, text: searchTerm }, page: 1 },
+			search: { filter: { category_id: id, text: searchTerm , status: ['VALID','AWAIT']}, page: 1 },
 		});
 		event.preventDefault();
 		handleBlurSearch();
@@ -223,7 +223,7 @@ export default function Header() {
 							<div className={UnderlineHover} />
 						</Link>
 						{isAuth ? (
-							<Link className={wrapIcon} to={'/myprofile'} search={{ provider_id: InfoUser.id }}>
+							<Link className={wrapIcon} to={'/myprofile'} search={{ provider_id: InfoUser.id , filter: { status: ['AWAIT', 'VALID'] }}}>
 								<AvatarComponent name={InfoUser.name} url={InfoUser.avatar_url || ''} />
 								<div className={UnderlineHover} />
 							</Link>
@@ -247,3 +247,5 @@ export default function Header() {
 		</div>
 	);
 }
+
+// node ace make:model moderateurProduct -m

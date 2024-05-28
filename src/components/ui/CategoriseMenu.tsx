@@ -68,7 +68,7 @@ export default function CategoriseMenu() {
 														<NavigationMenuLink asChild>
 															<Link
 																to={productsRoot.to}
-																search={{ filter: { category_id: Categorie.split(':')[1] }, page: 1 }}
+																search={{ filter: { category_id: Categorie.split(':')[1],status : ["VALID"] }, page: 1 }}
 																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
 																// mask={{ search : Categorie.split(':')[0] }}
 															>
@@ -81,7 +81,7 @@ export default function CategoriseMenu() {
 																<NavigationMenuLink key={item} asChild>
 																	<Link
 																		to={productsRoot.to}
-																		search={{ filter: { category_id: item.split(':')[1] }, page: 1 }}
+																		search={{ filter: { category_id: item.split(':')[1], status : ["VALID"]}, page: 1 }}
 																		className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
 																	>
 																		{item.split(':')[0]}

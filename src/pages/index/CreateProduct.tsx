@@ -206,7 +206,7 @@ export default function CreateProduct() {
 		ToastSuccess('Annonce crée avec succès');
 		navigate({
 			to: announceRoot.to,
-			search: { provider_id: account.id, filter: { order_by: 'date_desc' } },
+			search: { provider_id: account.id, filter: { order_by: 'date_desc' , status : ["AWAIT", "VALID"]} },
 		});
 	}
 	// if (mutation.isError) {

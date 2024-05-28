@@ -54,7 +54,7 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 						<div
 							className={` rounded-sm bg-cover bg-center bg-no-repeat object-contain`}
 							style={{
-								backgroundImage: `url(${typeof image === 'string' ? URL_IMAGE + image : image.buffer})`,
+								backgroundImage: `url(${typeof image === 'string' ? URL_IMAGE + image : image?.buffer})`,
 								width: '100%',
 								height: '100%',
 							}}

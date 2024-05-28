@@ -19,7 +19,7 @@ import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-que
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
 import { getDiscussions, sendMessage } from '@/services/api/discussions';
-export const LIMIT_PRODUCT_PAGE = 3;
+export const LIMIT_PRODUCT_PAGE = 6;
 //user
 export function accountQueryOptions(accountId: string) {
 	return queryOptions({
@@ -42,8 +42,9 @@ export function useCreateProductMutation() {
 		mutationKey: ['createProduct'],
 		mutationFn: createProduct,
 		onSuccess: () => {},
-		onError: () => {
+		onError: (e) => {
 			ToastError('Une erreur est survenue lors de la création du produit');
+			ToastError(e.message);
 		},
 	});
 }
@@ -63,28 +64,28 @@ export function useDeleteProductMutation() {
 
 const OrderBy = z.enum(['date_desc', 'date_asc', 'price_desc', 'price_asc']);
 
+const FilterProductSchema = z.object({
+	category_id: z.string(),
+	order_by: OrderBy.optional(),
+	text: z.string().optional(),
+	status: z.array(z.string()),
+	price: z.tuple([z.number(), z.number()]).optional(),
+});
 const FilterSchema = z.object({
 	category_id: z.string().optional(),
 	order_by: OrderBy.optional(),
 	text: z.string().optional(),
 	price: z.tuple([z.number(), z.number()]).optional(),
-});
-const FilterProductSchema = z.object({
-	category_id: z.string(),
-	order_by: OrderBy.optional(),
-	text: z.string().optional(),
-	price: z.tuple([z.number(), z.number()]).optional(),
+	status: z.array(z.string()),
 });
 
 export const RequestDataSchema = z.object({
 	provider_id: z.string(),
 	page: z.number().optional(),
-	// limit: z.number().optional(),
-	filter: FilterSchema.optional(),
+	filter: FilterSchema
 });
 
 export type RequestDataType = z.infer<typeof RequestDataSchema>;
-
 export const RequestFilterProductSchema = z.object({
 	// limit: z.number().default(),
 	page: z.number().optional(),
@@ -151,7 +152,7 @@ export function useAddProductFavouriteMutation() {
 		onError: (_err, _newId, context) => {
 			queryClient.setQueryData(['getAllFavouriteProductIds'], context?.previousIds);
 		},
-		onSettled: async() => {
+		onSettled: async () => {
 			await queryClient.invalidateQueries({ queryKey: ['getAllFavouriteProductIds'] });
 		},
 		onSuccess: async () => {
@@ -234,6 +235,7 @@ export function useCreateDiscussionMutaton() {
 		onError: (err) => {
 			console.log(err);
 			ToastError('Une erreur est survenue lors de la création de la discussion');
+			ToastError(err.message);
 		},
 	});
 }

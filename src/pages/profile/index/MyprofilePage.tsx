@@ -76,7 +76,7 @@ export default function MyprofilePage() {
 				{(
 					[
 						['/myprofile', 'Mes annonces', true, InfoUser?.id],
-						// ['/myprofile/discussion', 'Discussions'],
+						//['/myprofile/discussion', 'Discussions'],
 						['/myprofile/favourite', 'Favoris'],
 						['/myprofile/historique', 'Mon historique'],
 					] as const
@@ -89,7 +89,11 @@ export default function MyprofilePage() {
 							activeProps={{ className: `text-primary rounded-2xl p-1` }}
 							className="p-2"
 							// target='haut'
-							search={provider_id ? { provider_id: provider_id } : { page: 1 }}
+							search={
+								provider_id
+									? { provider_id: provider_id, filter: { status: ['VALID', 'AWAIT' ] } }
+									: { page: 1 }
+							}
 						>
 							{label}
 						</Link>

@@ -29,7 +29,7 @@ export default function PaginatedComponent({
 	}, [pageParam]);
 	useEffect(() => {
 		//ts-ignore
-		navigate({ search: (old) => ({ ...old, page: page }), replace: true });
+		navigate({ search: (old) => ({ ...old, page: page }) });
 	}, [page]);
 
 	const totalPages = Math.ceil(totalProduct / LIMIT_PRODUCT_PAGE);
@@ -41,7 +41,6 @@ export default function PaginatedComponent({
 		start = 1;
 		end = totalPages;
 	}
-
 	const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
 	return (
 		<Pagination>

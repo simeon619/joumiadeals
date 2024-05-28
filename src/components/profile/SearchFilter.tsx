@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FilterProductType } from '@/pages/profile/Myannounce';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import  {  useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDebounce, useFirstMountState } from 'react-use';
+import { useDebounce } from 'react-use';
 import {
 	Select,
 	SelectContent,
@@ -10,7 +11,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { twMerge } from 'tailwind-merge';
-import { announceRoot } from '@/lib/route';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
@@ -25,15 +25,15 @@ const filt = {
 	'prix croissant': 'price_asc',
 	'prix decroissant': 'price_desc',
 } as const;
-export default function SearchFilter() {
-	const searchParams = announceRoot.useSearch();
+export default function SearchFilter({ componentRoot }: { componentRoot: any }) {
+	const searchParams = componentRoot.useSearch();
 	const { register, watch } = useForm<FilterProductType>({
 		resolver: zodResolver(filterProductSchema),
 	});
-	function getKeyByValue(object: { [s: string]: unknown; } | ArrayLike<unknown>, value: unknown) {
-		return Object.entries(object).find(([key, val]) => val === value)?.[0];
+	function getKeyByValue(object: { [s: string]: unknown } | ArrayLike<unknown>, value: unknown) {
+		return Object.entries(object).find(([_, val]) => val === value)?.[0];
 	}
-	const navigate = useNavigate({ from: announceRoot.fullPath });
+	const navigate = useNavigate({ from: componentRoot.fullPath });
 	const searchTerm = watch('search');
 	const price = watch(['price_min', 'price_max']);
 	const { filter: filtParams } = searchParams;
@@ -197,7 +197,7 @@ export default function SearchFilter() {
 	);
 
 	return (
-		<div className="mb-16 flex flex-wrap items-center justify-start gap-4 px-4 ">
+		<div className="mb-8 flex flex-wrap items-center justify-start gap-4 px-4 ">
 			<div className=" ">
 				<span className="block text-sm font-medium text-slate-700">Rechercher</span>
 				<input

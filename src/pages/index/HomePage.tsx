@@ -38,7 +38,7 @@ export default function HomePage() {
 												role="img"
 												aria-label={item.name}
 											>
-												<div className="absolute bottom-0 size-full bg-gradient-to-b from-black/[.01] to-black/[.91]" />
+												<div className="absolute bottom-0 size-full bg-gradient-to-t from-slate-900" />
 												<span className="absolute bottom-[40%] font-bold text-slate-50">{item.name}</span>
 											</div>
 										</div>

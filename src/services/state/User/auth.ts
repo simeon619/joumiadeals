@@ -22,7 +22,7 @@ const userUpdateSchema = z.object({
 	avatar_url: z.string().nullable(),
 	created_at: z.string(),
 	email: z.string(),
-	id: z.string(),
+	id: z.number(),
 	location: z.string(),
 	name: z.string(),
 	use_whatsapp: z.number(),
@@ -113,7 +113,8 @@ export const useAuth = create(
 						toast.error('Une erreur est survenue, veuillez reessayer', {
 							position: 'top-center',
 							style: { background: '#f87171', color: 'white' },
-						});
+						});		
+					
 						return;
 					}
 					setToken(infoUser.data.token);
@@ -121,8 +122,8 @@ export const useAuth = create(
 						position: 'top-center',
 						style: { background: 'green', color: 'white' },
 					});
-					if(infoUser.success)
-					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
+					if (infoUser.success)
+						set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
 
 				me: async () => {
@@ -191,7 +192,7 @@ export const useAuth = create(
 						method: 'GET',
 						headers: getHeaders(),
 					});
-					if(!response.ok) {
+					if (!response.ok) {
 						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
 					}
 					const data = await response.json();

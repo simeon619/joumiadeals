@@ -30,7 +30,7 @@ export function setToken(value: string): void {
 }
 
 export function getToken(): string {
-	const item = localStorage.getItem('yoken');
+	const item = localStorage.getItem('token');
 	if (!item) {
 		return '';
 	}

@@ -29,7 +29,7 @@ export default function RegisterPage() {
 	});
 	const router = useRouter();
 	const [city, setCity] = useState<string>(cities[0]);
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 	const searchParams = router.latestLocation.search as {
 		name: string;
 		email: string;
@@ -37,7 +37,7 @@ export default function RegisterPage() {
 		oauth_provider_name: string;
 		oauth_client_id: string;
 	};
-	const { register: registerUser, isAuth , InfoUser } = useAuth();
+	const { register: registerUser, isAuth, InfoUser } = useAuth();
 	const name = searchParams.name;
 	const email = searchParams.email!;
 	const avatar_url = searchParams.avatar_url as string;
@@ -53,11 +53,11 @@ export default function RegisterPage() {
 	useLayoutEffect(() => {
 		if (isAuth && InfoUser.id) {
 			navigate({
-				to : myprofileRoot.to,
-				search: { provider_id: InfoUser.id },
-			})
+				to: myprofileRoot.to,
+				search: { provider_id: InfoUser.id, filter: { status: ['AWAIT', 'VALID'] } },
+			});
 		}
-	}, [isAuth,InfoUser]);
+	}, [isAuth, InfoUser]);
 	const onSubmit: SubmitHandler<RegisterSchemaType> = (data) => {
 		const dataToSend = {
 			location: city,

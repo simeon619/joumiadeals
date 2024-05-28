@@ -1,5 +1,5 @@
 // import { useRouter } from "@tanstack/react-router"
-import { discussionRoot, productDetailsRoot } from '@/lib/route';
+import { discussionRoot, productDetailsRoot, profileRoot } from '@/lib/route';
 import { formatDate } from '@/utils/formating';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { BadgeInfo, Expand, Loader2, MessageSquareText, Phone, Share2, X } from 'lucide-react';
@@ -20,7 +20,7 @@ const shareUrl = 'https://yourwebsite.com/awesome-content';
 
 export default function ProductDetailPage() {
 	const { productId } = productDetailsRoot.useParams();
-	
+
 	const { data: productPromise } = useSuspenseQuery(getProductOptions(productId));
 	const { mutate, isSuccess, isPending, data: discussion } = useCreateDiscussionMutaton();
 	const navigate = useNavigate();
@@ -28,9 +28,7 @@ export default function ProductDetailPage() {
 	const [current, setCurrent] = useState(0);
 	const [api, setApi] = useState<CarouselApi>();
 
-
 	useTitle(productPromise.title);
-	
 
 	useEffect(() => {
 		if (!api) {
@@ -177,14 +175,25 @@ export default function ProductDetailPage() {
 					</div>
 					<div className={`col-start-9 col-end-13`}>
 						<div className="m-3 shadow-md">
-							<button className="flex flex-row items-center gap-x-4  p-4">
+							<button
+								onClick={() =>
+									navigate({
+										to: '/otherProfile',
+										search: {
+											provider_id: product.provider.id,
+											filter: { status: ['AWAIT', 'VALID', 'REJECT'] },
+										},
+									})
+								}
+								className="flex flex-row items-center gap-x-4  p-4"
+							>
 								<img src={product.provider.avatar_url} className="size-14 rounded-full" alt="" />
 								<div className={`flex flex-col items-start gap-y-2`}>
 									<div className={`flex flex-col items-start`}>
-										<span className="">{product.provider.name}</span>
-										<span className={`text-xs `}>{product.provider.location}</span>
+										<span className="font-bold">{product.provider.name}</span>
+										<span className={`text-xs underline`}>{product.provider.location}</span>
 									</div>
-									<span className={`text-xs underline`}>
+									<span className={`text-xs text-gray-500`}>
 										Membre depuis {formatDate(product.provider.created_at)}
 									</span>
 								</div>

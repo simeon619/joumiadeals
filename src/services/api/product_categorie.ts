@@ -109,6 +109,7 @@ export async function createProduct(data: {
 	for (const key in dataProduct) {
 		formData.append(key, dataProduct[key]);
 	}
+
 	photos.forEach((photo, index) => {
 		if (typeof photo !== 'string')
 			formData.append(
@@ -117,17 +118,18 @@ export async function createProduct(data: {
 				`photo_${index}.${photo.file.type.split('/')[1]}`
 			);
 	});
+	const response = await fetch(`${BASE_URL}/create_product`, {
+		method: 'POST',
+		headers: getHeadersWithFormData(),
+		body: formData,
+	});
 	try {
-		const response = await fetch(`${BASE_URL}/create_product`, {
-			method: 'POST',
-			headers: getHeadersWithFormData(),
-			body: formData,
-		});
-
-		if (!response.ok) {
-			throw new Error('Erreur lors de la création du produit');
-		}
+		console.log('🚀 ~ response:', response);
 		const data = await response.json();
+		if (!response.ok) {
+			// throw new Error('Erreur lors de la création du produit');
+			throw new Error(data.message);
+		}
 		console.log('Données du produit créé :', data);
 		return data;
 	} catch (error) {
@@ -139,14 +141,15 @@ const ProductMinSchema = z.object({
 	avatar_url: z.string(),
 	photos: z.array(z.string()),
 	price: z.number(),
-	name: z.string(),
+	provider_name: z.string(),
+	provider_id: z.string(),
 	location: z.string(),
 	category_id: z.string(),
 	express_time: z.string().nullable(),
 	description: z.string(),
 	title: z.string(),
 	caracteristique: z.any(),
-	status: z.number(),
+	status: z.string(),
 	product_id: z.string(),
 	product_created_at: z.string(),
 });
@@ -169,6 +172,7 @@ export async function getProductsByFiltr(requestData: RequestDataType) {
 		body: JSON.stringify({ ...requestData, limit: LIMIT_PRODUCT_PAGE }),
 	});
 	const data = await response.json();
+	console.log('🚀 ~ getProductsByFiltr ~ data:', data);
 	const products = ProductShemaPaginate.safeParse(data);
 	if (!products.success) {
 		console.log(products.error);
@@ -212,12 +216,14 @@ const ProviderSchema = z.object({
 	updated_at: z.string(),
 });
 
+export type ProviderType = z.infer<typeof ProviderSchema>;
+
 const ProductDetailSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	price: z.number(),
 	description: z.string(),
-	status: z.number(),
+	status: z.string(),
 	photos: z.array(z.string()),
 	express_time: z.nullable(z.string()),
 	last_appearance: z.nullable(z.string()),
@@ -276,10 +282,10 @@ export async function updateProduct(dataUpdate: {
 
 	const photos = photosFile.map((photo, index) => {
 		if (typeof photo !== 'string') {
-			const gt = `photos_${index}`;
-			return gt;
+			return `photos_${index}`;
 		} else return photo;
 	});
+	formData.append('photos', JSON.stringify(photos));
 
 	photosFile.forEach((photo, index) => {
 		if (typeof photo !== 'string') {
@@ -290,7 +296,6 @@ export async function updateProduct(dataUpdate: {
 			);
 		}
 	});
-	formData.append('photos', JSON.stringify(photos));
 	try {
 		const response = await fetch(`${BASE_URL}/update_product`, {
 			method: 'PUT',
