@@ -4,6 +4,7 @@ import { formatDate } from '@/utils/formating';
 import { Link } from '@tanstack/react-router';
 import ActionFavourite from '../ui/ActionFavourite';
 import { formatPrice } from '@/lib/utils';
+import FeatureComponent from './FeatureComponent';
 
 export default function LayoutProduct2({ product }: { product: ProductsData['products'][0] }) {
 	return (
@@ -41,36 +42,23 @@ export default function LayoutProduct2({ product }: { product: ProductsData['pro
 						<div className="grid h-full  grid-cols-12 ">
 							<div className="col-start-1 col-end-12 flex h-full flex-col items-start justify-between">
 								<div className="flex flex-col gap-y-2">
-									<span className="text-[.975rem] font-semibold text-slate-900 group-hover:text-primary">
+									<span className="font-roboto text-[1.175rem] font-semibold text-slate-900 group-hover:text-primary">
 										{product.title}
 									</span>
 									<span className="text-[.975rem] font-bold text-slate-900">
 										{formatPrice(product.price)}
 									</span>
 								</div>
-								<div className="flex gap-x-5">
-									{Object.keys(product.caracteristique)
-										.slice(0, 4)
-										.map((key) => {
-											return (
-												<span className="flex flex-col items-start justify-center text-xs" key={key}>
-													<span className="text-xs capitalize text-gray-500">{key}</span>
-													<span className="text-[.8rem] font-light capitalize text-gray-900">
-														{product.caracteristique[key]}
-													</span>
-												</span>
-											);
-										})}
-								</div>
-								<div className="flex flex-row items-center gap-x-1">
-									<span className=" px-1 font-sans text-xs font-light text-gray-900">
+								<FeatureComponent productId={product.product_id} />
+								<div className="flex flex-row items-center gap-x-1 font-poppins">
+									<span className=" px-1 text-xs font-light text-gray-900">
 										{product.location}
 									</span>
-									<div className="size-[3px]  bg-black" />
+									<div className="size-[3px]  bg-gray-600" />
 									{product.express_time ? (
 										<></>
 									) : (
-										<span className=" px-1 font-sans text-xs font-light text-gray-900">
+										<span className=" px-1 text-xs font-light text-gray-600">
 											{formatDate(product.product_created_at)}
 										</span>
 									)}

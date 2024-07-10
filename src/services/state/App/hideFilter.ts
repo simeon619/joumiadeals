@@ -4,12 +4,18 @@ import { combine, persist } from 'zustand/middleware';
 export const useHideFilter = create(
 	combine(
 		{
-			value: false,
+			value: 0 as number,
+			direction : 'up' as 'up' | 'down',
 		},
 		(set) => ({
-			toggleValue: async (value: boolean) => {
+			setScrollPercent: async (value: number) => {
 				set(() => ({
 					value,
+				}));
+			},
+			setDirection: async (value: 'up' | 'down') => {
+				set(() => ({
+					direction: value,
 				}));
 			},
 		})

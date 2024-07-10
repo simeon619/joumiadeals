@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatPrice } from '@/lib/utils';
-import { FieldOptionsType, ProductsMinType } from '@/services/api/product_categorie';
+import { ProductsMinType } from '@/services/api/product_categorie';
 import { URL_IMAGE } from '@/utils/constante';
 import { formatDate } from '@/utils/formating';
-import { getAllChildCategoriesOptions, useDeleteProductMutation } from '@/utils/queryOptions';
+import { getFeatureProductOptions, useDeleteProductMutation } from '@/utils/queryOptions';
 import { Link } from '@tanstack/react-router';
 import {
 	BadgeX,
@@ -16,29 +16,28 @@ import {
 	Share2,
 	SquarePen,
 } from 'lucide-react';
-import { twMerge } from 'tailwind-merge';
 import { useCallback, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { get_caracteristique_child } from '@/utils/mock/Menucaegorie';
+// import { get_caracteristique_child } from '@/utils/mock/Menucaegorie';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
-import ModalEditProduct from '../ui/ModalEditProduct';
 import ActionFavourite from '../ui/ActionFavourite';
-import ModalConfirmation from '../ui/ModalConfirmation';
 import ModalBoostAnnouce from '../ui/ModalBoostAnnouce';
-const size_icon = 19;
+import ModalConfirmation from '../ui/ModalConfirmation';
+import ModalEditProduct from '../ui/ModalEditProduct';
+import FeatureComponent from './FeatureComponent';
+const size_icon = 16;
 const className = {
 	actionButton:
 		'flex flex-row items-center justify-center gap-1 border bg-white border-slate-100 p-1 rounded-md text-black',
-	text: 'text-sm',
+	text: 'text-xs',
 };
 
 export default function LayoutProduct1({ product }: { product: ProductsMinType[0] }) {
 	const mutation = useDeleteProductMutation();
+	
 	// const route = useRouter();
 	// const account = useAuth((state) => state.InfoUser);
-	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
-	const [fieldCharac, setFieldCharac] = useState<FieldOptionsType>([]);
 	const [modalConfirm, setModalConfirm] = useState(false);
 	const [showModalBoost, setShowModalBoost] = useState(false);
 
@@ -67,9 +66,9 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 	const openPopUp = useCallback((e: any) => {
 		e.preventDefault();
 		setShowPopUp(true);
-		const characteristics = get_caracteristique_child(product.category_id, data);
-		const mergedArray = characteristics.reduce((acc, curr) => acc.concat(curr), []);
-		setFieldCharac(mergedArray);
+		// const characteristics = get_caracteristique_child(product.category_id, data);
+		// const mergedArray = characteristics.reduce((acc, curr) => acc.concat(curr), []);
+		// setFieldCharac(mergedArray);
 		setFiles(product.photos);
 		document.body.style.overflow = 'hidden';
 	}, []);
@@ -96,7 +95,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 				<div className="row-start-1 row-end-11 border-b-[1px] border-slate-200">
 					<div className="grid h-full grid-cols-12 gap-2 py-1 pl-1">
 						<div
-							className={`group relative col-start-1 col-end-5 flex justify-center rounded-md bg-slate-400 bg-cover bg-center bg-no-repeat`}
+							className={`group relative col-start-1 col-end-5 flex justify-center overflow-hidden rounded-md bg-slate-400 bg-cover bg-center bg-no-repeat`}
 							style={{
 								backgroundImage: `url(${URL_IMAGE}${product.photos[0]})`,
 								width: '100%',
@@ -113,28 +112,30 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 							<ActionFavourite
 								key={product.product_id}
 								productId={product.product_id}
-								style={'absolute right-3 top-3 '}
+								style={
+									'absolute  opacity-0 right-3 top-3 transition-all duration-300 group-hover:opacity-100 '
+								}
 							/>
-							<div className="absolute inset-x-0 bottom-0 flex  justify-center gap-x-6 bg-slate-950/60">
+							<div className="absolute inset-x-0 -bottom-10 flex  justify-center gap-x-6 bg-slate-950 font-sans  transition-all duration-300 group-hover:bottom-0">
 								<div
 									title="nombre de vue sur l'annonce"
 									className="flex flex-row items-center justify-center gap-1 text-white"
 								>
-									<span className="font-bold">0</span>
+									<span className="">0</span>
 									<Eye size={size_icon} />
 								</div>
 								<div
 									title="nombre de conversation sur l'annonce"
 									className="flex flex-row items-center justify-center gap-1 text-white"
 								>
-									<span className="font-bold">0</span>
+									<span className="">0</span>
 									<MessageSquare size={size_icon} />
 								</div>
 								<div
 									title="nombre de partage sur l'annonce"
 									className="flex flex-row items-center justify-center gap-1 text-white"
 								>
-									<span className="font-bold">0</span>
+									<span className="">0</span>
 									<Share2 size={size_icon} />
 								</div>
 							</div>
@@ -144,6 +145,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 								<span className="text-lg text-stone-950">{product.title}</span>
 								<span className="font-roboto text-base text-stone-950">{formatPrice(product.price)}</span>
 							</div>
+							<FeatureComponent productId={product.product_id} />
 							<div className="flex flex-col justify-between gap-y-6">
 								<div className="flex flex-row flex-wrap items-center justify-between">
 									<button
@@ -160,7 +162,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 
 									<button
 										className={twMerge([className.actionButton, 'border-blue-400 hover:bg-slate-500 '])}
-										onClick={openPopUp}
+										onClick={(e) => openPopUp(e)}
 									>
 										<SquarePen size={size_icon} />
 										<span className={className.text}>Modifier</span>
@@ -168,7 +170,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 									<button
 										className={twMerge([
 											className.actionButton,
-											'border-slate-40 hover:bg-slate-200  text-black',
+											'border-slate-40 hover:bg-slate-200 text-black',
 										])}
 									>
 										<Pause size={size_icon} />
@@ -192,7 +194,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 										)}
 									</button>
 								</div>
-								<span className="text-sm font-light text-gray-900 shadow-sm">
+								<span className="font-roboto text-xs text-gray-900 shadow-sm">
 									{formatDate(product.product_created_at)}
 								</span>
 							</div>
@@ -200,12 +202,7 @@ export default function LayoutProduct1({ product }: { product: ProductsMinType[0
 					</div>
 				</div>
 			</Link>
-			<ModalEditProduct
-				product={product}
-				closePopUp={closePopUp}
-				showPopUp={showPopUp}
-				fieldCharac={fieldCharac}
-			/>
+			<ModalEditProduct product={product} closePopUp={closePopUp} showPopUp={showPopUp} />
 			<ModalConfirmation
 				closePopUp={closeModalConfirm}
 				showPopUp={modalConfirm}

@@ -1,4 +1,3 @@
-import { useHideFilter } from '@/services/state/App/hideFilter';
 import { Link } from '@tanstack/react-router';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,9 +6,9 @@ export default function Name() {
 	return (
 		<Link
 			to="/"
-			className={twMerge('font-poppins text-3xl font-extrabold tracking-tighter text-primary')}
+			className={twMerge('font-poppins text-xl font-extrabold tracking-tighter text-primary')}
 		>
-			adjameDeals
+			amedeals
 		</Link>
 	);
 }

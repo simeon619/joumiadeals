@@ -4,9 +4,12 @@ import {
 	createProduct,
 	deleteFavouriteProduct,
 	deleteProduct,
+	get_feature_values_product,
 	getAllChildCategories,
+	getAllFeatures,
 	getFavouriteProduct,
 	getFavouriteProductsId,
+	getFeaturesCategory,
 	getProduct,
 	getProducts,
 	getProductsByFiltr,
@@ -19,8 +22,8 @@ import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-que
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
 import { getDiscussions, sendMessage } from '@/services/api/discussions';
-export const LIMIT_PRODUCT_PAGE = 6;
-//user
+export const LIMIT_PRODUCT_PAGE = 7;
+
 export function accountQueryOptions(accountId: string) {
 	return queryOptions({
 		queryKey: ['account', accountId],
@@ -36,12 +39,31 @@ export const getAllChildCategoriesOptions = () => {
 		staleTime: Infinity,
 	});
 };
-
+export function getAllfeaturesOptions () {
+	return queryOptions({
+		queryKey: ['Allfeatures'],
+		queryFn: getAllFeatures,
+		gcTime: Infinity,
+		staleTime: Infinity,
+	});
+}
+export function getFeaturesCategoryOptions(category_id: string ) {
+	return queryOptions({
+	  queryKey: ["features", category_id],
+	  queryFn: () => getFeaturesCategory({ category_id }),
+	  // enabled: Boolean(category_id),
+	  placeholderData: keepPreviousData
+	});
+  }
 export function useCreateProductMutation() {
 	return useMutation({
 		mutationKey: ['createProduct'],
 		mutationFn: createProduct,
-		onSuccess: () => {},
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
+			await queryClient.invalidateQueries({ queryKey: ['products'] });
+			ToastSuccess('Le produit a bien été crée');
+		},
 		onError: (e) => {
 			ToastError('Une erreur est survenue lors de la création du produit');
 			ToastError(e.message);
@@ -49,6 +71,14 @@ export function useCreateProductMutation() {
 	});
 }
 
+export function getFeatureProductOptions(product_id : string) {
+	return queryOptions({
+		queryKey: ['featuresValues', product_id],
+		queryFn: () => get_feature_values_product({  product_id }),
+		placeholderData: keepPreviousData
+		
+	})
+}
 export function useDeleteProductMutation() {
 	return useMutation({
 		mutationFn: deleteProduct,

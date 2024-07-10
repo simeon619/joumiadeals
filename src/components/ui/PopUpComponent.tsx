@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PropsWithChildren } from 'react';
 import { twMerge } from 'tailwind-merge';
 const animation = {
@@ -13,25 +16,41 @@ export default function PopUpComponent({
 	children,
 	styleContainer,
 	animationName = 'zoom',
+	setHide,
+	position = 'center',
 }: PropsWithChildren<{
 	isOpen: boolean;
 	styleContainer?: string;
 	animationName?: keyof typeof animation;
+	setHide?: (value?: any) => void;
+	position?: 'start' | 'end' | 'center';
 }>) {
+	const handleHideModal = (e: any) => {
+		const isOutSide = e.target.firstChild?.getAttribute?.('data-outside');
+		if (setHide && isOutSide) {
+			setHide(false);
+		}
+	};
 	return (
 		<div
 			role="dialog"
 			aria-modal="true"
 			aria-label="edit/create"
-			className={twMerge('relative z-50')}
+			className={twMerge(
+				'relative',
+				isOpen ? 'pointer-events-auto block' : 'pointer-events-none hidden w-[0vw] h-[0vh]'
+			)}
+			tabIndex={-1}
+			onClick={handleHideModal}
 		>
 			<div
 				className={twMerge(
-					`fixed inset-0 z-50 flex items-start justify-center bg-black/65 duration-100 ease-in-out`,
+					`fixed z-60 inset-0 flex justify-${position} bg-black/65 duration-100 ease-in-out`,
 					isOpen ? 'opacity-100  pointer-events-auto' : 'opacity-0 pointer-events-none'
 				)}
 			>
 				<div
+					data-outside="outside"
 					className={twMerge(
 						'duration-300 ease-linear',
 						styleContainer,

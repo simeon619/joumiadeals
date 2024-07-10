@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useDropzone } from 'react-dropzone';
-import { useCallback, useMemo, useState } from 'react';
-import { Image } from 'lucide-react';
-import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { ToastError } from '@/lib/utils';
-import UploadImage from './UploadImage';
+import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { Nbr_Image_Upload } from '@/utils/constante';
+import { Image } from 'lucide-react';
+import { useMemo } from 'react';
+import { useDropzone } from 'react-dropzone';
+import UploadImage from './UploadImage';
 export default function InputFileComponent({
 	max = Nbr_Image_Upload,
 	maxSize = 12 * 1024 * 1024,
@@ -17,6 +17,11 @@ export default function InputFileComponent({
 }) {
 	const setFilesData = useInputCategorie((state) => state.setFilesData);
 	const files = useInputCategorie((state) => state.filesData);
+
+	// useMemo(() => {
+	// 	files.every((f) => {
+	// 	})
+	// },[files])
 	
 	const images = useMemo(
 		() =>

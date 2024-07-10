@@ -1,4 +1,4 @@
-import { CategoryType, FieldOptionsType } from '@/services/api/product_categorie';
+import { CategoryType, f_form_type,  } from '@/services/api/product_categorie';
 import { create } from 'zustand';
 import { combine } from 'zustand/middleware';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -9,7 +9,7 @@ export const useDataInputState = create(
 			{
 				labelList: [] as { label: string; id: string }[],
 				lastChild: {} as CategoryType[0],
-				fieldCharac: [] as FieldOptionsType,
+				fieldCharac: [] as f_form_type[],
 				productSelect: {} as CategoryType[0] | undefined,
 				childsCategorie: [] as CategoryType,
 				labelSuggest: '',
@@ -19,11 +19,11 @@ export const useDataInputState = create(
 					title : '',
 					description : '',
 					price : '',
-				} as { title : string; description : string; price : string },
+				} as { title : string | number; description : string | number; price : string | number },
 			},
 			(set) => ({
 				setStep: (step: 'one' | 'two' | 'three') => set((state) => ({ ...state, step })),
-				setMainInput : (mainInput : { title : string; description : string; price : string }) => set((state) => ({ ...state, mainInput })),
+				setMainInput : (mainInput : { title : string | number; description : string | number; price : string | number }) => set((state) => ({ ...state, mainInput })),
 				removeLabel: () => set((state) => ({ ...state, labelList: state.labelList.slice(0, -1) })),
 				setLabelList: (data: CategoryType[0]) => {
 					if (!data.parent_category_id) {
@@ -48,7 +48,7 @@ export const useDataInputState = create(
 						...state,
 						lastChild,
 					})),
-				setFieldCharac: (fieldCharac: FieldOptionsType) =>
+				setFieldCharac: (fieldCharac: f_form_type[]) =>
 					set((state) => ({
 						...state,
 						fieldCharac,

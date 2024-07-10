@@ -37,23 +37,15 @@ import ProfilePage from '@/pages/profile/index/ProfilePage';
 import Myannounce from '@/pages/profile/Myannounce';
 import MyFavourite from '@/pages/profile/MyFavourite';
 import { pageSchema } from '@/services/api/product_categorie';
-import { Suspense } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import Discussion from '@/pages/profile/Discussion';
 import { z } from 'zod';
+import RootPage from '@/components/root/RootPage';
 // import { getDiscussions } from '@/services/api/discussions';
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
-	component: () => (
-		<>
-			<ScrollRestoration getKey={(location) => location.pathname} />
-			<Suspense fallback={<div>Loading...</div>}>
-				<Outlet />
-			</Suspense>
-			{/* <TanStackRouterDevtools position="bottom-right" /> */}
-			<ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-		</>
-	),
+	component:  RootPage,
 	beforeLoad() {
 		useAuth.getState().verifToken();
 		//@ts-expect-error dert
@@ -82,7 +74,7 @@ const profileLayout = createRoute({
 
 export const loginRoot = createRoute({
 	getParentRoute: () => authLayout,
-	path: 'login',
+	path: 'connexion',
 	component: LoginPage,
 });
 

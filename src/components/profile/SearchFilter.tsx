@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FilterProductType } from '@/pages/profile/Myannounce';
-import  {  useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useDebounce } from 'react-use';
 import {
 	Select,
 	SelectContent,
@@ -10,10 +6,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { twMerge } from 'tailwind-merge';
+import { FilterProductType } from '@/pages/profile/Myannounce';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDebounce } from 'react-use';
+import { twMerge } from 'tailwind-merge';
+import { z } from 'zod';
 const filterProductSchema = z.object({
 	search: z.string(),
 	price_min: z.number(),
@@ -25,6 +25,10 @@ const filt = {
 	'prix croissant': 'price_asc',
 	'prix decroissant': 'price_desc',
 } as const;
+
+const className = {
+	input: `mt-1 flex rounded-full border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
+};
 export default function SearchFilter({ componentRoot }: { componentRoot: any }) {
 	const searchParams = componentRoot.useSearch();
 	const { register, watch } = useForm<FilterProductType>({
@@ -199,49 +203,43 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	return (
 		<div className="mb-8 flex flex-wrap items-center justify-start gap-4 px-4 ">
 			<div className=" ">
-				<span className="block text-sm font-medium text-slate-700">Rechercher</span>
+				{/* <span className="block text-sm font-medium text-slate-700">Rechercher</span> */}
 				<input
 					type={'text'}
 					inputMode="search"
 					{...register('search')}
 					name={'search'}
-					className={twMerge(
-						`mt-1 flex rounded-md border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
-					)}
+					className={twMerge(className.input)}
 					placeholder={'trouver une annonce'}
 					defaultValue={filtParams?.text}
 				/>
 			</div>
 			<div className=" ">
-				<span className="block text-sm font-medium text-slate-700">Prix</span>
+				{/* <span className="block text-sm font-medium text-slate-700">Prix</span> */}
 				<div className="flex gap-2">
 					<input
 						type={'number'}
 						inputMode="numeric"
 						{...register('price_min', { valueAsNumber: true })}
 						name={'price_min'}
-						className={twMerge(
-							`mt-1 flex w-1/4 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
-						)}
-						placeholder={'Minimum'}
+						className={twMerge(className.input, 'w-1/4')}
+						placeholder={'Prix min'}
 						defaultValue={filtParams?.price?.[0]}
 					/>
 					<input
-						type={'number'}
+							type={'number'}
 						inputMode="numeric"
 						{...register('price_max', { valueAsNumber: true })}
 						name={'price_max'}
-						className={twMerge(
-							`mt-1 flex w-1/4 rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
-						)}
-						placeholder={'Maximum'}
+						className={twMerge(className.input, 'w-1/4')}
+						placeholder={'Prix max'}
 						defaultValue={filtParams?.price?.[1]}
 					/>
 				</div>
 			</div>
 
 			<div className={twMerge('w-1/5')}>
-				<span className=" text-sm font-medium text-slate-700 ">{'Classer par :'}</span>
+				{/* <span className=" text-sm font-medium text-slate-700 ">{'Classer par :'}</span> */}
 				<Select
 					name="order"
 					defaultValue={getKeyByValue(filt, filtParams?.order_by) || Object.keys(filt)[0]}
@@ -250,7 +248,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 						setOrderBy(value);
 					}}
 				>
-					<SelectTrigger className="flex w-full rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm">
+					<SelectTrigger className={twMerge(className.input)}>
 						<SelectValue placeholder={Object.keys(filt)[0]} />
 					</SelectTrigger>
 					<SelectContent className="bg-white">

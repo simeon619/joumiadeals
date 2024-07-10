@@ -26,7 +26,6 @@ const ProductSchema = z.object({
 	photos: z.string().transform((data) => JSON.parse(data) as string[]),
 	express_time: z.string().nullable(),
 	last_appearance: z.string().nullable(),
-	caracteristique: z.string(),
 	moderator_id: z.string().nullable(),
 	category_id: z.string(),
 	account_id: z.string(),

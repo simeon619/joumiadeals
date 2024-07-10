@@ -1,20 +1,29 @@
 import { ToastWarn } from '@/lib/utils';
 import { create } from 'zustand';
-import { combine } from 'zustand/middleware';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { combine, createJSONStorage, persist } from 'zustand/middleware';
 export const useInputCategorie = create(
 	persist(
 		combine(
 			{
-				valueInput: {} as { [k: string]: string | number | undefined },
-				filesData: [] as ({ file: File; buffer: string } | string)[],
+				dataProduct: {} as { [k: string]: string | number | undefined | null },
+				dataProductFeature: {} as { [k: string]: string | number | undefined | null },
 				errorInput: {} as { [k: string]: string },
+				filesData: [] as ({ file: File; buffer: string } | string)[],
+				inputFocus: {} as { [k: string]: boolean },
 			},
-			(set) => ({
-				setValueInputs: async (value: { [k: string]: string | number | undefined }) => {
+			(set, get) => ({
+				setDataProduct: async (value: { [k: string]: string | number | undefined | null }) => {
 					set((state) => ({
-						valueInput: {
-							...state.valueInput,
+						dataProduct: {
+							...state.dataProduct,
+							...value,
+						},
+					}));
+				},
+				setDataProductFeature: async (value: { [k: string]: string | number | undefined | null }) => {
+					set((state) => ({
+						dataProductFeature: {
+							...state.dataProductFeature,
 							...value,
 						},
 					}));
@@ -30,6 +39,25 @@ export const useInputCategorie = create(
 							filesData: [...state.filesData, value],
 						};
 					});
+				},
+
+				setInputFocus: async (value: { [k: string]: boolean }) => {
+					const v = Object.keys(value)[0];
+					set(() => ({
+						inputFocus: {
+							...value,
+						},
+					}));
+
+					const allInputsBlurred = Object.values(get().inputFocus).every((value) => value === false);
+					if (allInputsBlurred) {
+						set({
+							inputFocus: {
+								[Object.keys(get().dataProduct)[Array.from(Object.keys(get().dataProduct)).indexOf(v)]]:
+									true,
+							},
+						});
+					}
 				},
 
 				setFile: async (value: ({ file: File; buffer: string } | string)[]) => {
@@ -51,8 +79,11 @@ export const useInputCategorie = create(
 					}));
 				},
 				resetAll: () => {
-					return set({ valueInput: {}, filesData: [], errorInput: {} });
+					return set({ dataProductFeature: {}, errorInput: {} });
 				},
+				resetFile : () => {
+					return set({ filesData: [] });
+				}
 			})
 		),
 		{

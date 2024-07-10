@@ -35,6 +35,13 @@ supression foreign key
 
 
 server
-
-1) filterproduct work only with after login
-2) 
+ * 1) filter (interface client - serveur)
+ * 2)mise en avant des produits
+ * 3) messagere sse
+ * 4)Produit similaire
+ * 5)Modifier statut produit
+ * 6) produit visite
+ * 7) Booster le produit
+ * 8) vote du provider
+ * 9) responsivite
+ * 10)commentaire

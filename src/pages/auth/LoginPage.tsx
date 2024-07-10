@@ -2,7 +2,7 @@
 import { redirectToConnect } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
 import { useNavigate, useRouter } from '@tanstack/react-router';
-import { Shell } from 'lucide-react';
+import { Loader, Shell } from 'lucide-react';
 import { useLayoutEffect } from 'react';
 
 export default function LoginPage() {
@@ -21,6 +21,7 @@ export default function LoginPage() {
 		created_at: string;
 		updated_at: string;
 		use_whatsapp: number;
+		role : string	
 	};
 	const name = searchParams.name;
 	const id = searchParams.id;
@@ -32,6 +33,7 @@ export default function LoginPage() {
 	const email = searchParams.email!;
 	const avatar_url = searchParams.avatar_url as string;
 	const use_whatsapp = searchParams.use_whatsapp;
+	const role = searchParams.role;
 	useLayoutEffect(() => {
 		if (!token && !email && !phone) {
 			redirectToConnect();
@@ -51,6 +53,7 @@ export default function LoginPage() {
 					updated_at,
 					use_whatsapp: Number(use_whatsapp),
 					id,
+					role
 				},
 			});
 			window.opener.dispatchEvent(customEvent);
@@ -61,7 +64,7 @@ export default function LoginPage() {
 	return (
 		<div className="flex h-screen w-screen flex-col items-center justify-center gap-y-6">
 			<h1 className="text-3xl font-bold">Veuillez patientez...</h1>
-			<Shell className="animate-spin" size={50} />
+			<Loader className="animate-spin" size={50} />
 		</div>
 	);
 }

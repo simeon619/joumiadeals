@@ -1,158 +1,180 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import  { memo, useEffect, useMemo } from 'react';
-import { twMerge } from 'tailwind-merge';
-import InputComponent from './InputComponent';
-import InputFileComponent from './InputFileComponent';
-import DateInputCategori from './DateInputCategori';
-import PopUpComponent from './PopUpComponent';
-import TextAreaComponent from './TextAreaComponent';
-import InputCategorie from './InputCategorie';
-import SelectCategorie from './SelectCategorie';
-import SwitchInputCategori from './SwitchInputCategori';
-import { Nbr_Image_Upload } from '@/utils/constante';
+import { field_annonce } from '@/lib/utils';
+import { f_form_type, ProductsMinType } from '@/services/api/product_categorie';
+import { useDataInputState } from '@/services/state/App/dataInputState';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
-import { FieldOptionsType, ProductsMinType } from '@/services/api/product_categorie';
-import { useForm } from 'react-hook-form';
-import { ProductSchema, ProductSchemaType } from '@/pages/index/CreateProduct';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useUpdateMutationproduct } from '@/utils/queryOptions';
-import { ToastWarn } from '@/lib/utils';
+import { Nbr_Image_Upload } from '@/utils/constante';
+import {
+	getAllChildCategoriesOptions,
+	getAllfeaturesOptions,
+	getFeatureProductOptions,
+	useUpdateMutationproduct,
+} from '@/utils/queryOptions';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import CloseModal from './CloseModal';
+import InputCategorie from './InputCategorie';
+import InputFileComponent from './InputFileComponent';
+import PopUpComponent from './PopUpComponent';
+import SelectCategorie from './SelectCategorie';
 
 export default memo(function ModalEditProduct({
 	showPopUp,
 	closePopUp,
 	product,
-	fieldCharac,
 }: {
 	showPopUp: boolean;
 	closePopUp: () => void;
 	product: ProductsMinType[0];
-	fieldCharac: FieldOptionsType;
 }) {
+	// const { fieldCharac, setFieldCharac } = useDataInputState((state) => state);
+	const [fieldCharac, setFieldCharac] = useState<f_form_type[]>([]);
 	const resetInput = useInputCategorie((state) => state.resetAll);
 	const filesData = useInputCategorie((state) => state.filesData);
-	const valueInput = useInputCategorie((state) => state.valueInput);
+	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
+	const { data: featuresProduct } = useSuspenseQuery(getFeatureProductOptions(product.product_id));
+	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
+	const dataProduct = useInputCategorie((state) => state.dataProduct);
+	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
+
+	// const collectFeatures = (Ids: string[]) => {
+	// 	setFieldCharac([]);
+	// 	const newFeatures: f_form_type[] = [];
+	// 	Ids.forEach((id) => {
+	// 		const feature = features.filter((feature) => {
+	// 			return feature.category_id === id;
+	// 		});
+	// 		newFeatures.push(...feature);
+	// 	});
+	// 	setFieldCharac(newFeatures);
+	// };
 	const mutation = useUpdateMutationproduct();
+	const getValueFeature = (id: string) => {
+		return featuresProduct.find((feature) => feature.feature_id === id)?.value;
+	};
 
 	useEffect(() => {
+		const featuresId = featuresProduct.map((feature) => feature.feature_id);
+		const fieldcharac = featuresId.map((id) => {
+			return features.find((f) => f.id === id)!;
+		});
+		const tr = fieldcharac?.filter(f => Boolean(f?.id))
+		setFieldCharac(tr);
 		return () => {
 			resetInput();
+			setFieldCharac([]);
 		};
-	}, []);
+	}, [featuresProduct]);
 
 	useMemo(() => {
 		if (mutation.isSuccess) {
 			closePopUp();
 		}
 	}, [mutation.isSuccess]);
-	const onSubmit = (data: ProductSchemaType) => {
-		if (filesData.length == 0) {
-			return ToastWarn('vous devez ajouter au moins une image');
-		}
-		for (const [key, value] of Object.entries(valueInput)) {
-			if (!value && value !== 0) {
-				ToastWarn('le champ ' + key + ' est obligatoire');
-				return;
-			}
-		}
-		mutation.mutate({
-			dataProduct: {
-				...data,
-				product_id: product.product_id,
-				caracteristique: JSON.stringify(valueInput)
-			},
-			photosFile: filesData,
-		});
-	};
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<ProductSchemaType>({ resolver: zodResolver(ProductSchema) });
+	// const onSubmit = (data: ProductSchemaType) => {
+	// 	if (filesData.length == 0) {
+	// 		return ToastWarn('vous devez ajouter au moins une image');
+	// 	}
+	// 	for (const [key, value] of Object.entries(valueInput)) {
+	// 		if (!value && value !== 0) {
+	// 			ToastWarn('le champ ' + key + ' est obligatoire');
+	// 			return;
+	// 		}
+	// 	}
+	// 	mutation.mutate({
+	// 		dataProduct: {
+	// 			...data,
+	// 			product_id: product.product_id,
+	// 			caracteristique: JSON.stringify(valueInput)
+	// 		},
+	// 		photosFile: filesData,
+	// 	});
+	// };
 	return (
 		<PopUpComponent
-			styleContainer="absolute flex  items-center justify-center h-full w-full"
+			styleContainer="flex items-center justify-center"
 			isOpen={showPopUp}
+			setHide={closePopUp}
 		>
 			<div
-				className={`flex h-2/3 w-[600px] flex-col items-center justify-center rounded-lg bg-white `}
+				className={` flex max-h-[90vh] min-w-[400px] max-w-[450px] flex-col items-center justify-center rounded-lg bg-white`}
 			>
-				<div
-					className={
-						'sticky inset-x-0 top-0 z-40 flex w-full items-center justify-center bg-slate-100 py-2 shadow-md'
-					}
-				>
-				<CloseModal closePopUp={closePopUp}/>
-					<span className={'text-center text-3xl'}>Modifier votre annonce</span>
+				<div className={' flex items-center justify-center shadow-md'}>
+					<CloseModal closePopUp={closePopUp} style="text-red-600" />
+					<span className={'text-center text-xl'}>Modifier votre annonce</span>
 				</div>
-				<div className={twMerge('overflow-y-scroll', ' min-w-[260px] max-w-[470px]')}>
-					<div className={'w-[250px] min-w-[300px] max-w-[370px]'}></div>
-					<form className="mt-5 flex min-w-[230px] flex-col items-center  justify-center">
-						<InputComponent
-							label="Titre de l'annonce"
-							type="text"
-							name="title"
-							placeholder="Nom de l'annonce"
-							register={register}
-							errors={errors}
-							defaultValue={product.title}
-						/>
-						<InputComponent
-							label="prix de l'annonce"
-							name="price"
-							type="number"
-							placeholder="Prix de l'annonce (FCFA)"
-							register={register}
-							defaultValue={product.price}
-							errors={errors}
-						/>
-						<TextAreaComponent
-							label="Description"
-							name="description"
-							placeholder="Description de l'annonce"
-							register={register}
-							defaultValue={product.description}
-							errors={errors}
-						/>
-						<InputFileComponent name={'photo de l\'annonce'} max={Nbr_Image_Upload} />
-						{fieldCharac?.map((item, i) => {
-							if (item.field === 'text' || item.field === 'number') {
-								const defaultValue = product.caracteristique[item.name];
-								return <InputCategorie item={{ ...item, default: defaultValue }} key={i} />;
-							}
-							if (item.field === 'select') {
-								const defaultValue = product.caracteristique[item.name];
-								return (
-									<SelectCategorie
-										key={i}
-										values={item.enum || []}
-										defaultValue={defaultValue}
-										label={item.name}
-									/>
-								);
-							}
-							if (item.field === 'date') {
-								const defaultValue = product.caracteristique[item.name];
-								return <DateInputCategori item={{ ...item, default: defaultValue }} key={i} />;
-							}
-							if (item.field === 'checkbox') {
-								const defaultValue = product.caracteristique[item.name];
-								return <SwitchInputCategori item={{ ...item, default: defaultValue }} key={i} />;
-							}
-						})}
+				<div className="flex max-h-[80vh] flex-col overflow-y-auto bg-white p-2">
+					<InputCategorie
+						valueSave={product.title}
+						item={{
+							name: field_annonce[0],
+							placeholder: 'Iphone 13 Pro Max',
+							collect_type: 'text',
+							required: 1,
+							min: 3,
+							max: 60,
+							match: /^[a-zA-Z0-9À-ÖØ-öø-ÿ\s()x.-\\&,/]+$/g,
+							id: '',
+						}}
+					/>
+					<InputCategorie
+						valueSave={product.price}
+						item={{
+							name: field_annonce[1],
+							collect_type: 'number',
+							placeholder: '150000',
+							required: 1,
+							min: 5,
+							max: 99999999999,
+							id: '',
+						}}
+					/>
+					<InputCategorie
+						valueSave={product.description}
+						item={{
+							name: field_annonce[2],
+							collect_type: 'textarea',
+							placeholder: "Description de l'annonce",
+							required: 1,
+							min: 3,
+							max: 850,
+							match: /^[a-zA-Z0-9À-ÖØ-öø-ÿ\s()x.-\\&,/]+$/g,
+							id: '',
+						}}
+					/>
+					<InputFileComponent name={"photo de l'annonce"} max={Nbr_Image_Upload} />
+					{fieldCharac.map((item, i) => {
+						if (item.collect_type === 'text' || item.collect_type === 'number') {
+							return (
+								<InputCategorie valueSave={getValueFeature(item.id)} isfeature={true} item={item} key={i} />
+							);
+						}
+						if (item.collect_type === 'select') {
+							return (
+								<SelectCategorie
+									key={i}
+									id={item.id}
+									values={item.enum || []}
+									isfeature={true}
+									label={item.name}
+									required={Boolean(item.required)}
+									defaultValue={getValueFeature(item.id)}
+								/>
+							);
+						}
+					})}
 
-						<div className="my-4 flex w-full flex-row items-center justify-center gap-x-2">
-							<button
-								disabled={mutation.isPending}
-								className={twMerge('w-1/2 rounded-sm bg-primary p-2 text-white my-4')}
-								type="submit"
-								onClick={handleSubmit(onSubmit)}
-							>
-								{mutation.isPending ? 'Modification en cours...' : "Modifier l'annonce"}
-							</button>
-						</div>
-					</form>
+					<div className="my-4 flex w-full flex-row items-center justify-center gap-x-2">
+						<button
+							disabled={mutation.isPending}
+							className={twMerge('w-1/2 rounded-sm bg-primary p-2 text-white my-4')}
+							type="submit"
+							// onClick={handleSubmit(onSubmit)}
+						>
+							{mutation.isPending ? 'Modification en cours...' : "Modifier l'annonce"}
+						</button>
+					</div>
 				</div>
 			</div>
 		</PopUpComponent>

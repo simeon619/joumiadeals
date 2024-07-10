@@ -8,7 +8,7 @@ import {
 } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export default function ActionFavourite({
@@ -48,12 +48,12 @@ export default function ActionFavourite({
 	]);
 	return (
 		<button
-			className={twMerge(style)}
+			className={twMerge(style, 'p-1 bg-white rounded-full')}
 			onClick={(e) => {
 				isFavourite ? fnDeleteFavourite(e) : fnAddFavourite(e);
 			}}
 		>
-			<Heart fill={isFavourite ? 'orange' : 'transparent'} color={isFavourite ? 'orange' : 'gray'} />
+			<Heart size={20} fill={isFavourite ? 'red' : 'white'} color={isFavourite ? 'red' : 'black'} />
 		</button>
 	);
 }

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FieldOptionsType } from '@/services/api/product_categorie';
+import { CategoryType, f_form_type } from '@/services/api/product_categorie';
 import { type ClassValue, clsx } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import { z } from 'zod';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -15,7 +16,7 @@ export function getRandomInt(min: number, max: number) {
 }
 
 export function redirectToConnect() {
-	window.location.href = 'http://localhost:3000/google_connexion';
+	window.location.href = 'http://localhost:3000/connexion';
 }
 export function truncateFirstName(name: string | undefined | null) {
 	if (!name) {
@@ -36,62 +37,157 @@ export function getToken(): string {
 	}
 	return item;
 }
-
-export function validField(
-	rule: FieldOptionsType[0],
-	caracteristique: { [k: string]: string | number }
-) {
-	const value = caracteristique[rule.name];
-	if (value != undefined) {
-		if (rule.type == 'string') {
-			if (typeof value !== 'string')
-				throw new Error(`'ERROR caracteristique.${rule.name} must be a string value`);
-			else {
-				if (rule.enum && !(rule.enum as string[]).includes(value))
-					throw new Error(`ERROR ${rule.name}:${value}, is not in Enumeration`);
-				if (rule.max && value.length > rule.max)
-					throw new Error(
-						`ERROR ${rule.name}:${value},  must be a value between [${rule.min ?? 0} , ${rule.max}]`
-					);
-				if (rule.min && value.length < rule.min)
-					throw new Error(`ERROR ${rule.name}:${value},  must be a value > ${rule.min}`);
-				if (rule.match && !new RegExp(rule.match[0], rule.match[1]).test(value))
-					throw new Error(`ERROR ${rule.name}:${value},  regExp no match : ${rule.match}`);
-			}
-		} else if (rule.type == 'number') {
-			const v = new RegExp(/^\d+$/).test(String(value)) ? Number(value) : '';
-			if (typeof v !== 'number') {
-				console.log('🚀 ~ trhox error', v);
-				throw new Error(`'ERROR caracteristique.${rule.name} must be a number value`);
+export const field_annonce = [
+	"Titre de l'annonce",
+	"prix de l'annonce (en FCFA)",
+	"Description de l'annonce",
+];
+export const onCreateProduct = ({
+	dataProduct,
+	dataFeatureProduct,
+	filesData,
+	fieldSelect,
+	errorInput,
+	createProduct,
+}: {
+	dataProduct: Record<string, number | string | null | undefined>;
+	dataFeatureProduct: Record<string, number | string | null | undefined>;
+	filesData: Array<any>;
+	fieldSelect: string;
+	errorInput: Record<string, any>;
+	createProduct: (args: any) => void;
+}) => {
+	for (const [key, value] of Object.entries({ ...dataProduct, ...dataFeatureProduct })) {
+		if (value === null || value === '') {
+			return ToastWarn(key.split(':')[0] + ' est obligatoire');
+		} else if (typeof value === 'number' && value < 0) {
+			return ToastWarn('Le champ ' + key.split(':')[0] + ' doit être supérieur à 0');
+		}
+	}
+	for (const [key, value] of Object.entries(errorInput)) {
+		if (value) {
+			return ToastWarn(key.split(':')[0] + ' est mal défini');
+		}
+	}
+	if (filesData.length == 0) {
+		return ToastWarn('Vous devez ajouter au moins une image.');
+	}
+	if (!fieldSelect) {
+		return ToastWarn('Vous devez sélectionner une catégorie');
+	}
+	try {
+		createProduct({
+			dataProduct: {
+				...dataProduct,
+				featuresProduct: dataFeatureProduct,
+				category_id: fieldSelect?.split(',')[0],
+			},
+			photos: filesData,
+		});
+	} catch (error) {
+		console.error('Erreur lors de la soumission du produit:', error);
+		ToastWarn('Une erreur est survenue lors de la soumission du produit.');
+	}
+};
+export const ProductSchema = z.object({
+	title: z
+		.string()
+		.min(3, { message: 'titre doit contenir au moins 3 caractere' })
+		.max(40, { message: 'titre trop long' }),
+	description: z
+		.string()
+		.min(10, { message: 'description doit contenir au moins 10 caractere' })
+		.max(1300, { message: 'description trop longue' }),
+	price: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)) && parseInt(val, 10) >= 0, {
+		message: "le prix n'est pas valide",
+	}),
+});
+export type ProductSchemaType = z.infer<typeof ProductSchema>;
+export type CatCreateType = Omit<CategoryType[0], 'created_at' | 'updated_at'>;
+export function validField(rule: f_form_type, caracteristique: { [k: string]: string | number }) {
+	const nameId = rule.id ? `${rule.name}:${rule.id}` : `${rule.name}`;
+	const value = caracteristique[nameId];
+	if (value !== undefined) {
+		if (rule.collect_type === 'select') {
+			if (typeof value !== 'string') {
+				throw new Error(`${rule.name} doit être une chaîne de caractères.`);
 			} else {
-				if (rule.enum && !(rule.enum as number[]).includes(v))
-					throw new Error(`ERROR ${rule.name}:${v}, is not in Enumeration`);
-				if (rule.max && v > rule.max)
-					throw new Error(
-						`ERROR ${rule.name}:${v},  must be a value between [${rule.min ?? 0} , ${rule.max} ]`
-					);
-				if (rule.min && v < rule.min)
-					throw new Error(`ERROR ${rule.name}:${v},  must be a value > ${rule.min}`);
+				if (rule.enum && !(rule.enum as string[]).includes(value)) {
+					throw new Error(`${value} n'est pas une valeur valide pour ${rule.name}.`);
+				}
+				if (rule.max && value.length > Number(rule.max)) {
+					throw new Error(`${rule.name} doit avoir au maximum ${rule.max} caractères.`);
+				}
+				if (rule.min && value.length < Number(rule.min)) {
+					throw new Error(`${rule.name} doit avoir au moins ${rule.min} caractères.`);
+				}
+				if (rule.match && !new RegExp(rule.match).test(value)) {
+					throw new Error(`${rule.name} ne correspond pas au format requis.`);
+				}
 			}
-		} else if (rule.type == 'date') {
-			if (!isDate(value))
-				throw new Error(`'ERROR caracteristique.${rule.name} must be a Date value, like "yyyy-mm-dd"`);
-			else {
-				if (rule.enum && !(rule.enum as string[]).includes(value))
-					throw new Error(`ERROR ${rule.name}:${value}, is not in Enumeration`);
-				if (rule.max && new Date(value) > new Date(rule.max))
-					throw new Error(
-						`ERROR ${rule.name}:${value},  must be a value between [${new Date(rule.min ?? 0).toDateString()} , ${new Date(rule.max).toDateString()} ]`
-					);
-				if (rule.min && new Date(value) < new Date(rule.min))
-					throw new Error(
-						`ERROR ${rule.name}:${value},  must be a value > ${new Date(rule.min).toDateString()}`
-					);
+		} else if (rule.collect_type === 'text' || rule.collect_type === 'textarea') {
+			if (typeof value !== 'string') {
+				throw new Error(`${rule.name} doit être une chaîne de caractères.`);
+			} else {
+				if (rule.max && value.length > Number(rule.max)) {
+					throw new Error(`${rule.name} doit avoir au maximum ${rule.max} caractères.`);
+				}
+				if (rule.min && value.length < Number(rule.min)) {
+					throw new Error(`${rule.name} doit avoir au moins ${rule.min} caractères.`);
+				}
+				if (rule.match && !new RegExp(rule.match).test(value)) {
+					throw new Error(`${rule.name} ne correspond pas au format requis.`);
+				}
+				//invalid url in text input
+				if (
+					new RegExp(
+						/(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/gi
+					).test(value)
+				) {
+					throw new Error(`${rule.name} contient une url`);
+				}
 			}
-		} else if (rule.type == 'boolean' && typeof value !== 'boolean')
-			throw new Error(`'ERROR caracteristique.${rule.name} must be a boolean value`);
+		} else if (rule.collect_type === 'number') {
+			const v = new RegExp(/^-?\d*$/).test(String(value)) ? Number(value) : NaN;
+			if (isNaN(v)) {
+				throw new Error(`${rule.name} doit être un nombre.`);
+			} else {
+				if (rule.enum && rule.enum?.length !== 0 && !(rule.enum as any[]).includes(v)) {
+					throw new Error(`${v} n'est pas une valeur valide pour ${rule.name}.`);
+				}
+				if (rule.max !== undefined && v > Number(rule.max)) {
+					throw new Error(`${rule.name} doit être au maximum ${rule.max}.`);
+				}
+				if (rule.min !== undefined && v < Number(rule.min)) {
+					throw new Error(`${rule.name} doit être au minimum ${rule.min}.`);
+				}
+				if (v < 0) {
+					throw new Error(`${rule.name} ne doit pas être un nombre négatif.`);
+				}
+			}
+		} else if (rule.collect_type === 'date') {
+			if (!isDate(value)) {
+				throw new Error(`${rule.name} doit être une date valide (aaaa-mm-jj).`);
+			} else {
+				if (rule.enum && !(rule.enum as string[]).includes(String(value))) {
+					throw new Error(`${value} n'est pas une date valide pour ${rule.name}.`);
+				}
+				if (rule.max && new Date(value) > new Date(rule.max)) {
+					throw new Error(`${rule.name} doit être avant le ${new Date(rule.max).toLocaleDateString()}.`);
+				}
+				if (rule.min && new Date(value) < new Date(rule.min)) {
+					throw new Error(`${rule.name} doit être après le ${new Date(rule.min).toLocaleDateString()}.`);
+				}
+			}
+		} else if (rule.collect_type === 'boolean') {
+			if (typeof value !== 'boolean') {
+				throw new Error(`${rule.name} doit être vrai ou faux.`);
+			}
+		}
 	} else {
-		if (rule.require == true) throw new Error('ERROR require ' + rule.name);
+		if (rule.required === 1) {
+			throw new Error(`${rule.name} est requis.`);
+		}
 	}
 }
 function isDate(a: any): a is string {
@@ -117,7 +213,7 @@ export const handleConnect = (e: any) => {
 	const windowLeft = Math.round((screenWidth - windowWidth) / 2);
 	const windowTop = Math.round((screenHeight - windowHeight) / 2);
 	window.open(
-		'/login',
+		'/connexion',
 		'_blank',
 		`toolbar=yes,scrollbars=yes,resizable=yes,top=${windowTop},left=${windowLeft},width=${windowWidth},height=${windowHeight}`
 	);
@@ -169,15 +265,16 @@ export function ToastInfo(message: string) {
 	});
 }
 
-export function formatPrice(price: number) {
+export function formatPrice(price: number): string {
 	return price.toLocaleString('fr-FR', {
 		style: 'currency',
 		currency: 'CFA',
-		compactDisplay: 'long',
 		maximumFractionDigits: 0,
-		currencySign: 'accounting',
+		minimumFractionDigits: 0,
+		minimumIntegerDigits: 1,
+		
 	});
 }
 export const capitalize = (str: string) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+	return str.charAt(0).toUpperCase() + str.slice(1);
+};

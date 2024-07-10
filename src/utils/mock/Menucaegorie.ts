@@ -230,7 +230,6 @@ export function get_old_parent(id: string | null, cats: CategoryType) {
 			get_old_parent(c.id, cats);
 		}
 	});
-	console.log('🚀 ~ get_old_parent ~ accu:', accu);
 	return accu;
 }
 export function get_first_cat(id: string | null, cats: CategoryType) {
@@ -292,36 +291,36 @@ export function get_all_parents(parent_id: string | null, cats: CategoryType) {
 		}
 	}
 	if (!parents || parents.length == 0) return [];
-	return parents.map((p) => p.label);
+	return parents.map((p) => p.id);
 }
 
-export const getCategorieById = (id: string, cats: CategoryType) => {
+export const getCategorieById = (id: string | null, cats: CategoryType) => {
 	return cats.find((category) => {
 		return category.id == id;
 	});
 };
 
-export function get_caracteristique_child(child_id: string | null, cats: CategoryType) {
-	const parents: CategoryType = [];
-	if (!cats) return [];
-	let first = true;
-	while (true) {
-		const cat = cats.find((category) => category.id == child_id);
-		if (first && cat) {
-			parents.push(cat);
-			first = false;
-		}
-		const parent = cats.find((c) => c.id == cat?.parent_category_id);
-		if (parent) {
-			parents.push(parent);
-			child_id = parent.id;
-		} else {
-			break;
-		}
-	}
-	if (!parents || parents.length == 0) return [];
-	return parents.map((p) => p.caracteristique_field);
-}
+// export function get_caracteristique_child(child_id: string | null, cats: CategoryType) {
+// 	const parents: CategoryType = [];
+// 	if (!cats) return [];
+// 	let first = true;
+// 	while (true) {
+// 		const cat = cats.find((category) => category.id == child_id);
+// 		if (first && cat) {
+// 			parents.push(cat);
+// 			first = false;
+// 		}
+// 		const parent = cats.find((c) => c.id == cat?.parent_category_id);
+// 		if (parent) {
+// 			parents.push(parent);
+// 			child_id = parent.id;
+// 		} else {
+// 			break;
+// 		}
+// 	}
+// 	if (!parents || parents.length == 0) return [];
+// 	return parents.map((p) => p.caracteristique_field);
+// }
 
 // const cat = await getFetchCat()
 export function BuildMenu(id: string | null, obj: any, count: number, categories: CategoryType) {

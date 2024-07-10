@@ -7,7 +7,7 @@ export default function SetAdvert({ style }: { style?: string }) {
 		<Link
 			to="/creation_annonce"
 			className={twMerge(
-				`flex h-10 max-w-[200px] cursor-pointer flex-row items-center gap-1 rounded-xl bg-primary  px-2`,
+				`flex  max-w-[200px] cursor-pointer flex-row items-center gap-1 rounded-xl bg-primary p-2`,
 				style
 			)}
 		>

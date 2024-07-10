@@ -45,7 +45,7 @@ export default function HeaderProfile({
 				</div>
 				<div className="flex flex-row items-center justify-center gap-x-1">
 					<PhoneCall size={20} className="text-slate-700" />
-					<span className="text-sm">{phone} </span>
+					<span className="text-sm">{	} </span>
 				</div>
 			</div>
 			<button

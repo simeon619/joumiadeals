@@ -1,21 +1,21 @@
-import { create } from 'zustand';
-import { combine } from 'zustand/middleware';
-import { z } from 'zod';
-import { toast } from 'sonner';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { BASE_URL } from '@/utils/constante';
 import { getToken, setToken } from '@/lib/utils';
+import { BASE_URL } from '@/utils/constante';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { create } from 'zustand';
+import { combine, createJSONStorage, persist } from 'zustand/middleware';
 const userSchema = z.object({
 	avatar_url: z.string().nullable(),
 	created_at: z.string(),
 	email: z.string(),
-	id: z.string(),
+	id: z.any(),
 	location: z.string(),
 	name: z.string(),
 	phone: z.any(),
 	updated_at: z.string(),
 	token: z.string(),
-	use_whatsapp: z.number(),
+	use_whatsapp: z.any(),
+	role: z.string(),
 });
 
 const userUpdateSchema = z.object({
@@ -25,7 +25,7 @@ const userUpdateSchema = z.object({
 	id: z.number(),
 	location: z.string(),
 	name: z.string(),
-	use_whatsapp: z.number(),
+	use_whatsapp: z.any(),
 	phone: z.any(),
 	updated_at: z.string(),
 });
@@ -33,7 +33,7 @@ const userUpdateSchema = z.object({
 const userUpdateToserverSchema = z.object({
 	avatar_url: z.string().nullable(),
 	location: z.string(),
-	use_whatsapp: z.number(),
+	use_whatsapp: z.any(),
 	name: z.string(),
 	phone: z.any(),
 });
@@ -44,7 +44,7 @@ export type UserData = z.infer<typeof userSchema>;
 export const dataToSendSchema = z.object({
 	phone: z.string(),
 	location: z.string(),
-	use_whatsapp: z.string().optional(),
+	use_whatsapp: z.any().optional(),
 	name: z.string(),
 	avatar_url: z.string().nullable(),
 	email: z.string(),
@@ -108,13 +108,16 @@ export const useAuth = create(
 				},
 
 				login: (dataS: UserType) => {
+					console.log("🚀 ~ dataS:", dataS)
 					const infoUser = userSchema.safeParse(dataS);
+					console.log("🚀 ~ infoUser:", infoUser)
 					if (!infoUser.success) {
-						toast.error('Une erreur est survenue, veuillez reessayer', {
+						toast.error('Une erreur est survenues, veuillez reessayer', {
 							position: 'top-center',
 							style: { background: '#f87171', color: 'white' },
-						});		
-					
+						});
+						console.log(infoUser.error);
+
 						return;
 					}
 					setToken(infoUser.data.token);
@@ -163,7 +166,7 @@ export const useAuth = create(
 							style: { background: 'green', color: 'white' },
 						});
 
-						set(() => ({ InfoUser: { ...infoUser.data, token: getToken() }, isAuth: true }));
+						// set(() => ({ InfoUser: { ...infoUser.data, token: getToken() }, isAuth: true }));
 					}
 				},
 				logout: async () => {

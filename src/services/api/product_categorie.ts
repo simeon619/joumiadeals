@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { field_annonce } from '@/lib/utils';
 import { BASE_URL, LimitItemPaginate } from '@/utils/constante';
-import { z } from 'zod';
-import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
 import {
 	LIMIT_PRODUCT_PAGE,
 	RequestDataType,
 	RequestFilterProductType,
 } from '@/utils/queryOptions';
+import { z } from 'zod';
+import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
 const FieldSchema = z.enum([
 	'button',
 	'checkbox',
@@ -33,36 +34,28 @@ const FieldSchema = z.enum([
 	'week',
 ]);
 
-const FieldOptionSchema = z.array(
-	z.object({
-		type: z.enum(['string', 'number', 'boolean', 'date', 'files']),
-		name: z.string(),
-		placeholder: z.string().optional(),
-		field: FieldSchema,
-		require: z.boolean().optional(),
-		default: z.string().optional(),
-		icon: z.string(),
-		match: z.tuple([z.string(), z.string()]).optional(),
-		enum: z.array(z.union([z.string(), z.number()])).optional(),
-		min: z.number().optional(),
-		max: z.number().optional(),
-		maxSize: z.number().optional(),
-		mime: z.array(z.union([z.string(), z.tuple([z.string(), z.number()])])),
-	})
-);
-
-export type FieldOptionsType = z.infer<typeof FieldOptionSchema>;
+export const f_form_min_schema = z.object({
+	collect_type: z.enum(['number', 'select', 'boolean', 'date', 'text', 'textarea', 'file']),
+	id: z.string(),
+	name: z.string(),
+	required: z.number().int().min(0).max(1).optional(),
+	placeholder: z.string().optional(),
+	default_value: z.union([z.string(), z.number()]).optional(),
+	icon: z.string().optional(),
+	min: z.number().optional(),
+	max: z.number().optional(),
+	match: z.any().optional(),
+	created_at: z.string().optional(),
+	category_id: z.string().optional(),
+	enum: z.union([z.array(z.string()), z.array(z.number())]).optional(),
+});
+export type f_form_type = z.infer<typeof f_form_min_schema>;
 
 const CategorySchema = z.array(
 	z.object({
 		id: z.string(),
 		label: z.string(),
 		icon: z.string().nullable(),
-		// caracteristique_field: z.string().transform((data) => {
-		// 	const field = JSON.parse(data) as FieldOptionsType;
-		// 	return field;
-		// }),
-		caracteristique_field: z.any(),
 		parent_category_id: z.string().nullable(),
 		is_parentable: z.number(),
 		created_at: z.string(),
@@ -82,7 +75,6 @@ export async function getAllChildCategories() {
 			throw new Error('Erreur lors de la récupération des catégories');
 		}
 		const data = await response.json();
-		console.log('🚀 ~ getAllChildCategories ~ data:', data);
 		const validationResult = CategorySchema.safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -93,6 +85,86 @@ export async function getAllChildCategories() {
 		throw error;
 	}
 }
+
+export async function getFeaturesCategory({ category_id }: { category_id: string | null }) {
+	if (!category_id) return [];
+	try {
+		const response = await fetch(`${BASE_URL}/get_features`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({ category_id }),
+		});
+		const data = await response.json();
+		console.log('🚀 ~ data:', data);
+		const validationResult = z.array(f_form_min_schema).safeParse(data);
+		if (!validationResult.success) {
+			throw new Error(validationResult.error.message);
+		}
+		return validationResult.data;
+	} catch (error) {
+		console.error('Erreur lors de la création de la catégorie :', error);
+		throw error;
+	}
+}
+
+export async function getAllFeatures() {
+	try {
+		const response = await fetch(`${BASE_URL}/get_features`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({}),
+		});
+		const data = await response.json();
+		console.log('🚀 ~ data:', data);
+		const validationResult = z.array(f_form_min_schema).safeParse(data);
+		if (!validationResult.success) {
+			throw new Error(validationResult.error.message);
+		}
+		return validationResult.data;
+	} catch (error) {
+		console.error('Erreur lors de la création de la catégorie :', error);
+		throw error;
+	}
+}
+const FeatureValueSchema = z.array(
+	z.object({
+		value: z.string(),
+		name: z.string(),
+		feature_id : z.string(),
+	})
+);
+export async function get_feature_values_product({ product_id }: { product_id: string }) {
+	try {
+		const response = await fetch(`${BASE_URL}/get_f_values_product`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({ product_id }),
+		});
+		const data = await response.json();
+		console.log('🚀 ~ data:', data);
+		const validationResult = FeatureValueSchema.safeParse(data);
+		if (!validationResult.success) {
+			throw new Error(validationResult.error.message);
+		}
+		return validationResult.data;
+	} catch (error) {
+		console.error('Erreur lors de la création de la catégorie :', error);
+		throw error;
+	}
+}
+
+const mapKeyForProductServer = (key: string) => {
+	switch (key) {
+		case field_annonce[0]:
+			return 'title';
+		case field_annonce[1]:
+			return 'price';
+		case field_annonce[2]:
+			return 'description';
+		default:
+			return key;
+	}
+};
 
 export async function createProduct(data: {
 	dataProduct: Record<string, any>;
@@ -107,9 +179,14 @@ export async function createProduct(data: {
 	const { dataProduct, photos } = data;
 	const formData = new FormData();
 	for (const key in dataProduct) {
-		formData.append(key, dataProduct[key]);
-	}
+		let value = dataProduct[key];
+		if (key === 'featuresProduct') value = JSON.stringify(dataProduct[key]);
+		if (key == 'price') value = Number(value);
 
+		const k = mapKeyForProductServer(key);
+
+		formData.append(k, value);
+	}
 	photos.forEach((photo, index) => {
 		if (typeof photo !== 'string')
 			formData.append(
@@ -118,19 +195,69 @@ export async function createProduct(data: {
 				`photo_${index}.${photo.file.type.split('/')[1]}`
 			);
 	});
-	const response = await fetch(`${BASE_URL}/create_product`, {
-		method: 'POST',
-		headers: getHeadersWithFormData(),
-		body: formData,
-	});
 	try {
+		const response = await fetch(`${BASE_URL}/create_product`, {
+			method: 'POST',
+			headers: getHeadersWithFormData(),
+			body: formData,
+		});
 		console.log('🚀 ~ response:', response);
 		const data = await response.json();
 		if (!response.ok) {
-			// throw new Error('Erreur lors de la création du produit');
 			throw new Error(data.message);
 		}
 		console.log('Données du produit créé :', data);
+		return data;
+	} catch (error) {
+		console.error('Erreur lors de la création du produit :', error);
+		throw error;
+	}
+}
+export async function updateProduct(dataUpdate: {
+	dataProduct: Record<string, any>;
+	photosFile: (
+		| string
+		| {
+				file: File;
+				buffer: string;
+		  }
+	)[];
+}) {
+	const { dataProduct, photosFile } = dataUpdate;
+	const formData = new FormData();
+	for (const key in dataProduct) {
+		formData.append(key, dataProduct[key]);
+	}
+
+	const photos = photosFile.map((photo, index) => {
+		if (typeof photo !== 'string') {
+			return `photos_${index}`;
+		} else return photo;
+	});
+	formData.append('photos', JSON.stringify(photos));
+
+	photosFile.forEach((photo, index) => {
+		if (typeof photo !== 'string') {
+			formData.append(
+				`photos_${index}`,
+				photo.file,
+				`photo_${index}.${photo.file.type.split('/')[1]}`
+			);
+		}
+	});
+	try {
+		const response = await fetch(`${BASE_URL}/update_product`, {
+			method: 'PUT',
+			headers: getHeadersWithFormData(),
+			body: formData,
+		});
+
+		if (!response.ok) {
+			throw new Error('Erreur lors de la mise a jour du produit');
+		}
+
+		const data = await response.json();
+		console.log('🚀 ~ updateProduct ~ data:', data);
 		return data;
 	} catch (error) {
 		console.error('Erreur lors de la création du produit :', error);
@@ -148,7 +275,6 @@ const ProductMinSchema = z.object({
 	express_time: z.string().nullable(),
 	description: z.string(),
 	title: z.string(),
-	caracteristique: z.any(),
 	status: z.string(),
 	product_id: z.string(),
 	product_created_at: z.string(),
@@ -172,7 +298,7 @@ export async function getProductsByFiltr(requestData: RequestDataType) {
 		body: JSON.stringify({ ...requestData, limit: LIMIT_PRODUCT_PAGE }),
 	});
 	const data = await response.json();
-	console.log('🚀 ~ getProductsByFiltr ~ data:', data);
+	console.log("🚀 ~ getProductsByFiltr ~ data:", data)
 	const products = ProductShemaPaginate.safeParse(data);
 	if (!products.success) {
 		console.log(products.error);
@@ -227,7 +353,6 @@ const ProductDetailSchema = z.object({
 	photos: z.array(z.string()),
 	express_time: z.nullable(z.string()),
 	last_appearance: z.nullable(z.string()),
-	caracteristique: z.any(),
 	moderator_id: z.nullable(z.string()),
 	category_id: z.string(),
 	account_id: z.string(),
@@ -264,58 +389,6 @@ export async function deleteProduct(id: string) {
 	}
 }
 
-export async function updateProduct(dataUpdate: {
-	dataProduct: Record<string, any>;
-	photosFile: (
-		| string
-		| {
-				file: File;
-				buffer: string;
-		  }
-	)[];
-}) {
-	const { dataProduct, photosFile } = dataUpdate;
-	const formData = new FormData();
-	for (const key in dataProduct) {
-		formData.append(key, dataProduct[key]);
-	}
-
-	const photos = photosFile.map((photo, index) => {
-		if (typeof photo !== 'string') {
-			return `photos_${index}`;
-		} else return photo;
-	});
-	formData.append('photos', JSON.stringify(photos));
-
-	photosFile.forEach((photo, index) => {
-		if (typeof photo !== 'string') {
-			formData.append(
-				`photos_${index}`,
-				photo.file,
-				`photo_${index}.${photo.file.type.split('/')[1]}`
-			);
-		}
-	});
-	try {
-		const response = await fetch(`${BASE_URL}/update_product`, {
-			method: 'PUT',
-			headers: getHeadersWithFormData(),
-			body: formData,
-		});
-
-		if (!response.ok) {
-			throw new Error('Erreur lors de la mise a jour du produit');
-		}
-
-		const data = await response.json();
-		console.log('🚀 ~ updateProduct ~ data:', data);
-		return data;
-	} catch (error) {
-		console.error('Erreur lors de la création du produit :', error);
-		throw error;
-	}
-}
-
 const IdSchemaProduct = z.array(z.string());
 
 export async function getFavouriteProductsId() {
@@ -325,6 +398,7 @@ export async function getFavouriteProductsId() {
 			headers: getHeaders(),
 		});
 		const data = await response.json();
+		if (!Array.isArray(data)) return [];
 		const products = IdSchemaProduct.safeParse(data);
 		if (!products.success) {
 			console.log(products.error);
