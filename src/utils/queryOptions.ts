@@ -1,3 +1,9 @@
+import { queryClient } from '@/lib/route';
+import { ToastError, ToastSuccess } from '@/lib/utils';
+import { getDiscussions, sendMessage } from '@/services/api/discussions';
+import { getAcount } from '@/services/api/user';
+import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
 import { createDiscussion } from './../services/api/discussions';
 import {
 	addFavouriteProduct,
@@ -16,12 +22,6 @@ import {
 	reportProduct,
 	updateProduct,
 } from './../services/api/product_categorie';
-import { z } from 'zod';
-import { getAcount } from '@/services/api/user';
-import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/route';
-import { ToastError, ToastSuccess } from '@/lib/utils';
-import { getDiscussions, sendMessage } from '@/services/api/discussions';
 export const LIMIT_PRODUCT_PAGE = 7;
 
 export function accountQueryOptions(accountId: string) {
@@ -39,7 +39,7 @@ export const getAllChildCategoriesOptions = () => {
 		staleTime: Infinity,
 	});
 };
-export function getAllfeaturesOptions () {
+export function getAllfeaturesOptions() {
 	return queryOptions({
 		queryKey: ['Allfeatures'],
 		queryFn: getAllFeatures,
@@ -47,14 +47,14 @@ export function getAllfeaturesOptions () {
 		staleTime: Infinity,
 	});
 }
-export function getFeaturesCategoryOptions(category_id: string ) {
+export function getFeaturesCategoryOptions(category_id: string) {
 	return queryOptions({
-	  queryKey: ["features", category_id],
-	  queryFn: () => getFeaturesCategory({ category_id }),
-	  // enabled: Boolean(category_id),
-	  placeholderData: keepPreviousData
+		queryKey: ['features', category_id],
+		queryFn: () => getFeaturesCategory({ category_id }),
+		// enabled: Boolean(category_id),
+		placeholderData: keepPreviousData,
 	});
-  }
+}
 export function useCreateProductMutation() {
 	return useMutation({
 		mutationKey: ['createProduct'],
@@ -71,13 +71,12 @@ export function useCreateProductMutation() {
 	});
 }
 
-export function getFeatureProductOptions(product_id : string) {
+export function getFeatureProductOptions(product_id: string) {
 	return queryOptions({
 		queryKey: ['featuresValues', product_id],
-		queryFn: () => get_feature_values_product({  product_id }),
-		placeholderData: keepPreviousData
-		
-	})
+		queryFn: () => get_feature_values_product({ product_id }),
+		placeholderData: keepPreviousData,
+	});
 }
 export function useDeleteProductMutation() {
 	return useMutation({
@@ -99,6 +98,14 @@ const FilterProductSchema = z.object({
 	order_by: OrderBy.optional(),
 	text: z.string().optional(),
 	status: z.array(z.string()),
+	features: z
+		.array(
+			z.object({
+				feature_id: z.string(),
+				value: z.union([z.string(), z.array(z.number())]),
+			})
+		)
+		.optional(),
 	price: z.tuple([z.number(), z.number()]).optional(),
 });
 const FilterSchema = z.object({
@@ -107,12 +114,22 @@ const FilterSchema = z.object({
 	text: z.string().optional(),
 	price: z.tuple([z.number(), z.number()]).optional(),
 	status: z.array(z.string()),
+	features: z
+		.array(
+			z.object({
+				feature_id: z.string(),
+				value: z.union([z.string(), z.array(z.number())]),
+			})
+		)
+		.optional(),
 });
+
+export type FilterProductType = z.infer<typeof FilterProductSchema>;
 
 export const RequestDataSchema = z.object({
 	provider_id: z.string(),
 	page: z.number().optional(),
-	filter: FilterSchema
+	filter: FilterSchema,
 });
 
 export type RequestDataType = z.infer<typeof RequestDataSchema>;

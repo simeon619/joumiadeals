@@ -27,17 +27,17 @@ const filt = {
 } as const;
 
 const className = {
-	input: `mt-1 flex rounded-full border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
+	input: `mt-1 flex rounded-full border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-f focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
 };
 export default function SearchFilter({ componentRoot }: { componentRoot: any }) {
-	const searchParams = componentRoot.useSearch();
+	const searchParams = componentRoot.useSearch() ;
 	const { register, watch } = useForm<FilterProductType>({
 		resolver: zodResolver(filterProductSchema),
 	});
 	function getKeyByValue(object: { [s: string]: unknown } | ArrayLike<unknown>, value: unknown) {
 		return Object.entries(object).find(([_, val]) => val === value)?.[0];
 	}
-	const navigate = useNavigate({ from: componentRoot.fullPath });
+	const navigate = useNavigate({ from: componentRoot.fullPath }) as any;
 	const searchTerm = watch('search');
 	const price = watch(['price_min', 'price_max']);
 	const { filter: filtParams } = searchParams;

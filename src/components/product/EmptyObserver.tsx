@@ -1,8 +1,8 @@
-import { useHideFilter } from '@/services/state/App/hideFilter';
-import React, { useEffect, useRef, useState } from 'react'
+import { useHideFilter } from '@/services/state/App/filterState';
+import { useEffect, useRef } from 'react';
 
 export default function EmptyObserver() {
-    const myRef = useRef<HTMLDivElement>(null);
+	const myRef = useRef<HTMLDivElement>(null);
 	const { toggleValue } = useHideFilter((state) => state);
 
 	useEffect(() => {
@@ -10,7 +10,7 @@ export default function EmptyObserver() {
 			const observer = new IntersectionObserver(
 				(entries) => {
 					entries.forEach((entry) => {
-						console.log("🚀 ~ entries.forEach ~ entry:", entry.isIntersecting)
+						console.log('🚀 ~ entries.forEach ~ entry:', entry.isIntersecting);
 						toggleValue(entry.isIntersecting);
 					});
 				},
@@ -21,7 +21,5 @@ export default function EmptyObserver() {
 			observer.observe(myRef.current);
 		}
 	}, [myRef]);
-  return (
-    <div ref={myRef} ></div>
-  )
+	return <div ref={myRef}></div>;
 }

@@ -2,7 +2,6 @@ import Header from '@/components/root/Header';
 import CategoriseMenu from '@/components/ui/CategoriseMenu';
 import { titleSite } from '@/utils/constante';
 import { Outlet } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
 import { useTitle } from 'react-use';
 
 export default function IndexLayout() {

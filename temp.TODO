@@ -1,0 +1,82 @@
+	{/* <div className="my-2 flex w-full flex-col items-start justify-start gap-4">
+						<span className="text-sm font-semibold text-black">Catégorie</span>
+						{filter?.category_id === 'all' && (
+							<>
+								<button
+								onClick={() => handleHierachie(null)}
+								className="flex items-center justify-center gap-2 text-sm"
+							>
+								<AlignRight size={20} />
+								<span>Toutes les catégories</span>
+							</button>
+								<button onClick={() => {
+									setResult_cat([]);
+								}}>X</button>
+							</>
+						
+						)}
+						{filter?.category_id !== 'all' && (
+							<button onClick={() => handleHierachie(null)} className="text-sm">
+								{get_firt_or_second_cat(filter?.category_id || null, categories)?.label}
+							</button>
+						)}
+					</div>
+					<div className="flex w-full flex-col items-start justify-start divide-y ">
+						<div
+							className={clsx('my-2 flex items-center rounded-xl border p-1', {
+								block: showSearchCat,
+								hidden: !showSearchCat
+							})}
+						>
+							<Search size={16} className="m-1 text-gray-400" />
+							<input
+								type="text"
+								placeholder="Recherche une valeur"
+								className="border-none p-1 text-sm outline-none"
+							/>
+						</div>
+
+						{parent_cat ? (
+							<div className="flex w-full flex-row items-baseline justify-around hover:bg-gray-100">
+								<button
+									className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins')}
+									onClick={() => {
+										handleHierachie(parent_cat?.id || null);
+									}}
+								>
+									<img
+										src={parent_cat.icon || ''}
+										className="size-4"
+										alt=""
+										style={{ filter:'invert(0.30)'}}
+									/>
+									<span className={clsx('text-[.83rem] font-semibold')}> {parent_cat?.label}</span>
+								</button>
+								<ChevronRight className={clsx('text-slate-600')} />
+							</div>
+						) : null}
+						{result_cat?.map((cat) => {
+							return (
+								<div
+									className="flex w-full flex-row items-baseline justify-around hover:bg-gray-100"
+									key={cat.id}
+								>
+									<button
+										className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins ')}
+										onClick={() => {
+											handleHierachie(cat?.id);
+										}}
+									>
+										<img src={cat.icon || ''} className="size-4" alt="" style={{ filter: 'invert(0.30)' }} />
+										<span className={clsx('text-[.83rem]')}>{cat.label}</span>
+									</button>
+									<ChevronRight
+										className={clsx({
+											' text-slate-300': !cat.is_parentable,
+											'rotate-90': !!cat.is_parentable,
+										})}
+									/>
+								</div>
+							);
+						})}
+					</div> */}

@@ -267,7 +267,7 @@ export default function CreateProduct() {
 							min: 3,
 							max: 60,
 							match: /^[a-zA-Z0-9À-ÖØ-öø-ÿ\s()x.-\\&,/]+$/g,
-							id: '',
+							feature_id: '',
 						}}
 					/>
 					<InputCategorie
@@ -279,7 +279,7 @@ export default function CreateProduct() {
 							required: 1,
 							min: 5,
 							max: 99999999999,
-							id: '',
+							feature_id: '',
 						}}
 					/>
 					<InputCategorie
@@ -292,7 +292,7 @@ export default function CreateProduct() {
 							min: 3,
 							max: 850,
 							match:  /^[a-zàâçéèêëîïôûùüÿñæœ(),;:"'&~$%@0-9\\// .-]*$/gi,
-							id: '',
+							feature_id: '',
 						}}
 					/>
 					<InputFileComponent name={"photo de l'annonce"} max={5} />
@@ -362,7 +362,7 @@ export default function CreateProduct() {
 							return (
 								<SelectCategorie
 									key={i}
-									id={item.id}
+									id={item.feature_id}
 									values={item.enum || []}
 									isfeature={true}
 									label={item.name}

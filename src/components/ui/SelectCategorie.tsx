@@ -74,9 +74,9 @@ export default function SelectCategorie({
 			>
 				{label}
 			</span>
-			<Select name={label} onValueChange={handleChange} defaultValue={String(defaultValue) || undefined}>
+			<Select name={label} onValueChange={handleChange} >
 				<SelectTrigger className="mt-1 rounded-md border border-slate-300 bg-white p-1 text-xs text-gray-600 shadow-sm  hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-					<SelectValue placeholder={placeholder || values?.[0]} />
+					<SelectValue placeholder={values[0]} />
 				</SelectTrigger>
 				<SelectContent className="rounded-2xl bg-white">
 					{values?.map((value, i) => {

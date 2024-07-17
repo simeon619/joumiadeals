@@ -35,13 +35,14 @@ const FieldSchema = z.enum([
 ]);
 
 export const f_form_min_schema = z.object({
-	collect_type: z.enum(['number', 'select', 'boolean', 'date', 'text', 'textarea', 'file']),
-	id: z.string(),
+	collect_type: z.enum(['number', 'select', 'radio', 'boolean', 'date', 'text', 'textarea', 'file']),
+	feature_id: z.string(),
 	name: z.string(),
 	required: z.number().int().min(0).max(1).optional(),
 	placeholder: z.string().optional(),
 	default_value: z.union([z.string(), z.number()]).optional(),
 	icon: z.string().optional(),
+	ext: z.string().max(3).optional(),
 	min: z.number().optional(),
 	max: z.number().optional(),
 	match: z.any().optional(),

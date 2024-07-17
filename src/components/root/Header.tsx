@@ -17,10 +17,12 @@ import { useForm } from 'react-hook-form';
 import { useDebounce } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
-import FilterProduct1 from '../product/FilterProduct1';
 import AvatarComponent from '../ui/AvatarComponent';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
+import clsx from 'clsx';
+import { useHideFilter } from '@/services/state/App/filterState';
+import FilterProduct from '../product/filter/FilterProduct';
 const SearchSchema = z.object({
 	search: z.string(),
 });
@@ -37,12 +39,21 @@ export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
+	const { value, direction } = useHideFilter((state) => state);
 	const [isShadow, setIsShadow] = useState(false);
 	const [searchterms, setSearchterms] = useState<Record<string, string>>({});
 	const navigate = useNavigate({ from: productsRoot.fullPath });
 	const { watch, register } = useForm<SearchSchemaType>({
 		resolver: zodResolver(SearchSchema),
 	});
+	const styleFilter = clsx(
+		'absolute inset-x-0 flex items-center justify-center bg-white p-1 transition-all duration-500 ease-in-out',
+		{
+			'bottom-[0%] -z-10': value <= 0.15,
+			'bottom-[-86%] shadow-md z-10': value > 0.15 && direction === 'up',
+			'-z-10 opacity-0': direction === 'down',
+		}
+	);
 	const searchTerm = watch('search');
 	const [currentTab, setCurrentTab] = useState(0);
 	useDebounce(
@@ -127,7 +138,7 @@ export default function Header() {
 	return (
 		<div
 			className={twMerge(
-				'sticky top-0 z-50 flex w-full justify-center flex-col items-center duration-300 bg-white',
+				'sticky top-0 z-20 flex w-full justify-center flex-col items-center duration-300 bg-white',
 				isShadow && 'shadow-md'
 			)}
 		>
@@ -247,7 +258,7 @@ export default function Header() {
 					</div>
 				</div>
 			</div>
-			<FilterProduct1 />
+			<FilterProduct style={styleFilter}  />
 		</div>
 	);
 }

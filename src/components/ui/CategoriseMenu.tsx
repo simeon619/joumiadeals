@@ -6,13 +6,13 @@ import {
 	NavigationMenuList,
 	NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { twMerge } from 'tailwind-merge';
+import { productsRoot } from '@/lib/route';
+import { BuildMenu } from '@/utils/mock/Menucaegorie';
+import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { BuildMenu } from '@/utils/mock/Menucaegorie';
-import {  getAllChildCategoriesOptions } from '@/utils/queryOptions';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { productsRoot } from '@/lib/route';
+import { twMerge } from 'tailwind-merge';
 const MenuCat = {};
 export default function CategoriseMenu() {
 	const { state } = useRouter();
@@ -38,7 +38,7 @@ export default function CategoriseMenu() {
 						const data = MenuCat[value];
 						return (
 							<NavigationMenuItem key={i} value={Categorie}>
-								<NavigationMenuTrigger className="relative font-light capitalize text-slate-800">
+								<NavigationMenuTrigger className="relative text-[0.775rem] font-light capitalize text-slate-800">
 									{Categorie.split(':')[0]}
 									<div className={UnderlineHover} />
 								</NavigationMenuTrigger>
@@ -61,6 +61,18 @@ export default function CategoriseMenu() {
 												Object.keys(data).length === 5 && 'max-h-[350px]'
 											)}
 										>
+											<NavigationMenuLink asChild>
+												<Link
+													to={productsRoot.to}
+													search={{
+														filter: { category_id: Categorie.split(':')[1], status: ['VALID'] },
+														page: 1,
+													}}
+													className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
+												>
+													Tout {Categorie.split(':')[0]}
+												</Link>
+											</NavigationMenuLink>
 											{Object.keys(data).map((Categorie) => {
 												if (Categorie === 'icon') return null;
 												return (
@@ -68,9 +80,11 @@ export default function CategoriseMenu() {
 														<NavigationMenuLink asChild>
 															<Link
 																to={productsRoot.to}
-																search={{ filter: { category_id: Categorie.split(':')[1],status : ["VALID"] }, page: 1 }}
+																search={{
+																	filter: { category_id: Categorie.split(':')[1], status: ['VALID'] },
+																	page: 1,
+																}}
 																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
-																// mask={{ search : Categorie.split(':')[0] }}
 															>
 																{Categorie.split(':')[0]}
 															</Link>
@@ -81,8 +95,11 @@ export default function CategoriseMenu() {
 																<NavigationMenuLink key={item} asChild>
 																	<Link
 																		to={productsRoot.to}
-																		search={{ filter: { category_id: item.split(':')[1], status : ["VALID"]}, page: 1 }}
-																		className="block cursor-pointer text-wrap py-1 text-sm  capitalize text-slate-500 hover:text-primary"
+																		search={{
+																			filter: { category_id: item.split(':')[1], status: ['VALID'] },
+																			page: 1,
+																		}}
+																		className="block cursor-pointer text-wrap py-1  text-[0.775rem]  capitalize text-slate-500 hover:text-primary"
 																	>
 																		{item.split(':')[0]}
 																	</Link>

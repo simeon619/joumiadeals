@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { CategoryType } from '@/services/api/product_categorie';
-import { BASE_URL } from '../constante';
 
 interface CategoryItem {
 	[key: string]: string[];
@@ -242,24 +241,36 @@ export function get_first_cat(id: string | null, cats: CategoryType) {
 		return cat;
 	}
 }
-export function get_second_cat(id: string | null, cats: CategoryType) : {id : string, label : string} | null {
+
+export function get_second_cat(
+	id: string | null,
+	cats: CategoryType
+): { id: string; label: string } | null {
 	const cat = cats.find((category) => {
 		return category.id == id;
 	});
-  
-	if (!cat || cat?.parent_category_id === null) {
-	  return null;
-	}
-  
-	const parentCat = get_second_cat(cat.parent_category_id, cats);
-  
-	if (!parentCat) {
-	  return {id : cat.id, label : cat.label};
-	}
-  
-	return parentCat;
-  }
 
+	if (!cat || cat?.parent_category_id === null) {
+		return null;
+	}
+
+	const parentCat = get_second_cat(cat.parent_category_id, cats);
+
+	if (!parentCat) {
+		return { id: cat.id, label: cat.label };
+	}
+
+	return parentCat;
+}
+export function get_firt_or_second_cat(id: string | null, cats: CategoryType) {
+	const c = cats.find((c) => c.id === id);
+
+	if (c?.parent_category_id === null) {
+		return { id: c.id, label: c.label };
+	} else {
+		return get_second_cat(id, cats);
+	}
+}
 export function get_first_cat_icon(id: string | null, cats: CategoryType) {
 	const cat = cats.find((category) => {
 		return category.id == id;

@@ -37,16 +37,16 @@ export default function PopUpComponent({
 			aria-modal="true"
 			aria-label="edit/create"
 			className={twMerge(
-				'relative',
-				isOpen ? 'pointer-events-auto block' : 'pointer-events-none hidden w-[0vw] h-[0vh]'
+				'relative z-60',
+				isOpen ? 'pointer-events-auto' : 'pointer-events-none'
 			)}
 			tabIndex={-1}
 			onClick={handleHideModal}
 		>
 			<div
 				className={twMerge(
-					`fixed z-60 inset-0 flex justify-${position} bg-black/65 duration-100 ease-in-out`,
-					isOpen ? 'opacity-100  pointer-events-auto' : 'opacity-0 pointer-events-none'
+					`fixed z-60 inset-0 flex justify-${position} bg-black/25 duration-300 ease-in-out`,
+					isOpen ? `opacity-100  pointer-events-auto ` : 'opacity-0 pointer-events-none'
 				)}
 			>
 				<div
