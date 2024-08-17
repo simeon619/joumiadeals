@@ -6,7 +6,6 @@ import { useTitle } from 'react-use';
 
 export default function IndexLayout() {
 	useTitle(titleSite);
-	
 	return (
 		<div className="flex justify-center">
 			<div className="flex w-full flex-col font-poppins">

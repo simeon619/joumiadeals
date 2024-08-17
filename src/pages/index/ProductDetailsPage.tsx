@@ -2,19 +2,20 @@
 import ActionFavourite from '@/components/ui/ActionFavourite';
 import { type CarouselApi } from '@/components/ui/carousel';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { discussionRoot, productDetailsRoot } from '@/lib/route';
+import { discussionRoot, productDetailsRoot, productsOtherRoot } from '@/lib/route';
 import { formatPrice } from '@/lib/utils';
 import { URL_IMAGE } from '@/utils/constante';
 import { formatDate } from '@/utils/formating';
 import {
 	getFeatureProductOptions,
 	getProductOptions,
+	useAddVisitedProductMutation,
 	useCreateDiscussionMutaton,
 } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
 	BadgeInfo,
-	Expand,
+	ChevronRight,
 	Flag,
 	Loader2,
 	MessageSquareText,
@@ -24,8 +25,10 @@ import {
 } from 'lucide-react';
 import { Suspense, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
+import SimilaireProduct from '@/components/product/similaire/SimilaireProduct';
 import ModalReport from '@/components/ui/ModalReport';
 import ModalViewImage from '@/components/ui/ModalViewImage';
+import { useAuth } from '@/services/state/User/auth';
 import { useNavigate } from '@tanstack/react-router';
 import { useTitle } from 'react-use';
 const shareText = 'Check out this awesome content!';
@@ -35,12 +38,20 @@ export default function ProductDetailPage() {
 	const { productId } = productDetailsRoot.useParams();
 
 	const { data: productPromise } = useSuspenseQuery(getProductOptions(productId));
-	const { mutate, isSuccess, isPending, data: discussion } = useCreateDiscussionMutaton();
+	const { mutate, isSuccess, isPending } = useCreateDiscussionMutaton();
+	const { mutate: addVisitedProduct } = useAddVisitedProductMutation();
 	const { data: features } = useSuspenseQuery(getFeatureProductOptions(productId));
 	const navigate = useNavigate();
 	const product = useDeferredValue(productPromise);
 	const [current, setCurrent] = useState(0);
 	const [api, setApi] = useState<CarouselApi>();
+	const isAuth = useAuth((s) => s.isAuth);
+
+	useEffect(() => {
+		if (isAuth) {
+			addVisitedProduct({ product_id: productId });
+		}
+	}, [addVisitedProduct, isAuth, productId]);
 
 	useTitle(productPromise.title);
 
@@ -67,7 +78,6 @@ export default function ProductDetailPage() {
 			// @ts-expect-error api is not typed
 			api?.scrollTo(i);
 		}, 10);
-
 		return () => {
 			clearTimeout(timeOut);
 		};
@@ -90,10 +100,17 @@ export default function ProductDetailPage() {
 
 	const handleCreateMessage = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		mutate({ product_id: productId });
+		mutate({ product_id: productId, type: 'personal', account_id: product.account_id });
 	};
 	if (isSuccess) {
-		navigate({ to: discussionRoot.to, search: { discussionId: discussion?.id } });
+		navigate({
+			to: discussionRoot.to,
+			search: {
+				filter: { type: 'private' },
+				provider_id: product.provider.id,
+				product_id: product.id,
+			},
+		});
 	}
 
 	const images = useMemo(() => {
@@ -109,7 +126,7 @@ export default function ProductDetailPage() {
 			<div className={`mt-5 w-app self-center`}>
 				<div className={`grid  grid-cols-12 gap-x-2`}>
 					<div className={`relative col-start-1 col-end-9`}>
-						<div className={`flex h-full items-center justify-center gap-x-1`}>
+						<div className={`flex h-full items-center justify-center gap-x-1 rounded-md border p-[1px]`}>
 							{images?.map((image, i) => {
 								return (
 									<button
@@ -133,16 +150,19 @@ export default function ProductDetailPage() {
 									e.preventDefault();
 									openPopUp();
 								}}
-								className="absolute left-3 top-3 flex flex-col items-center justify-between rounded-md bg-white px-2 py-1 hover:text-slate-600"
+								className="absolute bottom-3 flex rounded-md border bg-white px-2 py-[1px] hover:text-slate-600"
 							>
-								<Expand role="img" aria-label="expand" size={20} color={'black'} />
+								{/* <Expand role="img" aria-label="expand" size={20} color={'black'} /> */}
+								<span className="text-xs">
+									Voir {images?.length} photo{images?.length > 1 ? 's' : ''}
+								</span>
 							</button>
 							<div className={`absolute right-3 top-3 flex flex-row gap-x-3`}>
 								<Popover>
-									<PopoverTrigger className=" flex flex-col items-center justify-between rounded-xl   bg-white  px-2 py-1 hover:text-slate-600">
-										<Share2 color="black" role="img" aria-label="share" />
+									<PopoverTrigger className=" flex flex-col items-center justify-between rounded-xl border bg-white p-1 hover:text-slate-600">
+										<Share2 color="gray" size={20} role="img" aria-label="share" />
 									</PopoverTrigger>
-									<PopoverContent className="max-w-80">
+									<PopoverContent className="max-w-fit">
 										<div className="grid gap-4">
 											<div className="grid gap-2">
 												<h1>partagez l&apos;annonce </h1>
@@ -189,18 +209,18 @@ export default function ProductDetailPage() {
 						</span>
 					</div>
 					<div className={`col-start-9 col-end-13`}>
-						<div className="m-3 shadow-md">
+						<div className="m-3 rounded-md border">
 							<button
 								onClick={() =>
 									navigate({
-										to: '/otherProfile',
+										to: productsOtherRoot.to,
 										search: {
 											provider_id: product.provider.id,
-											filter: { status: ['AWAIT', 'VALID', 'REJECT'] },
+											filter: { status: 5 },
 										},
 									})
 								}
-								className="flex flex-row items-center gap-x-4 p-4"
+								className="group flex w-full flex-row items-center justify-between p-4"
 							>
 								<img src={product.provider.avatar_url} className="size-14 rounded-full" alt="" />
 								<div className={`flex flex-col items-start gap-y-2`}>
@@ -212,6 +232,7 @@ export default function ProductDetailPage() {
 										Inscrit {formatDate(product.provider.created_at)}
 									</span>
 								</div>
+								<ChevronRight size={20} className="text-gray-500 group-hover:text-gray-900" />
 							</button>
 							<div>
 								<div className="flex flex-col gap-y-2 p-5">
@@ -231,7 +252,6 @@ export default function ProductDetailPage() {
 											<span className={`text-[.85rem] text-white`}>Whatsapp</span>
 										</a>
 									)}
-
 									<a
 										href={'tel:+225' + product.provider.phone}
 										className="flex items-center justify-center  gap-x-1 rounded-md bg-green-600 px-8 py-2 text-white"
@@ -261,7 +281,9 @@ export default function ProductDetailPage() {
 							<div className={`flex flex-col gap-y-1 py-3`}>
 								<div className={`flex flex-col items-baseline	`}>
 									<h1 className={`font-roboto text-2xl`}>{product.title}</h1>
-									<span className={`font-roboto text-lg text-slate-700`}>{formatPrice(Number(product.price))}</span>
+									<span className={`font-roboto text-lg text-slate-700`}>
+										{formatPrice(Number(product.price))}
+									</span>
 								</div>
 							</div>
 							<div>
@@ -274,8 +296,8 @@ export default function ProductDetailPage() {
 													<BadgeInfo size={18} strokeWidth={0.75} color="black" />
 												</div>
 												<span className={`flex flex-col gap-y-0.5 text-xs font-light`}>
-													<span className={`capitalize text-gray-500`}>{f.name}</span>
-													<span className={`text-[.83rem] capitalize text-slate-950`}>{f.value}</span>
+													<span className={`capitalize text-gray-600`}>{f.name}</span>
+													<span className={`text-[.78rem] capitalize text-slate-950`}>{f.value}</span>
 												</span>
 											</div>
 										);
@@ -296,6 +318,7 @@ export default function ProductDetailPage() {
 								</button>
 							</div>
 						</div>
+						<SimilaireProduct categoryId={product.category_id} />
 					</div>
 					<div className={`col-start-9 col-end-13`}></div>
 				</div>

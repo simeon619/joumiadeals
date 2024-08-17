@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useAuth } from '@/services/state/User/auth';
 import { redirectToConnect } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
-import { useNavigate, useRouter } from '@tanstack/react-router';
-import { Loader, Shell } from 'lucide-react';
+import { useRouter } from '@tanstack/react-router';
+import { Loader } from 'lucide-react';
 import { useLayoutEffect } from 'react';
 
 export default function LoginPage() {
@@ -21,8 +22,9 @@ export default function LoginPage() {
 		created_at: string;
 		updated_at: string;
 		use_whatsapp: number;
-		role : string	
+		role: string;
 	};
+	console.log('🚀 ~ LoginPage ~ searchParams:', searchParams);
 	const name = searchParams.name;
 	const id = searchParams.id;
 	const token = searchParams.token;
@@ -53,7 +55,7 @@ export default function LoginPage() {
 					updated_at,
 					use_whatsapp: Number(use_whatsapp),
 					id,
-					role
+					role,
 				},
 			});
 			window.opener.dispatchEvent(customEvent);

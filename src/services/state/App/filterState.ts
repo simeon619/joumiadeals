@@ -26,10 +26,10 @@ export const useHideFilter = create(
 export const useSearchFilter = create(
 	combine(
 		{
-			value: {} as Omit<FilterProductType, 'status'>,
+			value: {} as FilterProductType,
 		},
 		(set) => ({
-			setFilter: (value: Omit<FilterProductType, 'status'>) => {
+			setFilter: (value: FilterProductType) => {
 				set(() => ({
 					value,
 				}));

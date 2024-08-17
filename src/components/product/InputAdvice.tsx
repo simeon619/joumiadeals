@@ -1,4 +1,4 @@
-import { capitalize } from '@/lib/utils';
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 export const InputAdvice = ({ advices = [] }: { advices?: string[] }) => {
 	return (
@@ -9,7 +9,7 @@ export const InputAdvice = ({ advices = [] }: { advices?: string[] }) => {
 						className={`flex items-center text-[.695rem] font-bold text-blue-400  before:m-1 before:inline-block before:size-1 before:rounded-full before:bg-blue-500 before:content-['']`}
 						key={i.toString()}
 					>
-						{capitalize(advice)}
+						{capitalizeFirstLetter(advice)}
 					</span>
 				);
 			})}

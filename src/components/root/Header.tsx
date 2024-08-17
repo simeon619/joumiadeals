@@ -11,18 +11,18 @@ import { getAllChildCategoriesOptions, getAllfeaturesOptions } from '@/utils/que
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { Bell, Heart, Mail, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebounce } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
+import FilterProduct from '../product/filter/FilterProduct';
 import AvatarComponent from '../ui/AvatarComponent';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
-import clsx from 'clsx';
-import { useHideFilter } from '@/services/state/App/filterState';
-import FilterProduct from '../product/filter/FilterProduct';
+
 const SearchSchema = z.object({
 	search: z.string(),
 });
@@ -39,20 +39,21 @@ export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
-	const { value, direction } = useHideFilter((state) => state);
+	// const { value, direction } = useHideFilter((state) => state);
 	const [isShadow, setIsShadow] = useState(false);
 	const [searchterms, setSearchterms] = useState<Record<string, string>>({});
 	const navigate = useNavigate({ from: productsRoot.fullPath });
 	const { watch, register } = useForm<SearchSchemaType>({
 		resolver: zodResolver(SearchSchema),
 	});
+
 	const styleFilter = clsx(
-		'absolute inset-x-0 flex items-center justify-center bg-white p-1 transition-all duration-500 ease-in-out',
-		{
-			'bottom-[0%] -z-10': value <= 0.15,
-			'bottom-[-86%] shadow-md z-10': value > 0.15 && direction === 'up',
-			'-z-10 opacity-0': direction === 'down',
-		}
+		'absolute -z-1 flex w-full items-center justify-center border-t-[1px] border-gray-100  bg-white p-1 shadow-sm'
+		// {
+		// 	'bottom-[0%] -z-10': value <= 0.15,
+		// 	'bottom-[-86%] shadow-md z-10': value > 0.15 && direction === 'up',
+		// 	'-z-10 opacity-0': direction === 'down',
+		// }
 	);
 	const searchTerm = watch('search');
 	const [currentTab, setCurrentTab] = useState(0);
@@ -100,7 +101,7 @@ export default function Header() {
 	function goSearchCategory(event: any, id: string) {
 		navigate({
 			to: productsRoot.to,
-			search: { filter: { category_id: id, text: searchTerm, status: ['VALID', 'AWAIT'] }, page: 1 },
+			search: { filter: { category_id: id, text: searchTerm, status: 5 }, page: 1 },
 		});
 		event.preventDefault();
 		handleBlurSearch();
@@ -138,11 +139,11 @@ export default function Header() {
 	return (
 		<div
 			className={twMerge(
-				'sticky top-0 z-20 flex w-full justify-center flex-col items-center duration-300 bg-white',
+				'sticky top-0 z-20 flex w-full justify-center flex-col items-center bg-white',
 				isShadow && 'shadow-md'
 			)}
 		>
-			<div className="flex flex-col bg-white py-2">
+			<div className="flex flex-col items-center  bg-white py-2">
 				<div className={`relative flex items-center justify-between gap-x-3`}>
 					<Name />
 					<SetAdvert />
@@ -219,7 +220,7 @@ export default function Header() {
 						</div>
 					</div>
 					<div className="flex justify-between gap-x-3">
-						<Link to="/myprofile/historique" className={wrapIcon}>
+						<Link to="/myprofile/historique" search={{ page: 1 }} className={wrapIcon}>
 							<Bell size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
 							<span className={contentIcon}>Mon historique</span>
 							<div className={UnderlineHover} />
@@ -230,7 +231,7 @@ export default function Header() {
 							<div className={UnderlineHover} />
 						</Link>
 
-						<Link to="/discussion" className={wrapIcon}>
+						<Link to="/discussion" search={{ filter: { type: 'private' } }} className={wrapIcon}>
 							<Mail size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
 							<span className={contentIcon}>Messages</span>
 							<div className={UnderlineHover} />
@@ -239,7 +240,7 @@ export default function Header() {
 							<Link
 								className={wrapIcon}
 								to={'/myprofile'}
-								search={{ provider_id: InfoUser.id, filter: { status: ['AWAIT', 'VALID'] } }}
+								search={{ provider_id: InfoUser.id, filter: { status: 5 } }}
 							>
 								<AvatarComponent name={InfoUser.name} url={InfoUser.avatar_url || ''} />
 								<div className={UnderlineHover} />
@@ -258,7 +259,7 @@ export default function Header() {
 					</div>
 				</div>
 			</div>
-			<FilterProduct style={styleFilter}  />
+			<FilterProduct style={styleFilter} isHeader={true} />
 		</div>
 	);
 }

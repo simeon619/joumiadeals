@@ -2,8 +2,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Outlet } from '@tanstack/react-router';
 import { ScrollRestoration } from '@tanstack/react-router';
 import  { Suspense, useEffect, useRef, useState } from 'react'
-
+// import { Transmit } from '@adonisjs/transmit-client'
 export default function RootPage() {
+    useEffect(() => {
+        
+    }, []);
   
     return (
         <div >

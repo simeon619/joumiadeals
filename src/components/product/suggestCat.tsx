@@ -15,12 +15,12 @@ export default function suggestCat({
 }) {
 	return (
 		<button
-  onClick={() => collectFeatures(stepC)}
+  onClick={() => collectFeatures(stepC.reverse())}
   className={clsx(
     'm-3 inline-flex transform-cpu items-center justify-center gap-1 rounded-lg bg-blue-200 p-1 font-roboto transition-all duration-300 ease-in-out hover:scale-105 hover:font-BlackOpsOne hover:shadow-2xl'
   )}
 >
-  {stepC.map((catId, index) => {
+  {stepC.reverse().map((catId, index) => {
     return (
       <div key={index} className={clsx('inline-flex items-center justify-center gap-1')}>
         <span className={clsx('text-[.705rem] capitalize')}>

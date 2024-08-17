@@ -1,22 +1,25 @@
-import HomePage from '@/pages/index/HomePage';
 import AuthLayout from '@/pages/_layout/AuthLayout';
 import IndexLayout from '@/pages/_layout/IndexLayout';
 import ProfileLayout from '@/pages/_layout/ProfileLayout';
 import RegisterPage from '@/pages/auth/RegisterPage';
+import HomePage from '@/pages/index/HomePage';
 // import { useAuth } from '@/services/state/User/auth';
-import {
-	ErrorComponent,
-	createRootRouteWithContext,
-	createRoute,
-	createRouter,
-	ScrollRestoration,
-} from '@tanstack/react-router';
-import { Outlet } from '@tanstack/react-router';
+import RootPage from '@/components/root/RootPage';
 import LoginPage from '@/pages/auth/LoginPage';
-import MyprofilePage from '@/pages/profile/index/MyprofilePage';
-import { QueryClient } from '@tanstack/react-query';
-import ProductsPage from '@/pages/index/ProductsPage';
+import CreateProduct from '@/pages/index/CreateProduct';
 import ProductDetailsPage from '@/pages/index/ProductDetailsPage';
+import ProductsPage from '@/pages/index/ProductsPage';
+import AvisPage from '@/pages/profile/AvisPage';
+import Discussion from '@/pages/profile/Discussion';
+import MyprofilePage from '@/pages/profile/index/MyprofilePage';
+import ProfilePage from '@/pages/profile/index/ProfilePage';
+import Myannounce from '@/pages/profile/Myannounce';
+import MyFavourite from '@/pages/profile/MyFavourite';
+import OtherAnnouncePage from '@/pages/profile/OtherAnnouncePage';
+import { FilterDiscussionSchema } from '@/services/api/discussions';
+import { pageSchema } from '@/services/api/product_categorie';
+import { UserType, useAuth } from '@/services/state/User/auth';
+
 import {
 	RequestDataSchema,
 	RequestFilterProductSchema,
@@ -27,27 +30,28 @@ import {
 	// getMessagesQueryOptions,
 	getOptionsFavouriteProduct,
 	getProductOptions,
-	getProductsByfiltrOptions,
+	// getProductsByfiltrOptions,
 	getProductsOptions,
+	getVisitedProductsOptions,
 } from '@/utils/queryOptions';
-import CreateProduct from '@/pages/index/CreateProduct';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { UserType, useAuth } from '@/services/state/User/auth';
-import ProfilePage from '@/pages/profile/index/ProfilePage';
-import Myannounce from '@/pages/profile/Myannounce';
-import MyFavourite from '@/pages/profile/MyFavourite';
-import { pageSchema } from '@/services/api/product_categorie';
-import { Suspense, useRef, useState } from 'react';
-import Discussion from '@/pages/profile/Discussion';
+import { QueryClient } from '@tanstack/react-query';
+import {
+	ErrorComponent,
+	createRootRouteWithContext,
+	createRoute,
+	createRouter,
+} from '@tanstack/react-router';
 import { z } from 'zod';
-import RootPage from '@/components/root/RootPage';
+import { initTransmit } from './transmit';
+import HistorisquePage from '@/pages/profile/HistorisquePage';
 // import { getDiscussions } from '@/services/api/discussions';
 const rootRoute = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
-	component:  RootPage,
+	component: RootPage,
 	beforeLoad() {
 		useAuth.getState().verifToken();
+		initTransmit();
 		//@ts-expect-error dert
 		addEventListener('iui', (event: { detail: UserType }) => {
 			useAuth.getState().login(event.detail);
@@ -60,18 +64,34 @@ const authLayout = createRoute({
 	id: 'auth',
 	component: AuthLayout,
 });
+
 const indexLayout = createRoute({
 	getParentRoute: () => rootRoute,
 	id: 'index',
 	component: IndexLayout,
 });
-
+//  const otherProfileLayout = createRoute({
+// 	getParentRoute: () => rootRoute,
+// 	id: 'otherProfile',
+// 	// parseParams: (params) => ({
+// 	// 	profileId: z.string().parse(String(params.profileId)),
+// 	// }),
+// 	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
+// 	// loader: ({ context: { queryClient }, params: { profileId } }) =>
+// 	// 	queryClient.ensureQueryData(accountQueryOptions(profileId)),
+// 	component: ProfilePage,
+// });
 const profileLayout = createRoute({
 	getParentRoute: () => rootRoute,
 	id: 'profile',
 	component: ProfileLayout,
+	wrapInSuspense: true,
 });
-
+const otherProfileLayout = createRoute({
+	getParentRoute: () => rootRoute,
+	id: 'otherProfile',
+	component: ProfileLayout,
+});
 export const loginRoot = createRoute({
 	getParentRoute: () => authLayout,
 	path: 'connexion',
@@ -84,25 +104,18 @@ export const registerRoot = createRoute({
 	component: RegisterPage,
 });
 
-export const myprofileRoot = createRoute({
-	getParentRoute: () => profileLayout,
-	path: '/myprofile',
-	component: MyprofilePage,
-});
-
 export const announceRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
 	path: '/',
 	validateSearch: (params) => RequestDataSchema.parse(params),
 	// preSearchFilters: [(search)=>({...search,filter:{...search.filter, text: undefined}})],
-
 	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
 		provider_id,
 		filter,
 		page,
 	}),
 	loader: (opts) => {
-		opts.context.queryClient.ensureQueryData(getProductsByfiltrOptions(opts.deps));
+		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
 		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
 	},
 	wrapInSuspense: true,
@@ -119,11 +132,17 @@ export const favouriteRoot = createRoute({
 	loader: ({ context: { queryClient }, deps: { page } }) =>
 		queryClient.ensureQueryData(getOptionsFavouriteProduct({ page })),
 	component: MyFavourite,
+	wrapInSuspense: true,
 });
 export const visitedRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
 	path: 'historique',
-	component: () => <div>historique</div>,
+	validateSearch: (params) => pageSchema.parse(params),
+	loaderDeps: ({ search: { page } }) => ({ page }),
+	loader: ({ context: { queryClient }, deps: { page } }) =>
+		queryClient.ensureQueryData(getVisitedProductsOptions({ page })),
+	component: HistorisquePage,
+	wrapInSuspense: true,
 });
 export const discussionSchema = z.object({ discussionId: z.string().optional() });
 
@@ -132,12 +151,19 @@ export const discussionRoot = createRoute({
 	path: 'discussion',
 	component: Discussion,
 	// parseParams: (params) => ({
-	// 	discussionId: z.string().optional().parse(params),
+	// 	productId: z.any().optional().parse(params),
 	// }),
-	validateSearch: (params) => discussionSchema.parse(params),
-	// loaderDeps: ({ search: { } }) => ({ page , limit }),
-	loader: ({ context: { queryClient } }) =>
-		queryClient.ensureQueryData(getDiscussionsQueryOptions()),
+	validateSearch: (params) => FilterDiscussionSchema.parse(params),
+	loaderDeps: ({ search: { filter, page, product_id, provider_id } }) => ({
+		page,
+		filter,
+		product_id,
+		provider_id,
+	}),
+	loader: ({ context: { queryClient }, deps: { filter, page, product_id, provider_id } }) =>
+		queryClient.ensureQueryData(
+			getDiscussionsQueryOptions({ filter, page, product_id, provider_id })
+		),
 });
 
 const homeRoot = createRoute({
@@ -145,9 +171,25 @@ const homeRoot = createRoute({
 	path: '/',
 	component: HomePage,
 });
-export const profileRoot = createRoute({
+export const myprofileRoot = createRoute({
 	getParentRoute: () => profileLayout,
-	path: 'otherProfile',
+	path: '/myprofile',
+	component: MyprofilePage,
+	wrapInSuspense: true,
+});
+
+export const profileOtherRoot = createRoute({
+	getParentRoute: () => otherProfileLayout,
+	path: 'o_profile',
+	wrapInSuspense: true,
+	component: ProfilePage,
+	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
+	// shouldReload: true,
+});
+
+export const productsOtherRoot = createRoute({
+	getParentRoute: () => profileOtherRoot,
+	path: 'announceOther',
 	validateSearch: (params) => RequestDataSchema.parse(params),
 	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
 		provider_id,
@@ -155,20 +197,26 @@ export const profileRoot = createRoute({
 		page,
 	}),
 	loader: (opts) => {
-		opts.context.queryClient.ensureQueryData(getProductsByfiltrOptions(opts.deps));
+		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
 		// opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
 		opts.context.queryClient.ensureQueryData(accountQueryOptions(opts.deps.provider_id));
 	},
 	wrapInSuspense: true,
-	// parseParams: (params) => ({
-	// 	profileId: z.string().parse(String(params.profileId)),
-	// }),
+	component: OtherAnnouncePage,
 	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
-	// loader: ({ context: { queryClient }, params: { profileId } }) =>
-	// 	queryClient.ensureQueryData(accountQueryOptions(profileId)),
-
-	component: ProfilePage,
 });
+
+export const noticesAccountRoot = createRoute({
+	getParentRoute: () => profileOtherRoot,
+	path: 'notices',
+	validateSearch: (params) => FilterDiscussionSchema.parse(params),
+	loaderDeps: ({ search: { filter, page, provider_id } }) => ({ page, filter, provider_id }),
+	loader: ({ context: { queryClient }, deps: { filter, page, provider_id } }) =>
+		queryClient.ensureQueryData(getDiscussionsQueryOptions({ filter, page, provider_id })),
+	component: AvisPage,
+});
+
+// export const comments
 
 export const productsRoot = createRoute({
 	getParentRoute: () => indexLayout,
@@ -178,13 +226,11 @@ export const productsRoot = createRoute({
 		page,
 	}),
 	path: 'products',
-
 	loader: (opts) => {
 		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
 		opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
 	},
 	wrapInSuspense: true,
-
 	component: ProductsPage,
 });
 
@@ -207,12 +253,9 @@ export const productDetailsRoot = createRoute({
 	component: ProductDetailsPage,
 });
 const routeTree = rootRoute.addChildren([
-	indexLayout.addChildren([
-		homeRoot,
-		profileRoot,
-		productsRoot,
-		productDetailsRoot,
-		createProductRoot,
+	indexLayout.addChildren([homeRoot, productsRoot, productDetailsRoot, createProductRoot]),
+	otherProfileLayout.addChildren([
+		profileOtherRoot.addChildren([productsOtherRoot, noticesAccountRoot]),
 	]),
 	authLayout.addChildren([registerRoot, loginRoot]),
 	profileLayout.addChildren([

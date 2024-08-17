@@ -1,12 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { queryClient } from '@/lib/route';
 import { ToastError, ToastSuccess } from '@/lib/utils';
-import { getDiscussions, sendMessage } from '@/services/api/discussions';
-import { getAcount } from '@/services/api/user';
+import {
+	checkAllUnreadMessages,
+	checkUnreadMessages,
+	FilterDiscussionType,
+	getDiscussions,
+	getMessages,
+	markAsRead,
+	sendMessage,
+} from '@/services/api/discussions';
+import { getAcount, getMyLike, toggleLike } from '@/services/api/user';
+import { useAuth } from '@/services/state/User/auth';
 import { keepPreviousData, queryOptions, useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 import { createDiscussion } from './../services/api/discussions';
 import {
 	addFavouriteProduct,
+	addVisitedProduct,
 	createProduct,
 	deleteFavouriteProduct,
 	deleteProduct,
@@ -18,16 +29,17 @@ import {
 	getFeaturesCategory,
 	getProduct,
 	getProducts,
-	getProductsByFiltr,
+	getVisitedProducts,
 	reportProduct,
 	updateProduct,
 } from './../services/api/product_categorie';
 export const LIMIT_PRODUCT_PAGE = 7;
 
-export function accountQueryOptions(accountId: string) {
+export function accountQueryOptions(accountId: number) {
 	return queryOptions({
 		queryKey: ['account', accountId],
 		queryFn: () => getAcount({ accountId }),
+		enabled: Boolean(accountId),
 	});
 }
 
@@ -71,10 +83,11 @@ export function useCreateProductMutation() {
 	});
 }
 
-export function getFeatureProductOptions(product_id: string) {
+export function getFeatureProductOptions(product_id: string | undefined) {
 	return queryOptions({
 		queryKey: ['featuresValues', product_id],
 		queryFn: () => get_feature_values_product({ product_id }),
+		enabled: Boolean(product_id),
 		placeholderData: keepPreviousData,
 	});
 }
@@ -93,41 +106,40 @@ export function useDeleteProductMutation() {
 
 const OrderBy = z.enum(['date_desc', 'date_asc', 'price_desc', 'price_asc']);
 
-const FilterProductSchema = z.object({
-	category_id: z.string(),
-	order_by: OrderBy.optional(),
-	text: z.string().optional(),
-	status: z.array(z.string()),
-	features: z
-		.array(
-			z.object({
-				feature_id: z.string(),
-				value: z.union([z.string(), z.array(z.number())]),
-			})
-		)
-		.optional(),
-	price: z.tuple([z.number(), z.number()]).optional(),
-});
+// const FilterProductSchema = z.object({
+// 	category_id: z.string(),
+// 	order_by: OrderBy.optional(),
+// 	text: z.string().optional(),
+// 	status: z.array(z.string()),
+// 	features: z
+// 		.array(
+// 			z.object({
+// 				feature_id: z.string(),
+// 				value: z.union([z.string().nullable(), z.array(z.number().nullable())]).optional(),
+// 			})
+// 		)
+// 		.optional(),
+// 	price: z.tuple([z.number().nullable(), z.number().nullable()]).optional(),
+// });
 const FilterSchema = z.object({
 	category_id: z.string().optional(),
 	order_by: OrderBy.optional(),
 	text: z.string().optional(),
-	price: z.tuple([z.number(), z.number()]).optional(),
-	status: z.array(z.string()),
-	features: z
-		.array(
-			z.object({
-				feature_id: z.string(),
-				value: z.union([z.string(), z.array(z.number())]),
-			})
-		)
-		.optional(),
+	price: z.tuple([z.number().nullable(), z.number().nullable()]).optional(),
+	status: z.number(),
+	features: z.record(z.union([z.string(), z.array(z.union([z.string(), z.number()]))])).optional(),
+	// features: z
+	// 	.object({
+	// 		feature_id: z.string(),
+	// 		value: z.union([z.string().nullable(), z.array(z.number().nullable())]).optional(),
+	// 	})
+	// 	.optional(),
 });
 
-export type FilterProductType = z.infer<typeof FilterProductSchema>;
+export type FilterProductType = z.infer<typeof FilterSchema>;
 
 export const RequestDataSchema = z.object({
-	provider_id: z.string(),
+	provider_id: z.number(),
 	page: z.number().optional(),
 	filter: FilterSchema,
 });
@@ -136,7 +148,7 @@ export type RequestDataType = z.infer<typeof RequestDataSchema>;
 export const RequestFilterProductSchema = z.object({
 	// limit: z.number().default(),
 	page: z.number().optional(),
-	filter: FilterProductSchema,
+	filter: FilterSchema,
 });
 
 export type RequestFilterProductType = z.infer<typeof RequestFilterProductSchema>;
@@ -149,13 +161,13 @@ export function getProductsOptions(RequestData: RequestFilterProductType) {
 	});
 }
 
-export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
-	return queryOptions({
-		queryKey: ['productsByfiltr', Requestfiltre],
-		queryFn: () => getProductsByFiltr(Requestfiltre),
-		placeholderData: keepPreviousData,
-	});
-}
+// export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
+// 	return queryOptions({
+// 		queryKey: ['productsByfiltr', Requestfiltre],
+// 		queryFn: () => getProductsByFiltr(Requestfiltre),
+// 		placeholderData: keepPreviousData,
+// 	});
+// }
 
 export function getProductOptions(id: string) {
 	return queryOptions({
@@ -170,13 +182,14 @@ export function getAllFavouriteProductIds() {
 		queryFn: getFavouriteProductsId,
 		gcTime: Infinity,
 		staleTime: Infinity,
+		placeholderData: keepPreviousData,
+		enabled: useAuth.getState().isAuth,
 	});
 }
 ///****FAVOURITE PRODUCT */
 export function useUpdateMutationproduct() {
 	return useMutation({
 		mutationFn: updateProduct,
-
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
 			ToastSuccess('Annonce modifie avec success');
@@ -243,6 +256,25 @@ export function getOptionsFavouriteProduct(paginate: { page: number }) {
 	});
 }
 
+//*****LIKES */
+
+export function getLikeOptions(data: { id: any; type: 'account' | 'message' }) {
+	return queryOptions({
+		queryKey: ['getLike', data],
+		queryFn: () => getMyLike(data),
+		placeholderData: keepPreviousData,
+		enabled: useAuth.getState().isAuth,
+	});
+}
+export function useToggleLikeMutation() {
+	return useMutation({
+		mutationFn: toggleLike,
+		onSuccess: (data, { id, type, value }) => {
+			queryClient.invalidateQueries({ queryKey: ['getLike', { id, type }] });
+		},
+	});
+}
+
 //*****REPORT PRODUCT */
 
 export function useReportProductMutation() {
@@ -259,11 +291,38 @@ export function useReportProductMutation() {
 
 //*****DISCUSSIONS */
 
+export function getAllUnreadMessagesOptions() {
+	return queryOptions({
+		queryKey: ['getAllUnreadMessages'],
+		queryFn: () => checkAllUnreadMessages(),
+		enabled: useAuth.getState().isAuth,
+	});
+}
+
+export function getUnreadMessagesOptions(discussion_id: number) {
+	return queryOptions({
+		queryKey: ['getUnreadMessages', discussion_id],
+		queryFn: () => checkUnreadMessages(discussion_id),
+		// enabled: useAuth.getState().isAuth,
+	});
+}
+export function useMarkAsReadMutation() {
+	return useMutation({
+		mutationFn: markAsRead,
+		onSuccess: async (data, variables) => {
+			await queryClient.invalidateQueries({ queryKey: ['getUnreadMessages', variables] });
+			await queryClient.invalidateQueries({ queryKey: ['getAllUnreadMessages'] });
+		},
+		onError: (err) => {
+			ToastError(err.message);
+		},
+	});
+}
 export function useSendMessageMutation() {
 	return useMutation({
 		mutationFn: sendMessage,
-		onSuccess: async (data) => {
-			await queryClient.invalidateQueries({ queryKey: ['getMessages', data?.discussion_id] });
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getDiscussions'] });
 			ToastSuccess('ok');
 		},
 		onError: () => {
@@ -287,20 +346,45 @@ export function useCreateDiscussionMutaton() {
 	});
 }
 
-export function getDiscussionsQueryOptions() {
+export function getDiscussionsQueryOptions(requestDiscussion: FilterDiscussionType) {
 	return queryOptions({
-		queryKey: ['getDiscussions'],
-		queryFn: getDiscussions,
+		queryKey: ['getDiscussions', requestDiscussion],
+		queryFn: () => getDiscussions(requestDiscussion),
 		placeholderData: keepPreviousData,
 	});
 }
 
-// export function getMessagesQueryOptions({ page = 1}) {
-// 	return queryOptions({
-// 		queryKey: ['getMessages', {page}],
-// 		queryFn: () => getMessages({ page}),
-// 		initi
+export function getMessagesQueryOptions({
+	page = 1,
+	discussion_id,
+}: {
+	page?: number;
+	discussion_id: number | undefined;
+}) {
+	return queryOptions({
+		queryKey: ['getMessages', { page, discussion_id }],
+		queryFn: () => getMessages({ page, discussion_id }),
+		placeholderData: keepPreviousData,
+	});
+}
 
-// 		placeholderData: keepPreviousData,
-// 	});
-// }
+///****VISITED PRODUCT */
+export function useAddVisitedProductMutation() {
+	return useMutation({
+		mutationFn: addVisitedProduct,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['getVisitedProducts'] });
+			ToastSuccess('Annonce ajoute au favoris');
+		},
+	});
+}
+
+export function getVisitedProductsOptions({ page }: { page: number }) {
+	return queryOptions({
+		queryKey: ['getVisitedProducts', page],
+		queryFn: () => getVisitedProducts({ page }),
+		staleTime: Infinity,
+		placeholderData: keepPreviousData,
+		enabled: useAuth.getState().isAuth,
+	});
+}

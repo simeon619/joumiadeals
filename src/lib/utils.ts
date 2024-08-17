@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CategoryType, f_form_type } from '@/services/api/product_categorie';
+import { CategoryType, f_form_type, StatusType } from '@/services/api/product_categorie';
 import { type ClassValue, clsx } from 'clsx';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
 
@@ -16,7 +16,7 @@ export function getRandomInt(min: number, max: number) {
 }
 
 export function redirectToConnect() {
-	window.location.href = 'http://localhost:3000/connexion';
+	window.location.href = 'http://localhost:3333/connexion';
 }
 export function truncateFirstName(name: string | undefined | null) {
 	if (!name) {
@@ -57,6 +57,7 @@ export const onCreateProduct = ({
 	errorInput: Record<string, any>;
 	createProduct: (args: any) => void;
 }) => {
+	console.log('🚀 ~ fieldSelect:', fieldSelect?.split(',')[0]);
 	for (const [key, value] of Object.entries({ ...dataProduct, ...dataFeatureProduct })) {
 		if (value === null || value === '') {
 			return ToastWarn(key.split(':')[0] + ' est obligatoire');
@@ -75,12 +76,13 @@ export const onCreateProduct = ({
 	if (!fieldSelect) {
 		return ToastWarn('Vous devez sélectionner une catégorie');
 	}
+	const len = fieldSelect?.split(',').length;
 	try {
 		createProduct({
 			dataProduct: {
 				...dataProduct,
 				featuresProduct: dataFeatureProduct,
-				category_id: fieldSelect?.split(',')[0],
+				category_id: fieldSelect?.split(',')[len - 1],
 			},
 			photos: filesData,
 		});
@@ -105,7 +107,7 @@ export const ProductSchema = z.object({
 export type ProductSchemaType = z.infer<typeof ProductSchema>;
 export type CatCreateType = Omit<CategoryType[0], 'created_at' | 'updated_at'>;
 export function validField(rule: f_form_type, caracteristique: { [k: string]: string | number }) {
-	const nameId = rule.id ? `${rule.name}:${rule.id}` : `${rule.name}`;
+	const nameId = rule.feature_id ? `${rule.name}:${rule.feature_id}` : `${rule.name}`;
 	const value = caracteristique[nameId];
 	if (value !== undefined) {
 		if (rule.collect_type === 'select') {
@@ -242,9 +244,31 @@ export function ToastSuccess(message: string) {
 		},
 	});
 }
-
+export function ToastLoading(message: string, myPromise: Promise<any>) {
+	toast.promise(
+		myPromise,
+		{
+			loading: 'Loading',
+			success: message,
+			error: 'Error when fetching',
+		},
+		{
+			style: {
+				minWidth: '250px',
+			},
+			success: {
+				duration: 5000,
+				icon: '🔥',
+			},
+			error: {
+				duration: 5000,
+				icon: '',
+			},
+		}
+	);
+}
 export function ToastWarn(message: string) {
-	toast.info(message, {
+	toast.error(message, {
 		position: 'top-center',
 		style: {
 			border: '1px solid #713200',
@@ -255,7 +279,7 @@ export function ToastWarn(message: string) {
 }
 
 export function ToastInfo(message: string) {
-	toast.info(message, {
+	toast.success(message, {
 		position: 'top-center',
 		style: {
 			border: '1px solid #713200',
@@ -272,9 +296,27 @@ export function formatPrice(price: number): string {
 		maximumFractionDigits: 0,
 		minimumFractionDigits: 0,
 		minimumIntegerDigits: 1,
-		
 	});
 }
-export const capitalize = (str: string) => {
+export const capitalizeFirstLetter = (str: string) => {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export function getStatusByLevel(level: number): StatusType[] {
+	switch (level) {
+		case 0:
+			return ['AWAIT'];
+		case 1:
+			return ['VALID'];
+		case 2:
+			return ['REJECTED'];
+		case 3:
+			return ['DELETED'];
+		case 4:
+			return ['PAUSE'];
+		case 5:
+			return ['AWAIT', 'DELETED', 'PAUSE', 'REJECTED', 'VALID'];
+		default:
+			return ['VALID'];
+	}
+}

@@ -1,6 +1,5 @@
-import { getToken, setToken } from '@/lib/utils';
+import { setToken, ToastError, ToastSuccess } from '@/lib/utils';
 import { BASE_URL } from '@/utils/constante';
-import { toast } from 'sonner';
 import { z } from 'zod';
 import { create } from 'zustand';
 import { combine, createJSONStorage, persist } from 'zustand/middleware';
@@ -90,47 +89,41 @@ export const useAuth = create(
 						},
 						body: JSON.stringify(dataS),
 					});
-
 					const data = await response.json();
+					console.log('🚀 ~ register: ~ data:', data);
 					const infoUser = userSchema.safeParse(data);
 
 					if (!infoUser.success) {
 						console.log(infoUser.error);
-						toast.error('Une erreur est survenue, veuillez reessayer', {
-							position: 'top-center',
-							style: { background: '#f87171', color: 'white' },
-						});
+						ToastError('Une erreur est survenue, veuillez reessayer' + infoUser.error);
 						return;
 					}
-					toast.success(' Connexion reussie', { position: 'top-center' });
+					ToastSuccess(' Connexion reussie');
 					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
+					// const token = JSON.parse(infoUser.data.token) ;
 					setToken(infoUser.data.token);
+					console.log('🚀 ~ register: ~ infoUser.data.token:', JSON.parse(infoUser.data.token));
 				},
 
 				login: (dataS: UserType) => {
-					console.log("🚀 ~ dataS:", dataS)
+					console.log('🚀 ~ dataS:', dataS);
 					const infoUser = userSchema.safeParse(dataS);
-					console.log("🚀 ~ infoUser:", infoUser)
+					console.log('🚀 ~ infoUser:', infoUser);
 					if (!infoUser.success) {
-						toast.error('Une erreur est survenues, veuillez reessayer', {
-							position: 'top-center',
-							style: { background: '#f87171', color: 'white' },
-						});
+						ToastError('Une erreur est survenues, veuillez reessayer');
 						console.log(infoUser.error);
 
 						return;
 					}
+					// const token = JSON.parse(infoUser.data.token);
 					setToken(infoUser.data.token);
-					toast.success('Heureux de vous revoir', {
-						position: 'top-center',
-						style: { background: 'green', color: 'white' },
-					});
+					ToastSuccess('Heureux de vous revoir');
 					if (infoUser.success)
 						set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
 
 				me: async () => {
-					const response = await fetch('http://localhost:3000/me', {
+					const response = await fetch('http://localhost:3333/me', {
 						method: 'GET',
 						headers: getHeaders(),
 					});
@@ -138,10 +131,7 @@ export const useAuth = create(
 					const infoUser = userSchema.safeParse(data);
 
 					if (!infoUser.success) {
-						toast.error('Une erreur est survenue, veuillez reessayer', {
-							position: 'top-center',
-							style: { background: '#f87171', color: 'white' },
-						});
+						ToastError('Une erreur est survenue, veuillez reessayer');
 						return;
 					}
 					set(() => ({ InfoUser: infoUser.data, isAuth: true }));
@@ -155,16 +145,10 @@ export const useAuth = create(
 					const data = await response.json();
 					const infoUser = userUpdateSchema.safeParse(data);
 					if (!infoUser.success) {
-						toast.error('Une erreur est survenue, veuillez reessayer', {
-							position: 'top-center',
-							style: { background: '#f87171', color: 'white' },
-						});
+						ToastError('Une erreur est survenue, veuillez reessayer');
 						return;
 					} else {
-						toast.success('Modification reussie', {
-							position: 'top-center',
-							style: { background: 'green', color: 'white' },
-						});
+						ToastSuccess('Modification reussie');
 
 						// set(() => ({ InfoUser: { ...infoUser.data, token: getToken() }, isAuth: true }));
 					}
@@ -176,18 +160,12 @@ export const useAuth = create(
 					});
 					const data = await response.json();
 					if (data.errors) {
-						toast.error('Une erreur est survenue, veuillez reessayer', {
-							position: 'top-center',
-							style: { background: '#f87171', color: 'white' },
-						});
+						ToastError('Une erreur est survenue, veuillez reessayer');
 						return;
 					}
 					localStorage.removeItem('token');
 					set(() => ({ isAuth: false, InfoUser: {} as UserType, isConnect: false }));
-					toast.success(' Deconnexion reussie', {
-						position: 'top-center',
-						style: { background: 'green', color: 'white' },
-					});
+					ToastSuccess(' Deconnexion reussie');
 				},
 				verifToken: async () => {
 					if (!get().isConnect) return;

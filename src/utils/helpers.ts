@@ -18,7 +18,6 @@ export const filterCategory = (searchTerm: string, data: CategoryType, fields: f
 		const field = fields.filter((field) => field.category_id === item.id);
 		const caracMatch = field?.some((fieldItem) =>
 			fieldItem.enum?.some((enumItem) => {
-				console.log('🚀 ~ caracMatch ~ enumItem:', enumItem);
 				const enumItemNormalized = (enumItem as string)
 					.toLowerCase()
 					.normalize('NFD')

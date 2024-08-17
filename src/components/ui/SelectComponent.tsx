@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	Select,
 	SelectContent,
@@ -15,7 +16,7 @@ export default function SelectComponent({
 	style,
 }: {
 	values: (string | number | undefined)[];
-	setValues: React.Dispatch<React.SetStateAction<string | number | undefined>>;
+	setValues: any;
 	label: string;
 	defaultValue?: string;
 	style?: string;

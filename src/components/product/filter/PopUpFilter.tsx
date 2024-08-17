@@ -5,24 +5,32 @@ import { productsRoot } from '@/lib/route';
 import { CatCreateType } from '@/lib/utils';
 import { f_form_type } from '@/services/api/product_categorie';
 import { useSearchFilter, useShowPopupFilter } from '@/services/state/App/filterState';
-import { get_children, getCategorieById } from '@/utils/mock/Menucaegorie';
+import {
+	get_all_parents,
+	get_children,
+	get_firt_or_second_cat,
+	getCategorieById,
+} from '@/utils/mock/Menucaegorie';
 import { getAllChildCategoriesOptions, getAllfeaturesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { AlignRight, ArrowLeftFromLine, ChevronRight, Search } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { ArrowLeftFromLine, ChevronRight, Search } from 'lucide-react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useDebounce } from 'react-use';
 import { z } from 'zod';
+import { FeatureComponentCheck } from './component/FeatureComponentCheck';
+
 const filterProductSchema = z.object({
 	price_min: z.number(),
 	price_max: z.number(),
 });
 
-export type FilterProductType = z.infer<typeof filterProductSchema>;
+// export type FilterProductType = z.infer<typeof filterProductSchema>;
 
 const SearchSchema: f_form_type[] = [
 	{
-		name: 'prix',
+		name: 'prix:price',
 		collect_type: 'number',
 		icon:
 			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWJhZGdlLWNlbnQiPjxwYXRoIGQ9Ik0zLjg1IDguNjJhNCA0IDAgMCAxIDQuNzgtNC43NyA0IDQgMCAwIDEgNi43NCAwIDQgNCAwIDAgMSA0Ljc4IDQuNzggNCA0IDAgMCAxIDAgNi43NCA0IDQgMCAwIDEtNC43NyA0Ljc4IDQgNCAwIDAgMS02Ljc1IDAgNCA0IDAgMCAxLTQuNzgtNC43NyA0IDQgMCAwIDEgMC02Ljc2WiIvPjxwYXRoIGQ9Ik0xMiA3djEwIi8+PHBhdGggZD0iTTE1LjQgMTBhNCA0IDAgMSAwIDAgNCIvPjwvc3ZnPg==',
@@ -38,7 +46,7 @@ const SearchSchema: f_form_type[] = [
 	// 	id: '2',
 	// },
 	{
-		name: 'Tri',
+		name: 'Tri:order_by',
 		collect_type: 'radio',
 		icon:
 			'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWFycm93LWRvd24td2lkZS1uYXJyb3ciPjxwYXRoIGQ9Im0zIDE2IDQgNCA0LTQiLz48cGF0aCBkPSJNNyAyMFY0Ii8+PHBhdGggZD0iTTExIDRoMTAiLz48cGF0aCBkPSJNMTEgOGg3Ii8+PHBhdGggZD0iTTExIDEyaDQiLz48L3N2Zz4=',
@@ -53,11 +61,41 @@ const SearchSchema: f_form_type[] = [
 	// 	enum: ['', 'Livraison', 'Paiement Main a main'],
 	// },
 ];
-const className = {
-	input: `rounded-s-xl  border w-[120px] border-slate-300 bg-white p-[10px] shadow-sm placeholder:text-slate-400 hover:border-filt focus:border-filt focus:outline-none focus:ring-1 focus:ring-filt sm:text-sm`,
-};
 
-export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () => void }) {
+
+const setFields = ({
+	Ids,
+	features,
+	setFieldCharac,
+}: {
+	Ids: string[];
+	features: f_form_type[];
+	setFieldCharac: React.Dispatch<React.SetStateAction<f_form_type[]>>;
+}) => {
+	setFieldCharac([]);
+	const newFeatures: f_form_type[] = [];
+	Ids.forEach((id) => {
+		const feature = features.filter((feature) => feature.category_id === id);
+		newFeatures.push(...feature);
+	});
+	setFieldCharac(newFeatures);
+};
+const removeEmptyArrays = (obj: Record<string, Array<string> | string>) => {
+	return Object.entries(obj)
+		.filter(([_key, value]) => (Array.isArray(value) ? value.length > 0 : true))
+		.reduce(
+			(acc, [key, value]) => {
+				acc[key] = value;
+				return acc;
+			},
+			{} as Record<string, Array<string> | string>
+		);
+};
+export const PopUpFilter = memo(function PopUpFilter({
+	setShowPopup,
+}: {
+	setShowPopup: () => void;
+}) {
 	const { value } = useShowPopupFilter((state) => state);
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
 	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
@@ -66,66 +104,134 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 	const [parent_cat, setParent_cat] = useState<CatCreateType>();
 	const [showSearchCat, setShowSearchCat] = useState(false);
 	const [stepC, setStepC] = useState<string[]>([]);
-	console.log('🚀 ~ PopUpFilter ~ stepC:', stepC);
 	const [result_cat, setResult_cat] = useState<CatCreateType[]>([]);
-	const filter = useSearchFilter((state) => state.value);
-	// const { filter   } = productsRoot.useSearch({});
-	const [storeFilter, setStoreFilter] = useState<
-		{ value: string | Array<number>; feature_id: string }[]
-	>([]);
-	console.log('🚀 ~ PopUpFilter ~ storeFilter:', storeFilter);
-	const navigate = useNavigate({ from: productsRoot.fullPath });
-	useEffect(() => {
-		const orderBy = storeFilter.find((item) => item.feature_id === '3');
-		const price = storeFilter.find((item) => item.feature_id === '1');
-		const newFilter = storeFilter.filter(
-			(item) => item.feature_id !== '3' && item.feature_id !== '1'
-		);
+	const filterFrom = useSearchFilter((state) => state.value);
+	const firstMount = useRef<boolean>(false);
 
-		console.log('🚀 ~ useEffect ~ orderBy.value:', { orderBy, price, newFilter });
-		if (orderBy && orderBy.value) {
-			// navigate({
-			// 	search: (old) => ({
-			// 		...old,
-			// 		filter: {
-			// 			...old.filter,
-			// 			order_by: orderBy.value as 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc',
-			// 		},
-			// 	}),
-			// 	replace: true,
-			// });
-		}
-		// if (price && price.value && Array.isArray(price.value)) {
-		// 	navigate({
-		// 		search: (old) => ({
-		// 			...old,
-		// 			filter: {
-		// 				...old.filter,
-		// 				price: price.value as [number, number],
-		// 			},
-		// 		}),
-		// 		replace: true,
-		// 	});
-		// }
-		// if (newFilter.length > 0 && Array.isArray(newFilter)) {
-		// 	navigate({
-		// 		search: (old) => ({
-		// 			...old,
-		// 			filter: {
-		// 				...old.filter,
-		// 				features: newFilter,
-		// 			},
-		// 		}),
-		// 		replace: true,
-		// 	});
-		// }
-	}, [navigate, storeFilter]);
+	const [storeFilter, setStoreFilter] = useState<Record<string, string | Array<string>>>({});
+	const navigate = useNavigate({ from: productsRoot.fullPath });
+	useDebounce(
+		() => {
+			if (firstMount.current) {
+				const orderBy = storeFilter['3'];
+				const price = storeFilter['1'];
+				const newFilter = {
+					...storeFilter,
+					'3': undefined,
+					'1': undefined,
+				};
+				if (orderBy) {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								order_by: orderBy as 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc',
+							},
+						}),
+						replace: true,
+					});
+				} else {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								order_by: 'date_desc',
+							},
+						}),
+						replace: true,
+					});
+				}
+				if (
+					price &&
+					Array.isArray(price) &&
+					price.length == 2 &&
+					!isNaN(Number(price[0])) &&
+					!isNaN(Number(price[1]))
+				) {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								price: [Number(price[0]), Number(price[1])],
+							},
+						}),
+						replace: true,
+					});
+				} else {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								price: undefined,
+							},
+						}),
+						replace: true,
+					});
+				}
+				if (newFilter && Object.keys(newFilter).length > 0) {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								features: newFilter,
+							},
+						}),
+						replace: true,
+					});
+				} else {
+					navigate({
+						search: (old) => ({
+							...old,
+							filter: {
+								...old.filter,
+								features: undefined,
+							},
+						}),
+					});
+				}
+			} else {
+				firstMount.current = true;
+			}
+		},
+		300,
+		[storeFilter]
+	);
+
 	useEffect(() => {
 		handleHierachie(null);
 	}, []);
 
+	useEffect(() => {
+		const bh = () => {
+			let obj: Record<string, Array<string | number> | string> = {};
+			Object.keys(filterFrom).forEach((key) => {
+				if (key === 'order_by') {
+					obj['3'] =
+						filterFrom[key] || ('date_desc' as 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc');
+				}
+				if (key === 'price') {
+					obj['1'] = filterFrom[key] as Array<number>;
+				}
+				if (key === 'features') {
+					// obj[key] = filterFrom[key] as any;
+					obj = { ...obj, ...filterFrom[key] };
+				}
+			});
+			setStoreFilter(obj);
+		};
+		if (!firstMount.current) bh();
+		const id = filterFrom.category_id;
+		const Ids = get_all_parents(id, categories);
+		setFields({ Ids, features, setFieldCharac });
+	}, [filterFrom]);
+
 	const detail = useMemo(() => {
-		return [...SearchSchema, ...fieldCharac].find((item) => item.feature_id == detailFilt);
+		return [...fieldCharac, ...SearchSchema].find((item) => item.feature_id == detailFilt);
 	}, [detailFilt, fieldCharac]);
 
 	const handleHierachie = useCallback((categoryId: string | null) => {
@@ -157,14 +263,6 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 	}, [result_cat]);
 
 	const collectFeatures = (Ids: string[]) => {
-		console.log('🚀 ~ collectFeatures ~ Ids:', Ids);
-		setFieldCharac([]);
-		const newFeatures: f_form_type[] = [];
-		Ids.forEach((id) => {
-			const feature = features.filter((feature) => feature.category_id === id);
-			newFeatures.push(...feature);
-		});
-		setFieldCharac(newFeatures);
 		navigate({
 			search: (old) => {
 				return {
@@ -176,12 +274,9 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 				};
 			},
 		});
+		setFields({ Ids, features, setFieldCharac });
 		setStepC([]);
 	};
-	// const navigate = useNavigate({ from: productsRoot.fullPath }) as any;
-	// const handleStoreFilter = ({ name, value , id  }: { name: string; value: string | Array<number>,id: string }) => {
-	// }
-	console.log("🚀 ~ //handleStoreFilter ~ StoreFilter:", storeFilter)
 
 	const handleFilterStore = ({
 		name,
@@ -190,56 +285,45 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 		collect_type,
 	}: {
 		name: string;
-		value: string | Array<number>;
+		value: string | Array<string>;
 		feature_id: string;
 		collect_type: f_form_type['collect_type'];
 	}) => {
 		setStoreFilter((prev) => {
-			const newState = [...prev];
-			if (collect_type === 'radio') {
-				const index = newState.findIndex((item) => item.feature_id === feature_id);
-				if (index !== -1) {
-					newState.splice(index, 1, { value, feature_id });
-					return newState;
-				} else {
-					return [...newState, { value, feature_id }];
-				}
+			const newState = { ...prev };
+			if (collect_type === 'radio' && typeof value === 'string') {
+				newState[feature_id] = value;
 			} else if (collect_type === 'select') {
-				const index = newState.findIndex((item) => item.feature_id === feature_id && item.value === value);
-				if (index !== -1) {
-					newState.splice(index, 1);
-					return newState;
-				} else {
-					return [...newState, { value, feature_id }];
+				let f_value = newState[feature_id];
+				if (!f_value && typeof value === 'string') {
+					f_value = [value];
+				} else if (Array.isArray(f_value) && typeof value === 'string') {
+					if (f_value.includes(value)) {
+						const index = f_value.indexOf(value);
+						f_value.splice(index, 1);
+					} else {
+						f_value.push(value);
+					}
 				}
+				newState[feature_id] = f_value;
 			} else if (collect_type === 'number') {
-				const price = (newState.find((item) => item.feature_id === feature_id)?.value as Array<number>) || [];
-				const index = newState.findIndex((item) => item.feature_id === feature_id);
+				const price = newState[feature_id] as Array<string>;
 				let min = price?.[0] ?? 0;
 				let max = price?.[1] ?? 0;
-
 				if (name.includes('Minimum')) {
 					min = Number(value);
 				}
 				if (name.includes('Maximum')) {
 					max = Number(value);
 				}
-				if (min === 0 && max === 0) {
-					if (index !== -1) {
-						newState.splice(index, 1);
-					}
+				if (min === '0' && max === '0') {
+					delete newState[feature_id];
 				} else {
-					if (index !== -1) {
-						newState.splice(index, 1, { value: [min, max], feature_id });
-					} else {
-						newState.push({ value: [min, max], feature_id });
-					}
+					newState[feature_id] = [min, max];
 				}
-
-				return newState;
-			} else {
-				return newState;
 			}
+			const cleanState = removeEmptyArrays(newState);
+			return cleanState;
 		});
 	};
 
@@ -278,7 +362,7 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 							className={clsx('cursor-pointer rounded-full text-slate-700')}
 						/>
 						<span className="text-center font-semibold text-black">
-							{detail ? detail.name : 'Filtres de recherche'}
+							{detail ? detail.name.split(':')[0] : 'Filtres de recherche'}
 						</span>
 						<CloseModal closePopUp={setShowPopup} style={'size-6'} />
 					</div>
@@ -311,8 +395,10 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 						>
 							<span className="text-[.88rem] text-gray-800">Categorie</span>
 							<div className="flex w-full justify-between text-[.91rem] text-gray-500">
-								<span className="font-roboto text-[.91rem] text-filt">Tout</span>
-								<ChevronRight className={' text-slate-700'} />
+								<span className="font-roboto text-[.91rem] text-filt">
+									{get_firt_or_second_cat(filterFrom.category_id || null, categories)?.label || 'Tout'}
+								</span>
+								<ChevronRight className={'text-slate-700'} />
 							</div>
 						</button>
 						{[...fieldCharac, ...SearchSchema].map((item) => {
@@ -331,19 +417,10 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 												return (
 													<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
 														<span className="text-[.87rem] text-gray-800 ">{mapData[value]}</span>
-														<input
-															className="size-5 p-1 accent-blue-900"
-															onChange={(e) =>
-																handleFilterStore({
-																	name: item.name,
-																	value: e.target.value,
-																	feature_id: item.feature_id,
-																	collect_type: item.collect_type,
-																})
-															}
+														<FeatureComponentCheck
+															handleFilterStore={handleFilterStore}
+															item={item}
 															value={value}
-															name={item.name}
-															type="radio"
 														/>
 													</label>
 												);
@@ -357,20 +434,10 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 												{['Minimum', 'Maximum'].map((value, i) => {
 													return (
 														<div key={i} className={'flex justify-start'}>
-															<input
-																type={'number'}
-																name={value}
-																inputMode="numeric"
-																className={className.input}
-																placeholder={value}
-																onChange={(e) => {
-																	handleFilterStore({
-																		name: item.name + '_' + value,
-																		value: e.target.value,
-																		feature_id: item.feature_id,
-																		collect_type: item.collect_type,
-																	});
-																}}
+															<FeatureComponentCheck
+																handleFilterStore={handleFilterStore}
+																item={item}
+																value={value}
 															/>
 															<div className="flex items-center justify-center rounded-e-xl border-y border-r border-gray-300 bg-slate-100 px-3 py-2 text-[.805rem] uppercase text-gray-500">
 																{item.ext}
@@ -390,19 +457,10 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 														if (i === 0) return null;
 														return (
 															<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
-																<span className="text-[.851rem]  text-gray-800">{value}</span>
-																<input
-																	className="size-5 border border-slate-500 p-1 accent-filt transition-all duration-300 "
-																	name={item.name}
-																	type="checkbox"
-																	onChange={(e) =>
-																		handleFilterStore({
-																			name: item.name,
-																			value: e.target.value,
-																			feature_id: item.feature_id,
-																			collect_type: item.collect_type,
-																		})
-																	}
+																<span className="text-[.811rem] capitalize text-slate-800">{value}</span>
+																<FeatureComponentCheck
+																	handleFilterStore={handleFilterStore}
+																	item={item}
 																	value={value}
 																/>
 															</label>
@@ -414,15 +472,19 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 													onClick={() => {
 														setDetailFilt(item.feature_id);
 													}}
-													className="ml-2 flex flex-col items-baseline justify-start gap-3"
+													className="flex w-full flex-col items-baseline justify-start gap-3"
 												>
 													<HeadFilt item={item} />
-													<span className="w-2/3 truncate text-[.71rem] text-gray-800">
-														{item.enum?.slice(1, 6).join(', ')}, {'...'}
-													</span>
+													<div className="flex w-2/3 truncate">
+														<span className="truncate text-left font-roboto text-[.72rem] text-slate-700">
+															{item.enum?.slice(1, 6).join(', ')}
+														</span>
+													</div>
 
 													<div className="flex w-full justify-between text-[.91rem] text-gray-500">
-														<span className="font-roboto text-[.91rem] text-filt">Tout</span>
+														<span className="font-roboto text-[.75rem] text-filt">
+															{filterFrom?.features?.[item.feature_id]?.slice(0, 6).join(', ') || 'Tous'}
+														</span>
 														<ChevronRight className={' text-slate-700'} />
 													</div>
 												</button>
@@ -434,7 +496,7 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 						})}
 					</div>
 					<div
-						className={clsx(' w-full flex-col gap-4', {
+						className={clsx('w-full flex-col gap-4', {
 							flex: detailFilt && detailFilt !== 'category_id',
 							hidden: detailFilt === 'category_id',
 						})}
@@ -444,20 +506,7 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 							return (
 								<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
 									<span className="text-[.851rem]  text-gray-800">{value}</span>
-									<input
-										className="size-5 border border-slate-500 p-1 accent-filt transition-all duration-300 "
-										name={detail.name}
-										type="checkbox"
-										onChange={(e) =>
-											handleFilterStore({
-												name: detail.name,
-												value: e.target.value,
-												feature_id: detail.feature_id,
-												collect_type: detail.collect_type,
-											})
-										}
-										value={value}
-									/>
+									<FeatureComponentCheck handleFilterStore={handleFilterStore} item={detail} value={value} />
 								</label>
 							);
 						})}
@@ -468,8 +517,8 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 							hidden: detailFilt !== 'category_id',
 						})}
 					>
-						<div className="flex w-full ">
-							{filter?.category_id === 'all' && !result_cat[0]?.parent_category_id && (
+						{/* <div className="flex w-full ">
+							{filterFrom?.category_id === 'all' && !result_cat[0]?.parent_category_id && (
 								<>
 									<button
 										onClick={() => handleHierachie(null)}
@@ -480,7 +529,7 @@ export default memo(function PopUpFilter({ setShowPopup }: { setShowPopup: () =>
 									</button>
 								</>
 							)}
-						</div>
+						</div> */}
 						<div className="flex w-full flex-col items-start justify-start divide-y ">
 							<div
 								className={clsx('my-2 flex items-center rounded-xl border p-1', {
@@ -558,7 +607,9 @@ const HeadFilt = ({ item }: { item: any }) => {
 	return (
 		<div className="mb-1 flex items-center ">
 			<img className="size-6 rounded-full bg-blue-100 p-1 invert-20" src={item.icon} alt={''} />
-			<span className="ml-2 text-[.88rem] capitalize text-gray-700">{item.name}</span>
+			<span className="ml-2 font-roboto text-[.95rem] capitalize text-slate-900">
+				{item.name.split(':')[0]}
+			</span>
 		</div>
 	);
 };

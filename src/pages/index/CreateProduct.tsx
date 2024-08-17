@@ -158,7 +158,7 @@ export default function CreateProduct() {
 				const combined = [...prev, ...newSuggestions];
 				const uniqueSet = new Set(combined);
 				const uniqueArray = Array.from(uniqueSet);
-				return uniqueArray.slice(-4);
+				return uniqueArray.slice(-5);
 			});
 		},
 		405,
@@ -231,6 +231,7 @@ export default function CreateProduct() {
 		Ids.forEach((id) => {
 			const feature = features.filter((feature) => feature.category_id === id);
 			newFeatures.push(...feature);
+			console.log("🚀 ~ collectFeatures ~ newFeatures:", newFeatures)
 		});
 		setFieldCharac(newFeatures);
 		setFieldSelect(Ids.join(','));
@@ -244,7 +245,7 @@ export default function CreateProduct() {
 			to: announceRoot.to,
 			search: {
 				provider_id: InfoUser.id,
-				filter: { order_by: 'date_desc', status: ['AWAIT', 'VALID'] },
+				filter: { order_by: 'date_desc', status: 5 },
 			},
 		});
 	}
@@ -420,11 +421,11 @@ export default function CreateProduct() {
 			<PopUpComponent
 				isOpen={showModal}
 				setHide={setShowModal}
-				styleContainer="flex justify-center flex-col bg-gray-300 rounded-lg p-2 mt-[10%]"
+				styleContainer="flex justify-center max-h-[500px] min-h-[500px] flex-col bg-gray-300 rounded-lg p-2 mt-[1%]"
 				animationName="zoom"
 			>
-				<div className="flex w-full flex-col items-center justify-center">
-					{/* <h1 className="py-2">Definir la categorie</h1> */}
+				<div className="flex  w-full flex-col items-center justify-center">
+					<h1 className="py-2">Choisissez la categorie</h1>
 					<div className="flex items-center justify-center gap-1 ">
 						{stepC.length >= 1 && (
 							<>
@@ -479,8 +480,8 @@ export default function CreateProduct() {
 											className={clsx(
 												' m-1 flex items-center justify-center gap-2 rounded-3xl border bg-white p-1 font-bold',
 												{
-													' border-primary': !!cat.is_parentable,
-													' border-slate-400': !cat.is_parentable,
+													'border-primary': !!cat.is_parentable,
+													'border-slate-400': !cat.is_parentable,
 												}
 											)}
 											onClick={() => {
@@ -500,7 +501,7 @@ export default function CreateProduct() {
 							}}
 							className={clsx('my-4  rounded-sm bg-primary px-4 py-1 text-white', {
 								hidden: result_cat.length > 0,
-								visible: result_cat.length === 0,
+								visible: result_cat.length === 0
 							})}
 						>
 							Validez

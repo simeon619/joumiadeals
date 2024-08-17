@@ -6,10 +6,10 @@
 	font-family: 'Roboto';
 	src: url('/fonts/Roboto-Bold.ttf');
 }
-@font-face {
+/* @font-face {
 	font-family: 'BebasNeue';
 	src: url('/fonts/BebasNeue-Regular.ttf');
-}
+} */
 
 @font-face {
 	font-family: 'Poppins';
@@ -23,6 +23,11 @@
 @font-face {
 	font-family: 'BlackOpsOne';
 	src: url('fonts/BlackOpsOne-Regular.ttf');
+}
+
+@font-face {
+	font-family: 'CocoBiker';
+	src: url('fonts/CocoBiker.ttf');
 }
 
 #root {
@@ -105,13 +110,35 @@
 }
 
 @layer utilities {
-	/* Hide scrollbar for Chrome, Safari and Opera */
-	.no-scrollbar::-webkit-scrollbar {
-		display: none;
-	}
-	/* Hide scrollbar for IE, Edge and Firefox */
-	.no-scrollbar {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
+	/* ::-webkit-scrollbar {
+		height: 5px;
+		width: 5px;
+		background: #fff3;
+		-webkit-border-radius: 1ex;
+	  }
+	  
+	  ::-webkit-scrollbar-thumb {
+		background: var(--accent);
+		-webkit-border-radius: 1ex;
+	  }
+	  
+	  ::-webkit-scrollbar-corner {
+		background: #fff3;
+	  } */
 }
+
+::-webkit-scrollbar {
+	height: 5px;
+	width: 7px;
+	background: rgb(255, 255, 255);
+	/* -webkit-border-radius: 1ex; */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+	background: #050c01;
+	-webkit-border-radius: 1ex;
+  }
+  
+  ::-webkit-scrollbar-corner {
+	background: #fff3;
+  }

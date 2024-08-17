@@ -16,7 +16,13 @@ mettre en favoris , cree recommendation, partageez , nombre de produit postez , 
 2. edit product
 3. favoris
 
+Genese 24:52
+Nombre 3 
+Malachie 2 13-14
+eclesiaste 5 v3
+2 samuel 13
 
+sourate 70v40 -hereux6v13-16 -Esaie 45v6 -phippien2
 
 
 
@@ -35,13 +41,13 @@ supression foreign key
 
 
 server
- * 1) filter (interface client - serveur)
+ * 1)filter (interface client - serveur)
  * 2)mise en avant des produits
- * 3) messagere sse
+ * 3)messagere sse
  * 4)Produit similaire
  * 5)Modifier statut produit
- * 6) produit visite
- * 7) Booster le produit
- * 8) vote du provider
- * 9) responsivite
+ * 6)produit visite
+ * 7)Booster le produit
+ * 9)responsivite
+ * 8)vote du provider
  * 10)commentaire

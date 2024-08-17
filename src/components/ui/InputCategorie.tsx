@@ -15,7 +15,7 @@ export default function InputCategorie({
 	valueSave?: string | number | undefined | null;
 	isfeature?: boolean;
 }) {
-	const { name, placeholder, required, collect_type, default_value, id } = item;
+	const { name, placeholder, required, collect_type, default_value, feature_id } = item;
 	const isFirstMount = useFirstMountState();
 	const { setInputFocus } = useInputCategorie((state) => state);
 	const {
@@ -26,7 +26,7 @@ export default function InputCategorie({
 		errorInput,
 		setErrorInputs,
 	} = useInputCategorie((state) => state);
-	const nameId = useMemo(() => (id ? `${name}:${id}` : `${name}`), []);
+	const nameId = useMemo(() => (feature_id ? `${name}:${feature_id}` : `${name}`), []);
 	const value = useMemo(
 		() => (isfeature ? dataProductFeature[nameId] : dataProduct[nameId]),
 		[dataProduct, dataProductFeature, isfeature, nameId]

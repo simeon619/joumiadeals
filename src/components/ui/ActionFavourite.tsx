@@ -48,12 +48,12 @@ export default function ActionFavourite({
 	]);
 	return (
 		<button
-			className={twMerge(style, 'p-1 bg-white rounded-full')}
+			className={twMerge(style, 'p-1 bg-white border rounded-full')}
 			onClick={(e) => {
 				isFavourite ? fnDeleteFavourite(e) : fnAddFavourite(e);
 			}}
 		>
-			<Heart size={20} fill={isFavourite ? 'red' : 'white'} color={isFavourite ? 'red' : 'black'} />
+			<Heart size={18} fill={isFavourite ? 'red' : 'white'} color={isFavourite ? 'red' : 'gray'} />
 		</button>
 	);
 }

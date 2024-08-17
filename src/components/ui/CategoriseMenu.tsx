@@ -65,7 +65,7 @@ export default function CategoriseMenu() {
 												<Link
 													to={productsRoot.to}
 													search={{
-														filter: { category_id: Categorie.split(':')[1], status: ['VALID'] },
+														filter: { category_id: Categorie.split(':')[1], status: 5 },
 														page: 1,
 													}}
 													className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
@@ -81,7 +81,7 @@ export default function CategoriseMenu() {
 															<Link
 																to={productsRoot.to}
 																search={{
-																	filter: { category_id: Categorie.split(':')[1], status: ['VALID'] },
+																	filter: { category_id: Categorie.split(':')[1], status: 5 },
 																	page: 1,
 																}}
 																className="inline-block cursor-pointer text-sm font-bold capitalize text-black hover:text-primary"
@@ -96,7 +96,7 @@ export default function CategoriseMenu() {
 																	<Link
 																		to={productsRoot.to}
 																		search={{
-																			filter: { category_id: item.split(':')[1], status: ['VALID'] },
+																			filter: { category_id: item.split(':')[1], status: 5 },
 																			page: 1,
 																		}}
 																		className="block cursor-pointer text-wrap py-1  text-[0.775rem]  capitalize text-slate-500 hover:text-primary"

@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { field_annonce } from '@/lib/utils';
+import { field_annonce, getStatusByLevel } from '@/lib/utils';
 import { BASE_URL, LimitItemPaginate } from '@/utils/constante';
-import {
-	LIMIT_PRODUCT_PAGE,
-	RequestDataType,
-	RequestFilterProductType,
-} from '@/utils/queryOptions';
+import { LIMIT_PRODUCT_PAGE, RequestFilterProductType } from '@/utils/queryOptions';
 import { z } from 'zod';
-import { getHeaders, getHeadersWithFormData } from '../state/User/auth';
+import { getHeaders, getHeadersWithFormData, useAuth } from '../state/User/auth';
 const FieldSchema = z.enum([
 	'button',
 	'checkbox',
@@ -59,8 +55,8 @@ const CategorySchema = z.array(
 		icon: z.string().nullable(),
 		parent_category_id: z.string().nullable(),
 		is_parentable: z.number(),
-		created_at: z.string(),
-		updated_at: z.string(),
+		created_at: z.string().optional(),
+		updated_at: z.string().optional(),
 	})
 );
 
@@ -116,7 +112,7 @@ export async function getAllFeatures() {
 			body: JSON.stringify({}),
 		});
 		const data = await response.json();
-		console.log('🚀 ~ data:', data);
+		// console.log('🚀 ~ data:', data);
 		const validationResult = z.array(f_form_min_schema).safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -131,10 +127,15 @@ const FeatureValueSchema = z.array(
 	z.object({
 		value: z.string(),
 		name: z.string(),
-		feature_id : z.string(),
+		feature_id: z.string(),
 	})
 );
-export async function get_feature_values_product({ product_id }: { product_id: string }) {
+export async function get_feature_values_product({
+	product_id,
+}: {
+	product_id: string | undefined;
+}) {
+	if (!product_id) return [];
 	try {
 		const response = await fetch(`${BASE_URL}/get_f_values_product`, {
 			method: 'POST',
@@ -142,7 +143,6 @@ export async function get_feature_values_product({ product_id }: { product_id: s
 			body: JSON.stringify({ product_id }),
 		});
 		const data = await response.json();
-		console.log('🚀 ~ data:', data);
 		const validationResult = FeatureValueSchema.safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -204,6 +204,7 @@ export async function createProduct(data: {
 		});
 		console.log('🚀 ~ response:', response);
 		const data = await response.json();
+		console.log('🚀 ~ data:', data);
 		if (!response.ok) {
 			throw new Error(data.message);
 		}
@@ -265,18 +266,20 @@ export async function updateProduct(dataUpdate: {
 		throw error;
 	}
 }
+const statusSchema = z.enum(['AWAIT', 'VALID', 'REJECTED', 'DELETED', 'PAUSE'])
+export type StatusType = z.infer<typeof statusSchema>
 const ProductMinSchema = z.object({
 	avatar_url: z.string(),
 	photos: z.array(z.string()),
 	price: z.number(),
 	provider_name: z.string(),
-	provider_id: z.string(),
+	provider_id: z.number(),
 	location: z.string(),
 	category_id: z.string(),
 	express_time: z.string().nullable(),
 	description: z.string(),
 	title: z.string(),
-	status: z.string(),
+	status: statusSchema,
 	product_id: z.string(),
 	product_created_at: z.string(),
 });
@@ -292,21 +295,22 @@ const ProductShemaPaginate = z.object({
 
 export type ProductsData = z.infer<typeof ProductShemaPaginate>;
 
-export async function getProductsByFiltr(requestData: RequestDataType) {
-	const response = await fetch(`${BASE_URL}/filter_product`, {
-		method: 'POST',
-		headers: getHeaders(),
-		body: JSON.stringify({ ...requestData, limit: LIMIT_PRODUCT_PAGE }),
-	});
-	const data = await response.json();
-	console.log("🚀 ~ getProductsByFiltr ~ data:", data)
-	const products = ProductShemaPaginate.safeParse(data);
-	if (!products.success) {
-		console.log(products.error);
-		throw new Error(products.error.message);
-	}
-	return products.data;
-}
+// export async function getProductsByFiltr(requestData: RequestDataType) {
+// 	console.log("🚀 ~ getProductsByFiltr ~ requestData:", requestData)
+// 	const response = await fetch(`${BASE_URL}/filter_product`, {
+// 		method: 'POST',
+// 		headers: getHeaders(),
+// 		body: JSON.stringify({ ...requestData, limit: LIMIT_PRODUCT_PAGE }),
+// 	});
+// 	const data = await response.json();
+// 	console.log("🚀 ~ getProductsByFiltr ~ data:", data)
+// 	const products = ProductShemaPaginate.safeParse(data);
+// 	if (!products.success) {
+// 		console.log(products.error);
+// 		throw new Error(products.error.message);
+// 	}
+// 	return products.data;
+// }
 
 export async function getProducts(requestData: RequestFilterProductType) {
 	const response = await fetch(`${BASE_URL}/filter_product`, {
@@ -316,23 +320,22 @@ export async function getProducts(requestData: RequestFilterProductType) {
 			...requestData,
 			filter: {
 				...requestData.filter,
+				status : getStatusByLevel(requestData.filter?.status),
 				category_id: requestData.filter?.category_id === 'all' ? null : requestData.filter?.category_id,
 			},
 			limit: LIMIT_PRODUCT_PAGE,
 		}),
 	});
 	const data = await response.json();
-	console.log('🚀 ~ getProducts ~ data:', data);
 	const products = ProductShemaPaginate.safeParse(data);
 	if (!products.success) {
-		console.log(products.error);
 		throw new Error(products.error.message);
 	}
 	return products.data;
 }
 
 const ProviderSchema = z.object({
-	id: z.string(),
+	id: z.number(),
 	name: z.string(),
 	location: z.string(),
 	email: z.string().email(),
@@ -350,13 +353,13 @@ const ProductDetailSchema = z.object({
 	title: z.string(),
 	price: z.number(),
 	description: z.string(),
-	status: z.string(),
+	status: z.enum(['AWAIT', 'VALID', 'REJECTED', 'DELETED', 'PAUSE']),
 	photos: z.array(z.string()),
 	express_time: z.nullable(z.string()),
 	last_appearance: z.nullable(z.string()),
-	moderator_id: z.nullable(z.string()),
+	moderator_id: z.nullable(z.number()),
 	category_id: z.string(),
-	account_id: z.string(),
+	account_id: z.number(),
 	created_at: z.string(),
 	provider: ProviderSchema,
 });
@@ -393,6 +396,7 @@ export async function deleteProduct(id: string) {
 const IdSchemaProduct = z.array(z.string());
 
 export async function getFavouriteProductsId() {
+	if (!useAuth.getState().isAuth) return [];
 	try {
 		const response = await fetch(`${BASE_URL}/get_all_favorite_products_id`, {
 			method: 'POST',
@@ -504,6 +508,45 @@ export const reportProduct = async ({
 		return data;
 	} catch (error) {
 		console.error('add produit favorit error :', error);
+		throw error;
+	}
+};
+const VisitedShemaPaginate = z.object({
+	visited: ProductsDataSchema,
+	total: z.number(),
+});
+export const addVisitedProduct = async ({ product_id }: { product_id: string }) => {
+	try {
+		const response = await fetch(`${BASE_URL}/add_visited_product`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({ product_id }),
+		});
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('add produit favorit error :', error);
+		throw error;
+	}
+};
+
+export const getVisitedProducts = async ({ page }: { page: number }) => {
+	try {
+		const response = await fetch(`${BASE_URL}/get_visited_products`, {
+			method: 'POST',
+			headers: getHeaders(),
+			body: JSON.stringify({ limit: LIMIT_PRODUCT_PAGE, page }),
+		});
+		const data = await response.json();
+		const products = VisitedShemaPaginate.safeParse(data);
+		console.log('🚀 ~ getVisitedProducts ~ products:', products);
+		if (!products.success) {
+			console.log(products.error);
+			throw new Error(products.error.message);
+		}
+		return products.data;
+	} catch (error) {
+		console.error('recuperation id produit favorit error :', error);
 		throw error;
 	}
 };

@@ -1,34 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { InputOTPTel } from '@/components/auth/InputOTPTel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cities } from '@/utils/mock/city';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuth } from '@/services/state/User/auth';
-import { redirectToConnect, truncateFirstName } from '@/lib/utils';
-import { useLayoutEffect, useNavigate, useRouter } from '@tanstack/react-router';
-import InputComponent from '@/components/ui/InputComponent';
-import { useState } from 'react';
 import SelectComponent from '@/components/ui/SelectComponent';
 import { myprofileRoot } from '@/lib/route';
-const RegisterSchema = z.object({
-	phone: z
-		.string()
-		.min(10, { message: 'numéro de téléphone trop court' })
-		.max(10, { message: 'numéro de téléphone trop long' }),
-});
+import { redirectToConnect, truncateFirstName } from '@/lib/utils';
+import { inputOTPtel } from '@/services/state/App/inputOtp';
+import { useAuth } from '@/services/state/User/auth';
+import { cities } from '@/utils/mock/city';
+import { useLayoutEffect, useNavigate, useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
+// const RegisterSchema = z.object({
+// 	phone: z
+// 		.string()
+// 		.min(10, { message: 'numéro de téléphone trop court' })
+// 		.max(10, { message: 'numéro de téléphone trop long' }),
+// });
+// type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
-type RegisterSchemaType = z.infer<typeof RegisterSchema>;
+const telLength = 10;
 export default function RegisterPage() {
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<RegisterSchemaType>({
-		resolver: zodResolver(RegisterSchema),
-	});
+	// const {
+	// 	register,
+	// 	handleSubmit,
+	// 	formState: { errors },
+	// } = useForm<RegisterSchemaType>({
+	// 	resolver: zodResolver(RegisterSchema),
+	// });
 	const router = useRouter();
 	const [city, setCity] = useState<string>(cities[0]);
+	const { setError, value: tel } = inputOTPtel();
 	const navigate = useNavigate();
 	const searchParams = router.latestLocation.search as {
 		name: string;
@@ -54,11 +54,17 @@ export default function RegisterPage() {
 		if (isAuth && InfoUser.id) {
 			navigate({
 				to: myprofileRoot.to,
-				search: { provider_id: InfoUser.id, filter: { status: ['AWAIT', 'VALID'] } },
+				search: { provider_id: InfoUser.id, filter: { status: 5 } },
 			});
 		}
 	}, [isAuth, InfoUser]);
-	const onSubmit: SubmitHandler<RegisterSchemaType> = (data) => {
+	const onSubmit = () => {
+		if (tel.toString().length !== telLength) {
+			setError(`numéro de téléphone doit avoir ${telLength} caractères.`);
+			return;
+		} else {
+			setError('');
+		}
 		const dataToSend = {
 			location: city,
 			name,
@@ -66,40 +72,42 @@ export default function RegisterPage() {
 			email,
 			oauth_client_id,
 			oauth_provider_name,
-			...data,
+			phone: tel.toString(),
 		};
 		registerUser(dataToSend);
+		// close();
 	};
 
 	return (
 		<div className="flex h-screen justify-center bg-gray-50">
 			<div className=" mt-12 flex h-1/3 max-h-[500px] min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white px-8 shadow-md">
 				<div className="mt-5 flex w-full flex-col gap-y-4">
-					<div className="flex flex-row gap-x-4">
-						<h1 className="font-poppins text-3xl">Bonjour {truncateFirstName(name)}</h1>
-						<Avatar className="bg-primary text-primary">
-							<AvatarImage src={avatar_url} alt={name} />
-							<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
-						</Avatar>
+					<div className="flex flex-col gap-y-4">
+						<span className="min-w-[320px] max-w-[400px] font-poppins text-sm">
+							Ajoutez ces dernier detail sur vous
+						</span>
+						<div>
+							<h1 className=" font-poppins text-xl">Bonjour {truncateFirstName(name)}</h1>
+							<Avatar className="bg-primary text-primary">
+								<AvatarImage src={avatar_url} alt={name} />
+								<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
+							</Avatar>
+						</div>
 					</div>
-					<span className="min-w-[320px] max-w-[400px] font-poppins text-sm">
-						Ajoutez ces dernier detail sur vous
-					</span>
 				</div>
-				<form onSubmit={handleSubmit(onSubmit)} className="mt-5 w-full">
-					<InputComponent
-						name="phone"
-						errors={errors}
-						register={register}
-						label="Numéro de téléphone"
-						type="number"
-						placeholder="00 06 00 00 78"
-					/>
+				<div className="mt-5 w-full">
+					<div className="mb-6 flex flex-col gap-y-1">
+						<InputOTPTel groupSize={4} length={telLength} label="Numéro de téléphone" />
+					</div>
 					<SelectComponent values={cities} setValues={setCity} label="Choisir adresse de vente" />
-					<button type="submit" className="mt-5 w-full rounded-2xl bg-primary p-2 text-white">
+					<button
+						type="submit"
+						onClick={onSubmit}
+						className="mt-5 w-full rounded-2xl bg-primary p-2 text-white"
+					>
 						Enregistrez
 					</button>
-				</form>
+				</div>
 			</div>
 		</div>
 	);

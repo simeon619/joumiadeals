@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@adonisjs/transmit-client": "^1.0.0",
     "@dhaiwat10/react-link-preview": "^1.15.0",
     "@faker-js/faker": "^8.4.0",
     "@hookform/resolvers": "^3.3.4",
@@ -29,7 +30,9 @@
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "embla-carousel-react": "8.0.0-rc22",
+    "framer-motion": "^11.3.8",
     "fuzzysort": "^2.0.4",
+    "input-otp": "^1.2.4",
     "lucide-react": "^0.321.0",
     "minisearch": "^6.3.0",
     "next-themes": "^0.2.1",
@@ -37,9 +40,9 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.50.0",
+    "react-hot-toast": "^2.4.1",
     "react-select": "^5.8.0",
     "react-use": "^17.5.0",
-    "sonner": "^1.4.0",
     "suggestions": "^1.7.1",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
