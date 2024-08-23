@@ -16,7 +16,11 @@ export default function CloseModal({
 				!style &&
 					'absolute left-2 top-2 z-10 size-7 rounded-full hover:text-black cursor-pointer', style
 			)}
-			onClick={closePopUp}
+			onClick={(e) =>{
+				e.preventDefault();
+				e.stopPropagation();
+				closePopUp();
+			}}
 		/>
 	);
 }

@@ -87,17 +87,18 @@ export default function MyprofilePage() {
 						<Link
 							key={to}
 							to={to}
-							// activeOptions={{ includeSearch: exact }}
+							activeOptions={{ includeSearch: false ,exact: true }}
+							
 							activeProps={{
 								className: 'text-black bg-white border shadow-md rounded-lg',
 							}}
-							className={'px-1 py-2 text-sm'}
+							className={'px-1 py-2 text-xs'}
 							//target='haut'
 							search={(old : { page?: number, provider_id?: string }) => {
 								const newParams = provider_id
 									? { 
 										provider_id: old?.provider_id ?? provider_id, 
-										filter: { status: 5 as const } 
+										filter: { status: 5 as const, order_by: 'date_desc' }
 									}
 									: { page: old?.page ?? 1 };
 								return newParams;

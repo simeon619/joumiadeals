@@ -49,11 +49,11 @@ export default function SimilaireProduct({ categoryId }: { categoryId: string })
 		})
 	);
 	return (
-		<div className=" my-5 border-t-[1px] border-slate-200 pt-5">
+		<div className="relative  my-5 border-t-[1px] border-slate-200 pt-5">
 			<div className="flex items-center justify-between gap-x-2 p-2">
 				<span className="text-sm text-slate-800">Annonces similaires</span>
 			</div>
-			<div className="flex w-full items-center justify-between gap-x-2 pt-2">
+			<div className="absolute inset-x-0 bottom-[50%] z-20 flex w-full items-center justify-between gap-x-2 pt-2">
 				<MoveLeftIcon
 					onClick={scrollLeft}
 					size={28}
@@ -67,7 +67,7 @@ export default function SimilaireProduct({ categoryId }: { categoryId: string })
 			</div>
 			<div
 				ref={scrollableRef}
-				className="flex snap-x snap-proximity flex-row gap-1 overflow-x-auto scroll-smooth"
+				className="flex snap-x snap-proximity flex-row gap-1 overflow-x-auto scroll-smooth border-x-[1px] border-slate-200"
 			>
 				{similaireProducts.products.map((product) => {
 					return (

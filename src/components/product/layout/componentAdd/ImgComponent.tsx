@@ -56,7 +56,7 @@ export default function ImgComponent({
 					<div
 						style={{
 							border: '4px solid rgba(255, 255, 255, 0.2)',
-							borderTopColor: 'rgba(255, 255, 255, 0.8)',
+							borderTopColor: 'rgba(255, 255, 255, 1)',
 						}}
 						className="inline-block size-8 animate-spin rounded-full text-gray-200"
 					></div>
@@ -66,7 +66,7 @@ export default function ImgComponent({
 				src={`${URL_IMAGE}${photos[currentImageIndex]}`}
 				alt={title}
 				className={`size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500 ${
-					isLoading ? 'blur-[2px]' : 'blur-0'
+					isLoading ? 'blur-[4px]' : 'blur-0'
 				}`}
 				loading="lazy"
 				onLoad={handleImageLoad}
@@ -74,30 +74,32 @@ export default function ImgComponent({
 					e.currentTarget.src = '/img/imgError.png';
 				}}
 			/>
-			<div className="absolute inset-x-0 bottom-[-10px] flex justify-center">
-				{photos.length > 1 &&
-					photos.map((_, index) => (
-						<button
-							key={index}
-							// style={{ bottom: `${index * 20}px` }}
-							className={`mx-1 size-2 rounded-full p-1 hover:bg-white ${currentImageIndex === index ? 'bg-primary' : 'bg-gray-400'}`}
-							onMouseOver={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								handleImageChange(index);
-							}}
-							onFocus={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								handleImageChange(index);
-							}}
-							onClick={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								handleImageChange(index);
-							}}
-						/>
-					))}
+			<div
+				className={clsx('absolute inset-x-0 bottom-[-10px] flex justify-center', {
+					hidden: photos.length <= 1,
+				})}
+			>
+				{photos.map((_, index) => (
+					<button
+						key={index}
+						className={`mx-1 size-2 rounded-full p-1 hover:bg-white ${currentImageIndex === index ? 'bg-primary' : 'bg-gray-400'}`}
+						onMouseOver={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleImageChange(index);
+						}}
+						onFocus={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleImageChange(index);
+						}}
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleImageChange(index);
+						}}
+					/>
+				))}
 			</div>
 			{children}
 		</div>

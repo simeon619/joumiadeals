@@ -26,7 +26,9 @@ export default function PopUpComponent({
 	position?: 'start' | 'end' | 'center';
 }>) {
 	const handleHideModal = (e: any) => {
-		const isOutSide = e.target.firstChild?.getAttribute?.('data-outside');
+		e.preventDefault();
+		e.stopPropagation();
+		const isOutSide = e.target.getAttribute?.('data-outside');
 		if (setHide && isOutSide) {
 			setHide(false);
 		}
@@ -35,30 +37,21 @@ export default function PopUpComponent({
 		<div
 			role="dialog"
 			aria-modal="true"
-			aria-label="edit/create"
 			className={twMerge(
-				'relative z-60',
-				isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+				`fixed z-60 inset-0 flex justify-${position} bg-black/50 duration-300 ease-in-out`,
+				isOpen ? `opacity-100 pointer-events-auto select-none` : 'opacity-0 pointer-events-none select-auto'
 			)}
-			tabIndex={-1}
 			onClick={handleHideModal}
 		>
 			<div
+				data-outside="outside"
 				className={twMerge(
-					`fixed z-60 inset-0 flex justify-${position} bg-black/25 duration-300 ease-in-out`,
-					isOpen ? `opacity-100  pointer-events-auto ` : 'opacity-0 pointer-events-none'
+					'transition-all duration-300 ease-in-out',
+					styleContainer,
+					isOpen ? animation[animationName][0] : animation[animationName][1]
 				)}
 			>
-				<div
-					data-outside="outside"
-					className={twMerge(
-						'duration-300 ease-linear',
-						styleContainer,
-						isOpen ? animation[animationName][0] : animation[animationName][1]
-					)}
-				>
-					{children}
-				</div>
+				{children}
 			</div>
 		</div>
 	);

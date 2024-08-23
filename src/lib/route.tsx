@@ -108,7 +108,6 @@ export const announceRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
 	path: '/',
 	validateSearch: (params) => RequestDataSchema.parse(params),
-	// preSearchFilters: [(search)=>({...search,filter:{...search.filter, text: undefined}})],
 	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
 		provider_id,
 		filter,

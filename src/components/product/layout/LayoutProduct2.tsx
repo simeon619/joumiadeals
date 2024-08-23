@@ -23,7 +23,7 @@ const ItemProduct = ({ product }: { product: ProductsData['products'][0] }) => {
 			key={product.product_id}
 			color="gray"
 			params={{ productId: product.product_id }}
-			className="group mt-2 flex max-w-[80%] flex-col  border-b-[1px] border-slate-300 bg-slate-100/10 px-1 py-3 hover:bg-slate-100/20"
+			className="group mt-2 flex max-w-[80%] flex-col  border-b-[1px] border-slate-300 bg-slate-100/10 px-1 py-3 transition-all duration-200 ease-linear hover:bg-slate-100/20"
 		>
 			<div className="flex flex-row items-center gap-x-2 rounded-xl bg-slate-100/20 p-1 ">
 				<img src={product.avatar_url} loading="lazy" className="size-7 rounded-full" alt="" />

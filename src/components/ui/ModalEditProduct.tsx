@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { field_annonce } from '@/lib/utils';
+import { field_annonce, onCreateProduct } from '@/lib/utils';
 import { f_form_type, ProductsMinType } from '@/services/api/product_categorie';
-import { useDataInputState } from '@/services/state/App/dataInputState';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { Nbr_Image_Upload } from '@/utils/constante';
 import {
-	getAllChildCategoriesOptions,
 	getAllfeaturesOptions,
 	getFeatureProductOptions,
 	useUpdateMutationproduct,
 } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import CloseModal from './CloseModal';
 import InputCategorie from './InputCategorie';
@@ -19,86 +17,78 @@ import InputFileComponent from './InputFileComponent';
 import PopUpComponent from './PopUpComponent';
 import SelectCategorie from './SelectCategorie';
 
-export default memo(function ModalEditProduct({
+export default function ModalEditProduct({
 	showPopUp,
 	closePopUp,
 	product,
 }: {
 	showPopUp: boolean;
 	closePopUp: () => void;
-	product: ProductsMinType[0];
+	product: ProductsMinType[0] | undefined;
 }) {
-	// const { fieldCharac, setFieldCharac } = useDataInputState((state) => state);
 	const [fieldCharac, setFieldCharac] = useState<f_form_type[]>([]);
 	const resetInput = useInputCategorie((state) => state.resetAll);
+	const setFiles = useInputCategorie((state) => state.setFile);
+	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
+	const dataProduct = useInputCategorie((state) => state.dataProduct);
+	const errorInput = useInputCategorie((state) => state.errorInput);
 	const filesData = useInputCategorie((state) => state.filesData);
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
-	const { data: featuresProduct } = useSuspenseQuery(getFeatureProductOptions(product.product_id));
-	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
-	const dataProduct = useInputCategorie((state) => state.dataProduct);
-	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
-
-	// const collectFeatures = (Ids: string[]) => {
-	// 	setFieldCharac([]);
-	// 	const newFeatures: f_form_type[] = [];
-	// 	Ids.forEach((id) => {
-	// 		const feature = features.filter((feature) => {
-	// 			return feature.category_id === id;
-	// 		});
-	// 		newFeatures.push(...feature);
-	// 	});
-	// 	setFieldCharac(newFeatures);
-	// };
-	const mutation = useUpdateMutationproduct();
+	const { data: featuresProduct } = useSuspenseQuery(getFeatureProductOptions(product?.product_id));
+	useEffect(() => {
+		if (!product) return;
+		setFiles(product.photos);
+	}, [product?.product_id]);
+	const {
+		mutate: updateProduct,
+		isSuccess: isSuccessUpdate,
+		isPending: isPendingUpdate,
+	} = useUpdateMutationproduct();
 	const getValueFeature = (id: string) => {
-		return featuresProduct.find((feature) => feature.feature_id === id)?.value;
+		const value = featuresProduct.find((feature) => feature.feature_id == id)?.value;
+		return value;
 	};
+	useEffect(() => {
+		if (!product) return;
+		dataProduct[field_annonce[0]] = product?.title;
+		dataProduct[field_annonce[1]] = product?.price;
+		dataProduct[field_annonce[2]] = product?.description;
+	}, [dataProduct, product, product?.description, product?.price, product?.title]);
 
 	useEffect(() => {
 		const featuresId = featuresProduct.map((feature) => feature.feature_id);
 		const fieldcharac = featuresId.map((id) => {
-			return features.find((f) => f.id === id)!;
+			return features.find((f) => f.feature_id === id)!;
 		});
-		const tr = fieldcharac?.filter(f => Boolean(f?.id))
+		const tr = fieldcharac?.filter((f) => Boolean(f?.feature_id));
 		setFieldCharac(tr);
 		return () => {
 			resetInput();
 			setFieldCharac([]);
 		};
-	}, [featuresProduct]);
+	}, [features, featuresProduct, resetInput]);
 
-	useMemo(() => {
-		if (mutation.isSuccess) {
+	useEffect(() => {
+		if (isSuccessUpdate) {
 			closePopUp();
 		}
-	}, [mutation.isSuccess]);
-	// const onSubmit = (data: ProductSchemaType) => {
-	// 	if (filesData.length == 0) {
-	// 		return ToastWarn('vous devez ajouter au moins une image');
-	// 	}
-	// 	for (const [key, value] of Object.entries(valueInput)) {
-	// 		if (!value && value !== 0) {
-	// 			ToastWarn('le champ ' + key + ' est obligatoire');
-	// 			return;
-	// 		}
-	// 	}
-	// 	mutation.mutate({
-	// 		dataProduct: {
-	// 			...data,
-	// 			product_id: product.product_id,
-	// 			caracteristique: JSON.stringify(valueInput)
-	// 		},
-	// 		photosFile: filesData,
-	// 	});
-	// };
+	}, [closePopUp, isSuccessUpdate]);;
+	if (!product) {
+		return <></>;
+	}
 	return (
 		<PopUpComponent
-			styleContainer="flex items-center justify-center"
+			styleContainer="flex items-center select-none size-full justify-center"
 			isOpen={showPopUp}
 			setHide={closePopUp}
 		>
 			<div
-				className={` flex max-h-[90vh] min-w-[400px] max-w-[450px] flex-col items-center justify-center rounded-lg bg-white`}
+				role="presentation"
+				className={`flex max-h-[90vh] min-w-[400px] max-w-[450px] select-none flex-col items-center justify-center rounded-lg bg-white`}
+				draggable={false}
+				onDrag={(e) => {
+					e.preventDefault();
+				}}
 			>
 				<div className={' flex items-center justify-center shadow-md'}>
 					<CloseModal closePopUp={closePopUp} style="text-red-600" />
@@ -106,7 +96,7 @@ export default memo(function ModalEditProduct({
 				</div>
 				<div className="flex max-h-[80vh] flex-col overflow-y-auto bg-white p-2">
 					<InputCategorie
-						valueSave={product.title}
+						valueSave={dataProduct[field_annonce[0]]}
 						item={{
 							name: field_annonce[0],
 							placeholder: 'Iphone 13 Pro Max',
@@ -115,11 +105,12 @@ export default memo(function ModalEditProduct({
 							min: 3,
 							max: 60,
 							match: /^[a-zA-Z0-9À-ÖØ-öø-ÿ\s()x.-\\&,/]+$/g,
-							id: '',
+							feature_id: '',
+							// id: '',
 						}}
 					/>
 					<InputCategorie
-						valueSave={product.price}
+						valueSave={dataProduct[field_annonce[1]]}
 						item={{
 							name: field_annonce[1],
 							collect_type: 'number',
@@ -127,11 +118,12 @@ export default memo(function ModalEditProduct({
 							required: 1,
 							min: 5,
 							max: 99999999999,
-							id: '',
+							// id: '',
+							feature_id: '',
 						}}
 					/>
 					<InputCategorie
-						valueSave={product.description}
+						valueSave={dataProduct[field_annonce[2]]}
 						item={{
 							name: field_annonce[2],
 							collect_type: 'textarea',
@@ -140,26 +132,32 @@ export default memo(function ModalEditProduct({
 							min: 3,
 							max: 850,
 							match: /^[a-zA-Z0-9À-ÖØ-öø-ÿ\s()x.-\\&,/]+$/g,
-							id: '',
+							feature_id: '',
+							// id: '',
 						}}
 					/>
 					<InputFileComponent name={"photo de l'annonce"} max={Nbr_Image_Upload} />
 					{fieldCharac.map((item, i) => {
 						if (item.collect_type === 'text' || item.collect_type === 'number') {
 							return (
-								<InputCategorie valueSave={getValueFeature(item.id)} isfeature={true} item={item} key={i} />
+								<InputCategorie
+									valueSave={getValueFeature(item.feature_id)}
+									isfeature={true}
+									item={item}
+									key={i}
+								/>
 							);
 						}
 						if (item.collect_type === 'select') {
 							return (
 								<SelectCategorie
 									key={i}
-									id={item.id}
+									id={item.feature_id}
 									values={item.enum || []}
 									isfeature={true}
 									label={item.name}
 									required={Boolean(item.required)}
-									defaultValue={getValueFeature(item.id)}
+									defaultValue={getValueFeature(item.feature_id)}
 								/>
 							);
 						}
@@ -167,20 +165,26 @@ export default memo(function ModalEditProduct({
 
 					<div className="my-4 flex w-full flex-row items-center justify-center gap-x-2">
 						<button
-							disabled={mutation.isPending}
+							disabled={isPendingUpdate}
 							className={twMerge('w-1/2 rounded-sm bg-primary p-2 text-white my-4')}
 							type="submit"
-							// onClick={handleSubmit(onSubmit)}
+							onClick={() =>
+								onCreateProduct({
+									createProduct: updateProduct,
+									dataFeatureProduct,
+									dataProduct,
+									fieldSelectOne : product.category_id,
+									errorInput,
+									filesData,
+									product_id: product.product_id
+								})
+							}
 						>
-							{mutation.isPending ? 'Modification en cours...' : "Modifier l'annonce"}
+							{isPendingUpdate ? 'Modification en cours...' : "Modifier l'annonce"}
 						</button>
 					</div>
 				</div>
 			</div>
 		</PopUpComponent>
 	);
-}, areEqual);
-
-function areEqual(prevProps: any, nextProps: any) {
-	return prevProps.showPopUp === nextProps.showPopUp;
 }

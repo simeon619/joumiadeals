@@ -62,6 +62,8 @@ export default function InputCategorie({
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setErrorInputs({ [nameId]: '' });
+		console.log(e.target.value,'e.target.value')
+		
 		try {
 			validField(item, { [nameId]: collect_type === 'number' ? Number(e.target.value) : e.target.value });
 		} catch (error) {

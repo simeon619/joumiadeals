@@ -1,0 +1,296 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import ModalBoostAnnouce from '@/components/ui/ModalBoostAnnouce';
+import ModalConfirmation from '@/components/ui/ModalConfirmation';
+import ModalEditProduct from '@/components/ui/ModalEditProduct';
+import { formatPrice } from '@/lib/utils';
+import { ProductsMinType, StatusType } from '@/services/api/product_categorie';
+import { formatDate } from '@/utils/formating';
+import { useUpdateMutationproductStatus } from '@/utils/queryOptions';
+import clsx from 'clsx';
+import { BadgeX, Pause, PlayCircle, Rocket, SquarePen } from 'lucide-react';
+import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
+import FeatureComponent from '../../FeatureComponent';
+type ActionType = 'boost' | 'repost' | 'pause' | 'delete' | 'ras';
+
+const size_icon = 15;
+const className = {
+	actionButton:
+		'flex flex-row items-center justify-center gap-1 border bg-white border-slate-100 p-1 rounded-md text-black',
+	text: 'text-xs',
+};
+export default function ContainAnnounceForL1({ product }: { product: ProductsMinType[0] }) {
+	const [modalState, setModalState] = useState({
+		confirm: false,
+		boost: false,
+		pause: false,
+		popUp: false,
+	});
+	const mutationStatus = useUpdateMutationproductStatus();
+	const [info, setInfo] = useState<string>('fonction non implémentée');
+	const [fn, setFn] = useState<ActionType>('ras');
+	const [p , setP] = useState<ProductsMinType[0]>();
+
+	const toggleModal = (modalType: keyof typeof modalState, isOpen: boolean) => {
+		setModalState({ ...modalState, [modalType]: isOpen });
+		document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+	};
+
+	const handleAction = (actionType: StatusType, comment: string) => {
+		mutationStatus.mutate({
+			product_id: product.product_id,
+			status: actionType,
+			comment: comment
+		});
+		toggleModal('confirm', false);
+	};
+
+	const openPopUp = (e: any) => {
+		e.preventDefault();
+		e.stopPropagation();
+		toggleModal('popUp', true);
+		setP(product);
+
+	};
+
+	const action = (Vact: ActionType) => {
+		switch (Vact) {
+			case 'boost':
+				return handleAction('AWAIT', 'boost');
+			case 'repost':
+				return handleAction('AWAIT', 'repost');
+			case 'pause':
+				return handleAction('PAUSE', 'pause');
+			case 'delete':
+				return handleAction('DELETED', 'delete');
+			default:
+				return alert('Action non implémentée');
+		}
+	};
+	const openModal = (e: any, typeModal: keyof typeof modalState) => {
+		e.preventDefault();
+		e.stopPropagation();
+		toggleModal(typeModal, true);
+	};
+	return (
+		<>
+			<div className={clsx(`flex size-full flex-col gap-2  px-2 py-1`)}>
+				{product.status === 'PAUSE' && (
+					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
+						<div className="flex items-start justify-between">
+							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+								{product.title}
+							</h2>
+							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+						</div>
+						<FeatureComponent productId={product.product_id} nbrFeature={4} />
+						<div className={clsx('flex flex-row flex-wrap items-center justify-between')}>
+							<button
+								className={twMerge([
+									className.actionButton,
+									'border-slate-40 hover:bg-slate-200 text-black ',
+								])}
+								onClick={(e: any) => {
+									openModal(e, 'confirm');
+									setInfo('Voulez vous republier cette annonce');
+									setFn('repost');
+									//
+
+								}}
+							>
+								<PlayCircle size={size_icon} />
+								<span className={className.text}>Republiez</span>
+							</button>
+							<button
+								className={twMerge([className.actionButton, 'border-blue-400 hover:bg-slate-500 '])}
+								onClick={(e) => openPopUp(e)}
+							>
+								<SquarePen size={size_icon} />
+								<span className={className.text}>Modifier</span>
+							</button>
+							<button
+								title="Supprimer votre annonce"
+								onClick={(e) => {
+									openModal(e, 'confirm');
+									setInfo('Voulez vous supprimer cette annonce');
+									setFn('delete');
+								}}
+								className={twMerge([className.actionButton, 'bg-red-400 hover:bg-red-600'])}
+							>
+								<BadgeX size={size_icon} />
+								<span className={className.text}>Supprimer</span>
+							</button>
+						</div>
+
+						<span className="font-roboto text-xs text-gray-600">
+							{formatDate(product.product_created_at)}
+						</span>
+					</div>
+				)}
+				{product.status === 'AWAIT' && (
+					<div className="flex h-full flex-col justify-between gap-4 rounded-lg bg-white px-4">
+						<div className="flex items-start justify-between">
+							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+								{product.title}
+							</h2>
+							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+						</div>
+						<FeatureComponent productId={product.product_id} nbrFeature={3} />
+						<div className="flex flex-col gap-y-1">
+							<span
+								className={clsx(
+									'my-3 inline-block rounded-lg border-[1px]  bg-black px-2 py-1 text-center text-[.75rem] font-semibold text-yellow-400'
+								)}
+							>
+								Votre produit est en attente de validation. Il sera publié après vérification.
+							</span>
+							<span className="text-xs text-gray-500">{formatDate(product.product_created_at)}</span>
+						</div>
+					</div>
+				)}
+				{product.status === 'VALID' && (
+					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
+						<div className="flex items-start justify-between">
+							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+								{product.title}
+							</h2>
+							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+						</div>
+						<FeatureComponent productId={product.product_id} nbrFeature={4} />
+						<div className={clsx('flex flex-row flex-wrap items-center justify-between')}>
+							<button
+								title="Booster votre annonce"
+								className={twMerge([
+									className.actionButton,
+									'border-slate-40 bg-yellow-400 hover:bg-yellow-300',
+								])}
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									toggleModal('boost', true);
+								}}
+							>
+								<Rocket size={size_icon} />
+								<span className={className.text}>Booster</span>
+							</button>
+
+							<button
+								className={twMerge([className.actionButton, 'border-blue-400 hover:bg-slate-500 '])}
+								onClick={(e) => openPopUp(e)}
+							>
+								<SquarePen size={size_icon} />
+								<span className={className.text}>Modifier</span>
+							</button>
+							<button
+								className={twMerge([
+									className.actionButton,
+									'border-slate-40 hover:bg-slate-200 text-black ',
+								])}
+								onClick={(e: any) => {
+									openModal(e, 'confirm');
+									setInfo("Voulez vous mettre en pause l'annonce");
+									setFn('pause');
+								}}
+							>
+								<Pause size={size_icon} />
+								<span className={className.text}>Pause</span>
+							</button>
+							<button
+								title="Supprimer votre annonce"
+								onClick={(e) => {
+									openModal(e, 'confirm');
+									setInfo('Voulez vous supprimer cette annonce');
+									setFn('delete');
+								}}
+								className={twMerge([className.actionButton, 'bg-red-400 hover:bg-red-600'])}
+							>
+								<BadgeX size={size_icon} />
+								<span className={className.text}>Supprimer</span>
+							</button>
+						</div>
+						<span className="font-roboto text-xs text-gray-600">
+							{formatDate(product.product_created_at)}
+						</span>
+					</div>
+				)}
+				{(product.status === 'DELETED' || product.status === 'REJECTED') && (
+					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
+						<div className="flex items-start justify-between">
+							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+								{product.title}
+							</h2>
+							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+						</div>
+						<FeatureComponent productId={product.product_id} nbrFeature={4} />
+						<div className="flex w-full flex-col items-baseline justify-start gap-x-1">
+							<span
+								className={clsx(
+									'my-3 inline-block rounded-lg border-[1px] bg-black px-2 py-1 text-center text-[.75rem] font-semibold text-red-500 '
+								)}
+							>
+								{product.status === 'DELETED' && 'Votre produit a été supprimée'}
+								{product.status === 'REJECTED' && 'Votre produit a été rejetée'}
+							</span>
+							{product.status === 'REJECTED' && (
+								<div className={clsx('flex w-full flex-row flex-wrap items-center justify-between')}>
+									<button
+										className={twMerge([
+											className.actionButton,
+											'border-slate-40 hover:bg-slate-200 text-black',
+										])}
+										onClick={(e) => {
+											openModal(e, 'confirm');
+											setInfo('Voulez vous republier cette annonce');
+											setFn('repost');
+										}}
+									>
+										<PlayCircle size={size_icon} />
+										<span className={className.text}>Republiez </span>
+									</button>
+									<button
+										className={twMerge([className.actionButton, 'border-blue-400 hover:bg-slate-500 '])}
+										onClick={(e) => openPopUp(e)}
+									>
+										<SquarePen size={size_icon} />
+										<span className={className.text}>Modifier</span>
+									</button>
+									<button
+										title="Supprimer votre annonce"
+										onClick={(e) => {
+											openModal(e, 'confirm');
+											setInfo('Voulez vous supprimer cette annonce');
+											setFn('delete');
+										}}
+										className={twMerge([className.actionButton, 'bg-red-400 hover:bg-red-600'])}
+									>
+										<BadgeX size={size_icon} />
+										<span className={className.text}>Supprimer</span>
+									</button>
+								</div>
+							)}
+						</div>
+						<span className="font-roboto text-xs text-gray-600">
+							{formatDate(product.product_created_at)}
+						</span>
+					</div>
+				)}
+			</div>
+			<ModalEditProduct
+				product={p}
+				closePopUp={() => toggleModal('popUp', false)}
+				showPopUp={modalState.popUp}
+			/>
+			<ModalConfirmation
+				closePopUp={() => toggleModal('confirm', false)}
+				showPopUp={modalState.confirm}
+				message={info}
+				confirm={() => action(fn)}
+			/>
+			<ModalBoostAnnouce
+				closePopUp={() => toggleModal('boost', false)}
+				showPopUp={modalState.boost}
+				product={product}
+			/>
+		</>
+	);
+}

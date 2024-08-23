@@ -45,7 +45,6 @@ export async function toggleLike({
 		body: JSON.stringify({ id, type, value }),
 	});
 	const data = await response.json();
-	console.log("🚀 ~ data:", data)
 	const validationResult = z.number().safeParse(data);
 	if (!validationResult.success) {
 		throw new Error(validationResult.error.message);
@@ -60,7 +59,6 @@ export async function getMyLike({ id, type }: { id: number; type: 'account' | 'm
 		body: JSON.stringify({ id, type }),
 	});
 	const data = await response.json();
-	console.log("🚀 ~ getMyLike ~ data:", data)
 	const validationResult = z
 		.object({ mylike: z.number(), totalLikes: z.number(), totalVotes: z.number() })
 		.safeParse(data);

@@ -32,6 +32,7 @@ import {
 	getVisitedProducts,
 	reportProduct,
 	updateProduct,
+	updateProductStatus,
 } from './../services/api/product_categorie';
 export const LIMIT_PRODUCT_PAGE = 7;
 
@@ -160,14 +161,15 @@ export function getProductsOptions(RequestData: RequestFilterProductType) {
 		placeholderData: keepPreviousData,
 	});
 }
-
-// export function getProductsByfiltrOptions(Requestfiltre: RequestDataType) {
-// 	return queryOptions({
-// 		queryKey: ['productsByfiltr', Requestfiltre],
-// 		queryFn: () => getProductsByFiltr(Requestfiltre),
-// 		placeholderData: keepPreviousData,
-// 	});
-// }
+export function useUpdateMutationproductStatus() {
+	return useMutation({
+	  mutationFn: updateProductStatus,
+	  onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: ["products"] });
+		// ToastSuccess('Annonce modifie avec success');
+	  },
+	});
+  }
 
 export function getProductOptions(id: string) {
 	return queryOptions({

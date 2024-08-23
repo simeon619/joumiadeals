@@ -47,22 +47,27 @@ export const onCreateProduct = ({
 	dataFeatureProduct,
 	filesData,
 	fieldSelect,
+	fieldSelectOne,
+	product_id,
 	errorInput,
 	createProduct,
 }: {
 	dataProduct: Record<string, number | string | null | undefined>;
 	dataFeatureProduct: Record<string, number | string | null | undefined>;
 	filesData: Array<any>;
-	fieldSelect: string;
+	fieldSelect?: string;
+	fieldSelectOne?: string;
+	product_id?: string;
 	errorInput: Record<string, any>;
 	createProduct: (args: any) => void;
 }) => {
-	console.log('🚀 ~ fieldSelect:', fieldSelect?.split(',')[0]);
+	console.log({dataProduct , dataFeatureProduct});
+	
 	for (const [key, value] of Object.entries({ ...dataProduct, ...dataFeatureProduct })) {
 		if (value === null || value === '') {
 			return ToastWarn(key.split(':')[0] + ' est obligatoire');
 		} else if (typeof value === 'number' && value < 0) {
-			return ToastWarn('Le champ ' + key.split(':')[0] + ' doit être supérieur à 0');
+			return ToastWarn('Le champ ' + key.split(':')[0] + 'doit être supérieur à 0');
 		}
 	}
 	for (const [key, value] of Object.entries(errorInput)) {
@@ -73,16 +78,17 @@ export const onCreateProduct = ({
 	if (filesData.length == 0) {
 		return ToastWarn('Vous devez ajouter au moins une image.');
 	}
-	if (!fieldSelect) {
+	if (!fieldSelect && !fieldSelectOne) {
 		return ToastWarn('Vous devez sélectionner une catégorie');
 	}
-	const len = fieldSelect?.split(',').length;
+	const len = fieldSelect?.split(',').length || 1;
 	try {
 		createProduct({
 			dataProduct: {
 				...dataProduct,
 				featuresProduct: dataFeatureProduct,
-				category_id: fieldSelect?.split(',')[len - 1],
+				category_id: fieldSelectOne || fieldSelect?.split(',')[len - 1],
+				product_id 
 			},
 			photos: filesData,
 		});
@@ -318,5 +324,24 @@ export function getStatusByLevel(level: number): StatusType[] {
 			return ['AWAIT', 'DELETED', 'PAUSE', 'REJECTED', 'VALID'];
 		default:
 			return ['VALID'];
+	}
+}
+
+export function getLevelByStatus(status: StatusType[]): number {
+	switch (status) {
+		case ['AWAIT']:
+			return 0;
+		case ['VALID']:
+			return 1;
+		case ['REJECTED']:
+			return 2;
+		case ['DELETED']:
+			return 3;
+		case ['PAUSE']:
+			return 4;
+		case ['AWAIT', 'DELETED', 'PAUSE', 'REJECTED', 'VALID']:
+			return 5;
+		default:
+			return 1;
 	}
 }

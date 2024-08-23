@@ -109,20 +109,6 @@ export default function CreateProduct() {
 		isPending: isPendingCreateProduct,
 	} = useCreateProductMutation();	
 
-	// useEffect(() => {
-	// 	const title = dataProduct[field_annonce[0]]!;
-	// 	const price = dataProduct[field_annonce[1]]!;
-	// 	const description = dataProduct[field_annonce[2]]!;
-	// 	setMainInput({ title: title, price: price, description: description });
-	// }, [dataProduct[field_annonce[0]], dataProduct[field_annonce[1]], dataProduct[field_annonce[2]]]);
-	// useEffect(() => {
-	// 	setDataProduct({
-	// 		[field_annonce[0]]: mainInput.title,
-	// 		[field_annonce[1]]: mainInput.price,
-	// 		[field_annonce[2]]: mainInput.description,
-	// 	});
-	// }, []);
-
 	useEffect(() => {
 		handleHierachie(null);
 		resetFile();
@@ -186,44 +172,6 @@ export default function CreateProduct() {
 		});
 	};
 
-	// const getChildCategorie = (categorieId: string | null) => {
-	// 	const allChild = get_children(categorieId, data);
-	// 	if (allChild?.length == 0) {
-	// 		const characteristics = get_caracteristique_child(categorieId, data);
-	// 		const mergedArray = characteristics.reduce((acc, curr) => acc.concat(curr), []);
-	// 		setFieldCharac(mergedArray);
-	// 		return;
-	// 	}
-	// 	return allChild;
-	// };
-
-	// const back = () => {
-	// 	const last = getChildCategorie(lastChild?.parent_category_id || null);
-	// 	setChildsCategorie(last);
-	// 	setProductSelect(undefined);
-	// 	setFieldCharac([]);
-	// 	const parent = get_parent(lastChild?.parent_category_id || null, data);
-	// 	setLastChild(parent);
-	// 	removeLabel();
-	// };
-
-	// const forwad = (id: string) => {
-	// 	const cat = getCategorieById(id, data);
-	// 	setProductSelect(undefined);
-	// 	resetAll();
-	// 	if (!cat) return;
-	// 	if (cat.is_parentable === 1) {
-	// 		setProductSelect(cat);
-	// 		setStep('one');
-	// 	}
-	// 	setLabelList(cat);
-
-	// 	const parent = get_parent(id, data);
-	// 	const childs = getChildCategorie(id);
-	// 	if (!childs) return;
-	// 	setLastChild(parent);
-	// 	setChildsCategorie(childs);
-	// };
 	const collectFeatures = (Ids: string[]) => {
 		setFieldCharac([]);
 		setFieldSelect('');
@@ -231,7 +179,6 @@ export default function CreateProduct() {
 		Ids.forEach((id) => {
 			const feature = features.filter((feature) => feature.category_id === id);
 			newFeatures.push(...feature);
-			console.log("🚀 ~ collectFeatures ~ newFeatures:", newFeatures)
 		});
 		setFieldCharac(newFeatures);
 		setFieldSelect(Ids.join(','));
@@ -245,7 +192,7 @@ export default function CreateProduct() {
 			to: announceRoot.to,
 			search: {
 				provider_id: InfoUser.id,
-				filter: { order_by: 'date_desc', status: 5 },
+				filter: { order_by: 'date_desc', status: 1 },
 			},
 		});
 	}
@@ -392,7 +339,7 @@ export default function CreateProduct() {
 								) : (
 									<button
 										disabled={isPendingCreateProduct}
-										className={clsx('my-4 rounded-lg bg-primary px-3 py-1 text-sm  text-white')}
+										className={clsx('my-4 rounded-lg bg-primary px-3 py-1 text-sm text-white')}
 										type="submit"
 										onClick={() =>
 											onCreateProduct({

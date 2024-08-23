@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import PopUpComponent from './PopUpComponent';
-import CloseModal from './CloseModal';
 import { ProductsMinType } from '@/services/api/product_categorie';
 import { URL_IMAGE } from '@/utils/constante';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
+import CloseModal from './CloseModal';
+import PopUpComponent from './PopUpComponent';
 
 const formulesub = [
 	{
@@ -40,14 +40,13 @@ export default function ModalBoostAnnouce({
 
 	return (
 		<PopUpComponent
-			styleContainer="relative flex items-center justify-center h-full w-full"
+			styleContainer="relative flex items-center size-full justify-center"
 			isOpen={showPopUp}
+			setHide={closePopUp}
 		>
-			<div
-				className={`absolute flex flex-col items-center justify-center gap-y-8 rounded-md bg-blue-50 p-4 `}
-			>
-				<CloseModal closePopUp={closePopUp} />
+			<div className={`relative flex flex-col items-center justify-center gap-y-8 rounded-md bg-blue-50 p-4 `}>
 				<div className={`h-[150px] w-[200px]`}>
+					<CloseModal closePopUp={closePopUp} style="absolute right-4 top-4" />
 					<div
 						className={`rounded-md bg-slate-400 bg-cover bg-center bg-no-repeat`}
 						style={{

@@ -62,7 +62,6 @@ const SearchSchema: f_form_type[] = [
 	// },
 ];
 
-
 const setFields = ({
 	Ids,
 	features,
@@ -226,7 +225,7 @@ export const PopUpFilter = memo(function PopUpFilter({
 		};
 		if (!firstMount.current) bh();
 		const id = filterFrom.category_id;
-		const Ids = get_all_parents(id, categories);
+		const Ids = get_all_parents(id || null, categories);
 		setFields({ Ids, features, setFieldCharac });
 	}, [filterFrom]);
 

@@ -11,12 +11,13 @@ export default function ModalConfirmation({
 	showPopUp: boolean;
 	closePopUp: () => void;
 	message: string;
-	confirm: (e: any) => void;
+	confirm: any;
 }) {
 	return (
 		<PopUpComponent
 			styleContainer="relative flex items-center justify-center h-full w-full"
 			isOpen={showPopUp}
+			setHide={closePopUp}
 		>
 			<div className={`absolute w-[500px] rounded-md bg-white p-4 `}>
 				<CloseModal closePopUp={closePopUp} />

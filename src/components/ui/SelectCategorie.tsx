@@ -67,14 +67,14 @@ export default function SelectCategorie({
 		<div className="mt-5 w-full">
 			<span
 				className={twMerge(
-					`block text-sm font-medium text-slate-700 `,
+					`block text-sm font-medium text-slate-700`,
 					Boolean(required) &&
 						"after:ml-0.5 after:text-[.785rem] after:font-serif after:text-gray-500 after:content-100 after:content-['(obligatoire)']"
 				)}
 			>
 				{label}
 			</span>
-			<Select name={label} onValueChange={handleChange} >
+			<Select name={label} onValueChange={handleChange} defaultValue={String(defaultValue)}>
 				<SelectTrigger className="mt-1 rounded-md border border-slate-300 bg-white p-1 text-xs text-gray-600 shadow-sm  hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
 					<SelectValue placeholder={values[0]} />
 				</SelectTrigger>

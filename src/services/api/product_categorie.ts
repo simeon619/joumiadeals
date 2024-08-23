@@ -202,7 +202,6 @@ export async function createProduct(data: {
 			headers: getHeadersWithFormData(),
 			body: formData,
 		});
-		console.log('🚀 ~ response:', response);
 		const data = await response.json();
 		console.log('🚀 ~ data:', data);
 		if (!response.ok) {
@@ -217,7 +216,7 @@ export async function createProduct(data: {
 }
 export async function updateProduct(dataUpdate: {
 	dataProduct: Record<string, any>;
-	photosFile: (
+	photos: (
 		| string
 		| {
 				file: File;
@@ -225,20 +224,23 @@ export async function updateProduct(dataUpdate: {
 		  }
 	)[];
 }) {
-	const { dataProduct, photosFile } = dataUpdate;
+	const { dataProduct, photos } = dataUpdate;
 	const formData = new FormData();
 	for (const key in dataProduct) {
-		formData.append(key, dataProduct[key]);
+		let value = dataProduct[key];
+		if (key === 'featuresProduct') value = JSON.stringify(dataProduct[key]);
+		if (key == 'price') value = Number(value);
+		const k = mapKeyForProductServer(key);
+		formData.append(k, value);
 	}
 
-	const photos = photosFile.map((photo, index) => {
+	const phots = photos.map((photo, index) => {
 		if (typeof photo !== 'string') {
 			return `photos_${index}`;
 		} else return photo;
 	});
-	formData.append('photos', JSON.stringify(photos));
-
-	photosFile.forEach((photo, index) => {
+	formData.append('photos', JSON.stringify(phots));
+	photos.forEach((photo, index) => {
 		if (typeof photo !== 'string') {
 			formData.append(
 				`photos_${index}`,
@@ -266,8 +268,8 @@ export async function updateProduct(dataUpdate: {
 		throw error;
 	}
 }
-const statusSchema = z.enum(['AWAIT', 'VALID', 'REJECTED', 'DELETED', 'PAUSE'])
-export type StatusType = z.infer<typeof statusSchema>
+const statusSchema = z.enum(['AWAIT', 'VALID', 'REJECTED', 'DELETED', 'PAUSE']);
+export type StatusType = z.infer<typeof statusSchema>;
 const ProductMinSchema = z.object({
 	avatar_url: z.string(),
 	photos: z.array(z.string()),
@@ -294,7 +296,6 @@ const ProductShemaPaginate = z.object({
 });
 
 export type ProductsData = z.infer<typeof ProductShemaPaginate>;
-
 // export async function getProductsByFiltr(requestData: RequestDataType) {
 // 	console.log("🚀 ~ getProductsByFiltr ~ requestData:", requestData)
 // 	const response = await fetch(`${BASE_URL}/filter_product`, {
@@ -320,7 +321,7 @@ export async function getProducts(requestData: RequestFilterProductType) {
 			...requestData,
 			filter: {
 				...requestData.filter,
-				status : getStatusByLevel(requestData.filter?.status),
+				status: getStatusByLevel(requestData.filter?.status),
 				category_id: requestData.filter?.category_id === 'all' ? null : requestData.filter?.category_id,
 			},
 			limit: LIMIT_PRODUCT_PAGE,
@@ -550,3 +551,26 @@ export const getVisitedProducts = async ({ page }: { page: number }) => {
 		throw error;
 	}
 };
+export async function updateProductStatus(dataUpdate: {
+	product_id: string;
+	status: StatusType;
+	comment: string;
+}) {
+	try {
+		const response = await fetch(`${BASE_URL}/update_product_status`, {
+			method: 'PUT',
+			headers: getHeaders(),
+			body: JSON.stringify({ ...dataUpdate }),
+		});
+
+		if (!response.ok) {
+			const text = await response.json();
+			console.log(text.message);
+		}
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		// console.error("Erreur lors de la mise a jour du statut du produit", error);
+		// throw error;
+	}
+}
