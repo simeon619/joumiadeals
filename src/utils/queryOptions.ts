@@ -73,7 +73,6 @@ export function useCreateProductMutation() {
 		mutationKey: ['createProduct'],
 		mutationFn: createProduct,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
 			await queryClient.invalidateQueries({ queryKey: ['products'] });
 			ToastSuccess('Le produit a bien été crée');
 		},
@@ -96,7 +95,7 @@ export function useDeleteProductMutation() {
 	return useMutation({
 		mutationFn: deleteProduct,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
+			await queryClient.invalidateQueries({ queryKey: ['products'] });
 			ToastSuccess("L'annonce a bien été supprimée");
 		},
 		onError: () => {
@@ -163,13 +162,13 @@ export function getProductsOptions(RequestData: RequestFilterProductType) {
 }
 export function useUpdateMutationproductStatus() {
 	return useMutation({
-	  mutationFn: updateProductStatus,
-	  onSuccess: async () => {
-		await queryClient.invalidateQueries({ queryKey: ["products"] });
-		// ToastSuccess('Annonce modifie avec success');
-	  },
+		mutationFn: updateProductStatus,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ['products'] });
+			// ToastSuccess('Annonce modifie avec success');
+		},
 	});
-  }
+}
 
 export function getProductOptions(id: string) {
 	return queryOptions({
@@ -192,8 +191,9 @@ export function getAllFavouriteProductIds() {
 export function useUpdateMutationproduct() {
 	return useMutation({
 		mutationFn: updateProduct,
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ['productsByfiltr'] });
+		onSuccess: async (data, { dataProduct }) => {
+			await queryClient.invalidateQueries({ queryKey: ['products'] });
+			await queryClient.invalidateQueries({ queryKey: ['featuresValues', dataProduct.product_id] });
 			ToastSuccess('Annonce modifie avec success');
 		},
 	});

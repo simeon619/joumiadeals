@@ -38,15 +38,18 @@ export default function PopUpComponent({
 			role="dialog"
 			aria-modal="true"
 			className={twMerge(
-				`fixed z-60 inset-0 flex justify-${position} bg-black/50 duration-300 ease-in-out`,
-				isOpen ? `opacity-100 pointer-events-auto select-none` : 'opacity-0 pointer-events-none select-auto'
+				`fixed inset-0 z-50 flex bg-black/50 duration-300 ease-in-out`,
+				isOpen
+					? `opacity-100 pointer-events-auto select-none`
+					: 'opacity-0 pointer-events-none select-auto'
 			)}
 			onClick={handleHideModal}
 		>
 			<div
 				data-outside="outside"
 				className={twMerge(
-					'transition-all duration-300 ease-in-out',
+					'relative transition-all z-50 duration-300 ease-in-out',
+					position === 'start' ? 'justify-start' : position === 'end' ? 'justify-end' : 'justify-center',
 					styleContainer,
 					isOpen ? animation[animationName][0] : animation[animationName][1]
 				)}

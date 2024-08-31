@@ -53,16 +53,16 @@ export default function SimilaireProduct({ categoryId }: { categoryId: string })
 			<div className="flex items-center justify-between gap-x-2 p-2">
 				<span className="text-sm text-slate-800">Annonces similaires</span>
 			</div>
-			<div className="absolute inset-x-0 bottom-[50%] z-20 flex w-full items-center justify-between gap-x-2 pt-2">
+			<div className="pointer-events-none absolute bottom-[50%] z-10  flex w-full items-center justify-between gap-x-2 pt-2">
 				<MoveLeftIcon
 					onClick={scrollLeft}
 					size={28}
-					className="cursor-pointer rounded-full border bg-slate-50 p-1 text-slate-900 shadow-xl hover:text-gray-900"
+					className="pointer-events-auto cursor-pointer rounded-full border bg-slate-50 p-1 text-slate-900 shadow-xl hover:text-gray-900"
 				/>
 				<MoveRightIcon
 					onClick={scrollRight}
 					size={28}
-					className="cursor-pointer rounded-full border bg-slate-50 p-1 text-slate-900 shadow-xl hover:text-gray-900"
+					className="pointer-events-auto cursor-pointer rounded-full border bg-slate-50 p-1 text-slate-900 shadow-xl hover:text-gray-900"
 				/>
 			</div>
 			<div

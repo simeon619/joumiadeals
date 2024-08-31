@@ -19,7 +19,7 @@ import { ArrowLeftFromLine, ChevronRight, Search } from 'lucide-react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
 import { z } from 'zod';
-import { FeatureComponentCheck } from './component/FeatureComponentCheck';
+import FeatureComponentCheck from './component/FeatureComponentCheck';
 
 const filterProductSchema = z.object({
 	price_min: z.number(),
@@ -208,19 +208,31 @@ export const PopUpFilter = memo(function PopUpFilter({
 	useEffect(() => {
 		const bh = () => {
 			let obj: Record<string, Array<string | number> | string> = {};
+
 			Object.keys(filterFrom).forEach((key) => {
-				if (key === 'order_by') {
-					obj['3'] =
-						filterFrom[key] || ('date_desc' as 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc');
-				}
-				if (key === 'price') {
-					obj['1'] = filterFrom[key] as Array<number>;
-				}
-				if (key === 'features') {
-					// obj[key] = filterFrom[key] as any;
-					obj = { ...obj, ...filterFrom[key] };
+				switch (key) {
+					case 'order_by':
+						obj['3'] =
+							(filterFrom[key] as 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc') || 'date_desc';
+						break;
+
+					case 'price':
+						obj['1'] = filterFrom[key] as Array<number>;
+						break;
+
+					case 'features': {
+						const filtFr = filterFrom[key]!;
+						if (Object.keys(filtFr).length > 0) {
+							obj = { ...obj, ...filtFr };
+						}
+						break;
+					}
+
+					default:
+						break;
 				}
 			});
+
 			setStoreFilter(obj);
 		};
 		if (!firstMount.current) bh();
@@ -288,6 +300,8 @@ export const PopUpFilter = memo(function PopUpFilter({
 		feature_id: string;
 		collect_type: f_form_type['collect_type'];
 	}) => {
+		console.log('5 ');
+
 		setStoreFilter((prev) => {
 			const newState = { ...prev };
 			if (collect_type === 'radio' && typeof value === 'string') {
@@ -328,9 +342,9 @@ export const PopUpFilter = memo(function PopUpFilter({
 
 	return (
 		<PopUpComponent
-			animationName="translateRight"
+			animationName="translateTop"
 			isOpen={value}
-			styleContainer={'realtive'}
+			styleContainer={'flex w-full'}
 			setHide={setShowPopup}
 			position="end"
 		>
@@ -400,28 +414,20 @@ export const PopUpFilter = memo(function PopUpFilter({
 								<ChevronRight className={'text-slate-700'} />
 							</div>
 						</button>
-						{[...fieldCharac, ...SearchSchema].map((item) => {
+						{[...fieldCharac, ...SearchSchema].reverse().map((item) => {
 							return (
 								<div key={item.feature_id} className="flex w-full flex-col gap-1 py-5">
 									{item.collect_type === 'radio' && (
 										<>
 											<HeadFilt item={item} />
 											{item.enum?.map((value, i) => {
-												const mapData: any = {
-													price_asc: 'Prix croissant',
-													price_desc: 'Prix décroissant',
-													date_asc: 'plus anciennes',
-													date_desc: 'plus recentes',
-												};
 												return (
-													<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
-														<span className="text-[.87rem] text-gray-800 ">{mapData[value]}</span>
-														<FeatureComponentCheck
-															handleFilterStore={handleFilterStore}
-															item={item}
-															value={value}
-														/>
-													</label>
+													<FeatureComponentCheck
+														handleFilterStore={handleFilterStore}
+														item={item}
+														value={value}
+														key={i}
+													/>
 												);
 											})}
 										</>
@@ -455,14 +461,12 @@ export const PopUpFilter = memo(function PopUpFilter({
 													{item.enum?.map((value, i) => {
 														if (i === 0) return null;
 														return (
-															<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
-																<span className="text-[.811rem] capitalize text-slate-800">{value}</span>
-																<FeatureComponentCheck
-																	handleFilterStore={handleFilterStore}
-																	item={item}
-																	value={value}
-																/>
-															</label>
+															<FeatureComponentCheck
+																handleFilterStore={handleFilterStore}
+																item={item}
+																value={value as any}
+																key={i}
+															/>
 														);
 													})}
 												</>
@@ -503,10 +507,12 @@ export const PopUpFilter = memo(function PopUpFilter({
 						{detail?.enum?.map((value, i) => {
 							if (i === 0) return null;
 							return (
-								<label key={i} className="mb-1 flex cursor-pointer items-baseline justify-between ">
-									<span className="text-[.851rem]  text-gray-800">{value}</span>
-									<FeatureComponentCheck handleFilterStore={handleFilterStore} item={detail} value={value} />
-								</label>
+								<FeatureComponentCheck
+									handleFilterStore={handleFilterStore}
+									item={detail}
+									value={value as any}
+									key={i}
+								/>
 							);
 						})}
 					</div>
@@ -516,19 +522,6 @@ export const PopUpFilter = memo(function PopUpFilter({
 							hidden: detailFilt !== 'category_id',
 						})}
 					>
-						{/* <div className="flex w-full ">
-							{filterFrom?.category_id === 'all' && !result_cat[0]?.parent_category_id && (
-								<>
-									<button
-										onClick={() => handleHierachie(null)}
-										className="flex items-center justify-center gap-2 text-sm"
-									>
-										<AlignRight size={20} />
-										<span>Toutes les catégories</span>
-									</button>
-								</>
-							)}
-						</div> */}
 						<div className="flex w-full flex-col items-start justify-start divide-y ">
 							<div
 								className={clsx('my-2 flex items-center rounded-xl border p-1', {
@@ -606,7 +599,7 @@ const HeadFilt = ({ item }: { item: any }) => {
 	return (
 		<div className="mb-1 flex items-center ">
 			<img className="size-6 rounded-full bg-blue-100 p-1 invert-20" src={item.icon} alt={''} />
-			<span className="ml-2 font-roboto text-[.95rem] capitalize text-slate-900">
+			<span className="ml-2 font-roboto text-[.9rem] capitalize text-slate-900">
 				{item.name.split(':')[0]}
 			</span>
 		</div>

@@ -41,6 +41,7 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.50.0",
     "react-hot-toast": "^2.4.1",
+    "react-phone-input-2": "^2.15.1",
     "react-select": "^5.8.0",
     "react-use": "^17.5.0",
     "suggestions": "^1.7.1",

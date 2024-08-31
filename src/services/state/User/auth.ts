@@ -12,7 +12,7 @@ const userSchema = z.object({
 	name: z.string(),
 	phone: z.any(),
 	updated_at: z.string(),
-	token: z.string(),
+	token: z.string().optional(),
 	use_whatsapp: z.any(),
 	role: z.string(),
 });
@@ -30,11 +30,10 @@ const userUpdateSchema = z.object({
 });
 
 const userUpdateToserverSchema = z.object({
-	avatar_url: z.string().nullable(),
 	location: z.string(),
 	use_whatsapp: z.any(),
 	name: z.string(),
-	phone: z.any(),
+	phone: z.string(),
 });
 
 export type UserUpdateType = z.infer<typeof userUpdateToserverSchema>;
@@ -69,7 +68,13 @@ export function getHeaders() {
 	myHeader.append('Authorization', `Bearer ${token}`);
 	return myHeader;
 }
-
+const putInSto = (t: string | undefined) => {
+	if (!t) {
+		ToastError('Une erreur est survenue, veuillez reessayer');
+		throw new Error('token non trouvé');
+	}
+	setToken(t);
+};
 export const useAuth = create(
 	persist(
 		combine(
@@ -101,10 +106,9 @@ export const useAuth = create(
 					ToastSuccess(' Connexion reussie');
 					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 					// const token = JSON.parse(infoUser.data.token) ;
-					setToken(infoUser.data.token);
-					console.log('🚀 ~ register: ~ infoUser.data.token:', JSON.parse(infoUser.data.token));
+					// console.log('🚀 ~ register: ~ infoUser.data.token:', JSON.parse(infoUser.data.token));
+					putInSto(infoUser.data.token);
 				},
-
 				login: (dataS: UserType) => {
 					console.log('🚀 ~ dataS:', dataS);
 					const infoUser = userSchema.safeParse(dataS);
@@ -115,13 +119,11 @@ export const useAuth = create(
 
 						return;
 					}
-					// const token = JSON.parse(infoUser.data.token);
-					setToken(infoUser.data.token);
+					putInSto(infoUser.data.token);
 					ToastSuccess('Heureux de vous revoir');
 					if (infoUser.success)
 						set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
-
 				me: async () => {
 					const response = await fetch('http://localhost:3333/me', {
 						method: 'GET',
@@ -136,21 +138,48 @@ export const useAuth = create(
 					}
 					set(() => ({ InfoUser: infoUser.data, isAuth: true }));
 				},
-				editMe: async (dataS: UserUpdateType) => {
+				editMe: async (dataS: {
+					dataUser: UserUpdateType;
+					files: ({ file: File; buffer: string } | string)[];
+				}) => {
+					const { dataUser, files } = dataS;
+					const formData = new FormData();
+
+					files.forEach((photo, index) => {
+						if (typeof photo !== 'string') {
+							formData.append(
+								`avatar_url_${index}`,
+								photo.file,
+								`avatar_url_${index}.${photo.file.type.split('/')[1]}`
+							);
+						}
+					});
+					for (const key in dataUser) {
+						let value = dataUser[key];
+						if (key === 'use_whatsapp') value = Number(value);
+						formData.append(key, value);
+					}
+						console.log('🚀 ~ formData:', formData);
 					const response = await fetch(`${BASE_URL}/edit_me`, {
 						method: 'PUT',
-						headers: getHeaders(),
-						body: JSON.stringify(dataS),
+						headers: getHeadersWithFormData(),
+						body: formData,
 					});
 					const data = await response.json();
-					const infoUser = userUpdateSchema.safeParse(data);
+					console.log('🚀 ~ data:', data);
+					const infoUser = userSchema.safeParse(data);
 					if (!infoUser.success) {
 						ToastError('Une erreur est survenue, veuillez reessayer');
+						console.log(infoUser.error);
 						return;
 					} else {
 						ToastSuccess('Modification reussie');
-
-						// set(() => ({ InfoUser: { ...infoUser.data, token: getToken() }, isAuth: true }));
+						set((state) => {
+							return {
+								...state,
+								InfoUser: infoUser.data,
+							};
+						});
 					}
 				},
 				logout: async () => {

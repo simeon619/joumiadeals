@@ -34,6 +34,7 @@ export default function InputCategorie({
 	useEffect(() => {
 		if (required) {
 			if (isfeature) {
+				
 				setDataProductFeature({
 					[nameId]: valueSave || default_value || null,
 				});
@@ -62,7 +63,6 @@ export default function InputCategorie({
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setErrorInputs({ [nameId]: '' });
-		console.log(e.target.value,'e.target.value')
 		
 		try {
 			validField(item, { [nameId]: collect_type === 'number' ? Number(e.target.value) : e.target.value });
@@ -70,6 +70,7 @@ export default function InputCategorie({
 			setErrorInputs({ [nameId]: (error as Error).message });
 		}
 		if (isfeature) {
+			
 			setDataProductFeature({
 				[nameId]:  collect_type === 'number' ? Number(e.target.value) : e.target.value,
 			});

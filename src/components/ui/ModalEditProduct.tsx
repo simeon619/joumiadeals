@@ -9,7 +9,7 @@ import {
 	useUpdateMutationproduct,
 } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import CloseModal from './CloseModal';
 import InputCategorie from './InputCategorie';
@@ -30,6 +30,7 @@ export default function ModalEditProduct({
 	const resetInput = useInputCategorie((state) => state.resetAll);
 	const setFiles = useInputCategorie((state) => state.setFile);
 	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
+	const set = useInputCategorie((state) => state.setDataProductFeature);
 	const dataProduct = useInputCategorie((state) => state.dataProduct);
 	const errorInput = useInputCategorie((state) => state.errorInput);
 	const filesData = useInputCategorie((state) => state.filesData);
@@ -50,10 +51,17 @@ export default function ModalEditProduct({
 	};
 	useEffect(() => {
 		if (!product) return;
-		dataProduct[field_annonce[0]] = product?.title;
-		dataProduct[field_annonce[1]] = product?.price;
-		dataProduct[field_annonce[2]] = product?.description;
-	}, [dataProduct, product, product?.description, product?.price, product?.title]);
+
+		// Créez une copie de dataProduct pour éviter les mutations directes
+		const updatedDataProduct = { ...dataProduct };
+
+		updatedDataProduct[field_annonce[0]] = product?.title;
+		updatedDataProduct[field_annonce[1]] = product?.price;
+		updatedDataProduct[field_annonce[2]] = product?.description;
+
+		// Maintenant, vous pouvez mettre à jour le state ou la variable appropriée
+		set(updatedDataProduct); // Assurez-vous d'avoir cette fonction setDataProduct
+	}, [product, field_annonce]);
 
 	useEffect(() => {
 		const featuresId = featuresProduct.map((feature) => feature.feature_id);
@@ -72,7 +80,7 @@ export default function ModalEditProduct({
 		if (isSuccessUpdate) {
 			closePopUp();
 		}
-	}, [closePopUp, isSuccessUpdate]);;
+	}, [isSuccessUpdate]);
 	if (!product) {
 		return <></>;
 	}
@@ -84,7 +92,7 @@ export default function ModalEditProduct({
 		>
 			<div
 				role="presentation"
-				className={`flex max-h-[90vh] min-w-[400px] max-w-[450px] select-none flex-col items-center justify-center rounded-lg bg-white`}
+				className={`flex max-h-[90vh] min-w-[400px] max-w-[450px] select-none flex-col items-center justify-center rounded-lg bg-white/40`}
 				draggable={false}
 				onDrag={(e) => {
 					e.preventDefault();
@@ -94,7 +102,7 @@ export default function ModalEditProduct({
 					<CloseModal closePopUp={closePopUp} style="text-red-600" />
 					<span className={'text-center text-xl'}>Modifier votre annonce</span>
 				</div>
-				<div className="flex max-h-[80vh] flex-col overflow-y-auto bg-white p-2">
+				<div className="flex max-h-[80vh] flex-col overflow-y-auto p-2">
 					<InputCategorie
 						valueSave={dataProduct[field_annonce[0]]}
 						item={{
@@ -172,11 +180,11 @@ export default function ModalEditProduct({
 								onCreateProduct({
 									createProduct: updateProduct,
 									dataFeatureProduct,
-									dataProduct,
-									fieldSelectOne : product.category_id,
+									dataProduct: dataProduct,
+									fieldSelectOne: product.category_id,
 									errorInput,
 									filesData,
-									product_id: product.product_id
+									product_id: product.product_id,
 								})
 							}
 						>

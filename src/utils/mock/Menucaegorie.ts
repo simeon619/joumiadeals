@@ -305,10 +305,16 @@ export function get_all_parents(parent_id: string | null, cats: CategoryType) {
 	return parents.map((p) => p.id);
 }
 
-export const getCategorieById = (id: string | null, cats: CategoryType) => {
-	return cats.find((category) => {
+export const getCategorieById = (id: string | undefined, cats: CategoryType) => {
+	const bu  = cats.find((category) => {
 		return category.id == id;
 	});
+	return bu || {
+		id: null,
+		label: null,
+		icon: null,
+		is_parentable: 0,
+	}
 };
 
 // export function get_caracteristique_child(child_id: string | null, cats: CategoryType) {

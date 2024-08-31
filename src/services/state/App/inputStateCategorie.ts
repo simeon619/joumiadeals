@@ -13,6 +13,7 @@ export const useInputCategorie = create(
 			},
 			(set, get) => ({
 				setDataProduct: async (value: { [k: string]: string | number | undefined | null }) => {
+					console.log('required', value);
 					set((state) => ({
 						dataProduct: {
 							...state.dataProduct,
@@ -81,9 +82,9 @@ export const useInputCategorie = create(
 				resetAll: () => {
 					return set({ dataProductFeature: {}, errorInput: {} });
 				},
-				resetFile : () => {
+				resetFile: () => {
 					return set({ filesData: [] });
-				}
+				},
 			})
 		),
 		{

@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import HeaderProfile from '@/components/profile/HeaderProfile';
-import InputComponent from '@/components/ui/InputComponent';
 import PopUpComponent from '@/components/ui/PopUpComponent';
 import SelectComponent from '@/components/ui/SelectComponent';
 import SwitchInputComponent from '@/components/ui/SwitchInputComponent';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
+import { ToastError } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
+import { URL_IMAGE } from '@/utils/constante';
 import { cities } from '@/utils/mock/city';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, Outlet, useRouter } from '@tanstack/react-router';
-import { X } from 'lucide-react';
+import { PenLine, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useDropzone } from 'react-dropzone';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
 const RegisterSchema = z.object({
@@ -26,54 +29,98 @@ export type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 export default function MyprofilePage() {
 	useResetScrollBar();
 	const { isAuth, InfoUser, editMe, logout } = useAuth();
-	const [city, setCity] = useState<string>(cities[0]);
 	const [isOpen, setIsOpen] = useState(false);
+	const [city, setCity] = useState<string>(cities[0]);
+	const [checked, setChecked] = useState(InfoUser?.use_whatsapp || 0);
+	const [phone, setPhone] = useState(InfoUser?.phone);
+	const [files, setFiles] = useState<{ file: File; buffer: string }[]>([]);
+
+	const [name, setName] = useState(InfoUser?.name);
 	const router = useRouter();
+	// const [avatar, setAvatar] = useState(null);
 	useEffect(() => {
 		if (!isAuth) {
 			router.history.push('/');
 		}
 	}, [isAuth, router.history]);
-	const onSubmit: SubmitHandler<RegisterSchemaType> = (data) => {
-		const dataModified = {
-			...data,
-			location: city,
-		};
-		editMe(dataModified);
-		setIsOpen(false);
-		// console.log(dataModified);
-	};
 
 	const openDialog = () => {
 		setIsOpen(true);
+		setFiles([]);
 		document.body.style.overflow = 'hidden';
 	};
 	const closeDialog = () => {
 		setIsOpen(false);
+		setFiles([]);
 		document.body.style.overflow = 'auto';
 	};
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<RegisterSchemaType>({
-		resolver: zodResolver(RegisterSchema),
+	const onSubmit = (e: any) => {
+		e.preventDefault();
+		const phones = phone.replace(/\s+/g, '');
+		if (phones.length !== 14) {
+			ToastError('le numro de téléphone doit contenir 10 chiffres');
+			return;
+		}
+
+		if (phones.slice(0, 4) !== '+225') {
+			ToastError('Le numéro doit commencer par +225.');
+			return;
+		}
+		if (phones.slice(4).length !== 10) {
+			ToastError('Le numéro doit comporter 9 chiffres après le préfixe +225.');
+			return;
+		}
+		if (name.length > 25) {
+			ToastError('Nom trop long. Max 25 caractères.');
+			return;
+		}
+		editMe({
+			dataUser: {
+				name,
+				location: city,
+				use_whatsapp: checked,
+				phone: phones,
+			},
+			files: files,
+		});
+
+		closeDialog();
+	};
+
+	const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
+		maxFiles: 1,
+		autoFocus: true,
+	});
+
+	acceptedFiles.forEach((file) => {
+		const files = new FileReader();
+		files.onloadend = function () {
+			if (!file.type.includes('image')) return ToastError("Le format de l'image n'est pas autorisé");
+			if (file.size > 12 * 1024 * 1024) return ToastError("La taille de l'image est trop grande");
+			if (files.result === null)
+				return ToastError("Une erreur est survenue lors de l'envoi du fichier");
+			setFiles([{ buffer: files.result?.toString(), file: file }]);
+		};
+		files.readAsDataURL(file);
 	});
 
 	return (
 		<>
 			<HeaderProfile
-				avatar_url={InfoUser?.avatar_url}
+				avatar_url={
+					InfoUser?.avatar_url?.startsWith('http')
+						? InfoUser?.avatar_url
+						: URL_IMAGE + InfoUser?.avatar_url
+				}
 				name={InfoUser?.name}
 				created_at={InfoUser?.created_at}
 				idUser={InfoUser?.id}
 				openDialog={openDialog}
 				logout={logout}
-				location={city}
+				location={InfoUser?.location}
 				phone={InfoUser?.phone}
 				email={InfoUser?.email}
 			/>
-
 			<div className="my-2 inline-flex gap-x-5 self-start rounded-lg border bg-slate-100 p-1">
 				{(
 					[
@@ -87,19 +134,18 @@ export default function MyprofilePage() {
 						<Link
 							key={to}
 							to={to}
-							activeOptions={{ includeSearch: false ,exact: true }}
-							
+							activeOptions={{ includeSearch: false, exact: true }}
 							activeProps={{
 								className: 'text-black bg-white border shadow-md rounded-lg',
 							}}
 							className={'px-1 py-2 text-xs'}
 							//target='haut'
-							search={(old : { page?: number, provider_id?: string }) => {
+							search={(old: { page?: number; provider_id?: string }) => {
 								const newParams = provider_id
-									? { 
-										provider_id: old?.provider_id ?? provider_id, 
-										filter: { status: 5 as const, order_by: 'date_desc' }
-									}
+									? {
+											provider_id: old?.provider_id ?? provider_id,
+											filter: { status: 5 as const, order_by: 'date_desc' },
+										}
 									: { page: old?.page ?? 1 };
 								return newParams;
 							}}
@@ -112,60 +158,100 @@ export default function MyprofilePage() {
 			<hr />
 			<Outlet />
 			<PopUpComponent
-				styleContainer={twMerge(
-					'w-1/3 min-w-[400px] max-w-[400px] bg-white p-4 relative mt-24 h-2/3 max-h-[600px] min-h-[600px] '
-				)}
+				styleContainer={twMerge('flex items-center select-none size-full justify-center')}
 				isOpen={isOpen}
+				setHide={closeDialog}
 			>
-				<X
-					className="absolute right-0 top-0 mr-2 mt-2 rounded-full bg-red-700 text-white"
-					onClick={closeDialog}
-				/>
-				<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center  justify-center">
-					<h1 className="mb-3 text-xl font-bold">Modification du Profile</h1>
-					<div className="flex w-full flex-col items-center gap-y-4">
-						<InputComponent
-							register={register}
-							defaultValue={InfoUser?.phone}
-							errors={errors}
-							label="Numéro de téléphone"
-							name="phone"
-							type="number"
-							placeholder="00 06 00 00 78"
+				<form className="relative w-1/3 min-w-[400px] max-w-[400px] rounded-lg bg-white p-4">
+					<X
+						className="absolute right-0 top-0 mr-2 mt-2 rounded-full bg-red-700 text-white"
+						onClick={closeDialog}
+					/>
+					<div className="flex w-full flex-col items-start justify-start gap-y-4 ">
+						<button className="group relative " {...getRootProps()}>
+							<img
+								src={
+									files[0]?.buffer
+										? files[0]?.buffer
+										: InfoUser?.avatar_url?.startsWith('http')
+											? InfoUser?.avatar_url
+											: URL_IMAGE + InfoUser?.avatar_url
+								}
+								alt="avatar"
+								className="size-20 rounded-full"
+							/>
+							<div className="absolute inset-0 flex items-center justify-center rounded-full group-hover:bg-black/30" />
+							<PenLine size={19} className="absolute -right-3 bottom-1 rounded-full text-black" />
+							<input
+								{...getInputProps({
+									role: 'button',
+									'aria-label': 'drag and drop area',
+									accept: 'image/jpg, image/jpeg , image/webp',
+								})}
+								type="file"
+								accept="image/*"
+								id="input_file"
+								style={{ display: 'none' }} // Alternative à `hidden`
+							/>
+						</button>
+
+						<input
+							type={'text'}
+							name={'name'}
+							className={twMerge(
+								`my-2 flex rounded-md border w-full border-slate-300 bg-white px-3 py-[5px] shadow-sm placeholder:text-slate-400 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`
+							)}
+							placeholder={'Nom et Prenoms'}
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							autoComplete={'off'}
 						/>
-						<SwitchInputComponent
-							errors={errors}
-							label="Cochez pour liez votre numero a Whatsapp"
-							name="use_whatsapp"
-							register={register}
-							defaultValue={InfoUser?.use_whatsapp || 0}
-						/>
-						<InputComponent
-							register={register}
-							defaultValue={InfoUser?.name}
-							errors={errors}
-							label="Nom et Prenoms"
-							name="name"
-							placeholder="Damien Celeste"
-							type="text"
-						/>
-						<InputComponent
-							register={register}
-							defaultValue={InfoUser?.avatar_url || undefined}
-							errors={errors}
-							label="Photo"
-							name="avatar_url"
-							type="text"
-							placeholder="https://maphoto.jpeg"
-						/>
+						<div className="flex w-full flex-col items-center justify-center gap-x-2">
+							<PhoneInput
+								onlyCountries={['ci']}
+								country={'ci'}
+								masks={{ ci: '.. .. .. .. ..' }}
+								value={phone}
+								placeholder="00 06 00 00 78"
+								onBlur={(e) => setPhone(e.target.value)}
+								inputStyle={{
+									borderColor: 'rgb(101 163 13)	',
+									fontSize: '.9rem',
+									fontWeight: '400',
+									height: '2rem',
+									fontFamily: 'Poppins',
+									backgroundColor: 'rgb(255 255 255)',
+									width: '100%',
+								}}
+								buttonStyle={{
+									fontSize: '.8rem',
+									backgroundColor: 'rgb(255 255 255)',
+									fontFamily: 'Poppins',
+									borderEndEndRadius: '0.8rem',
+								}}
+								containerStyle={{
+									fontFamily: 'Poppins',
+									borderRadius: '0.8rem',
+									width: '100%',
+								}}
+							/>
+							<SwitchInputComponent
+								label="Cochez pour liez votre numero a Whatsapp"
+								name="use_whatsapp"
+								defaultValue={InfoUser?.use_whatsapp || 0}
+								value={checked}
+								setValue={setChecked}
+							/>
+						</div>
 						<SelectComponent
 							defaultValue={InfoUser?.location}
 							values={cities}
 							setValues={setCity}
 							label="changez l'adresse de vente"
+							style="w-[100%]"
 						/>
 
-						<button type="submit" className="mt-5  w-1/3 rounded-2xl bg-primary p-2 text-white">
+						<button onClick={onSubmit} className="mt-5 w-1/3 rounded-2xl bg-primary p-2 text-white">
 							Enregistrez
 						</button>
 					</div>
