@@ -3,7 +3,7 @@ import DisplayForumMessage from '@/components/message/DisplayForumMessage';
 import AvatarComponent from '@/components/ui/AvatarComponent';
 import ImagePagination from '@/components/ui/ImagePagination';
 import { noticesAccountRoot } from '@/lib/route';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getUrlImage } from '@/lib/utils';
 import { DiscussionSchemaType } from '@/services/api/discussions';
 import { useAuth } from '@/services/state/User/auth';
 import { URL_IMAGE } from '@/utils/constante';
@@ -118,7 +118,7 @@ export default function AvisPage() {
 						className="flex flex-row gap-x-2"
 					>
 						<div className="flex w-full flex-row items-start justify-start gap-2 border-b border-gray-200  p-2 shadow-md shadow-slate-100">
-							<img src={acc.account?.avatarUrl} alt="" className="size-[30px] rounded-lg" />
+							<img src={getUrlImage(acc.account?.avatarUrl)} alt="" className="size-[30px] rounded-lg" />
 							<div className="flex flex-col items-start gap-y-1">
 								<span className="text-xs font-bold">{acc.account?.name}</span>
 								<span className="text-xs text-gray-500">{acc.account?.location}</span>
@@ -209,6 +209,8 @@ const DiscussionDetail = ({ discussion }: { discussion: any }) => {
 		return (
 			<div className="w-full text-center text-sm text-gray-500">Aucune discussion sélectionnée...</div>
 		);
+	console.log(discussion?.avatarUrl);
+
 	return (
 		<div className="flex w-full flex-col gap-y-2">
 			<div className={clsx({})}>
@@ -230,7 +232,7 @@ const DiscussionDetail = ({ discussion }: { discussion: any }) => {
 				)}
 				{discussion?.name && (
 					<div className="flex w-full flex-row items-start justify-start gap-2 border-b border-gray-200  p-2 shadow-md shadow-slate-100">
-						<img src={discussion?.avatarUrl} alt="" className="size-[30px] rounded-lg" />
+						<img src={getUrlImage(discussion?.avatarUrl)} alt="" className="size-[30px] rounded-lg" />
 						<div className="flex flex-col items-start gap-y-1">
 							<span className="text-xs font-bold">{discussion?.name}</span>
 							<span className="text-xs text-gray-500">{discussion?.location}</span>
@@ -239,7 +241,7 @@ const DiscussionDetail = ({ discussion }: { discussion: any }) => {
 				)}
 			</div>
 			<div className="flex size-full flex-row items-start justify-start gap-2 border-b border-gray-200 p-1 shadow-xl shadow-slate-100">
-				<AvatarComponent style="size-[35px]" url={InfoUser.avatar_url || undefined} />
+				<AvatarComponent style="size-[35px]" url={getUrlImage(InfoUser?.avatar_url)} name={InfoUser?.name} />
 				<textarea
 					placeholder="Ajouter un message..."
 					ref={textareaRef}

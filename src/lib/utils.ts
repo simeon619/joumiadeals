@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CategoryType, f_form_type, StatusType } from '@/services/api/product_categorie';
+import { URL_IMAGE } from '@/utils/constante';
 import { type ClassValue, clsx } from 'clsx';
 import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
@@ -29,7 +30,39 @@ export function truncateFirstName(name: string | undefined | null) {
 export function setToken(value: string): void {
 	localStorage.setItem('token', value);
 }
-
+// export function getUrlImage(url?: string | null | undefined): string {
+// 	if (!url) return '/img/default-avatar.png';
+// 	const reslt = url.startsWith('http') ? url : URL_IMAGE + url;
+// 	const img = new Image();
+// 	img.src = reslt;
+// 	img.onerror = () => {
+// 		return '/img/default-avatar.png';
+// 	};
+// 	return reslt;
+// }
+export function getAsyncUrlImage(url?: string | null | undefined): Promise<string> {
+	return new Promise((resolve) => {
+	  if (!url) return resolve('/img/default-avatar.png');
+  
+	  const reslt = url.startsWith('http') ? url : `${URL_IMAGE}${url}`;
+	  const img = new Image();
+  
+	  img.src = reslt;
+  
+	  img.onload = () => {
+		resolve(reslt); // L'image est chargée avec succès
+	  };
+  
+	  img.onerror = () => {
+		resolve('/img/default-avatar.png'); // Erreur lors du chargement de l'image
+	  };
+	});
+  }
+  export function getUrlImage(url?: string | null | undefined): string {
+	if (!url) return '/img/default-avatar.png';
+	const reslt = url.startsWith('http') ? url : URL_IMAGE + url;
+	return reslt;
+  }
 export function getToken(): string {
 	const item = localStorage.getItem('token');
 	if (!item) {
@@ -61,8 +94,8 @@ export const onCreateProduct = ({
 	errorInput: Record<string, any>;
 	createProduct: (args: any) => void;
 }) => {
-	console.log({dataProduct , dataFeatureProduct});
-	
+	console.log({ dataProduct, dataFeatureProduct });
+
 	for (const [key, value] of Object.entries({ ...dataProduct, ...dataFeatureProduct })) {
 		if (value === null || value === '') {
 			return ToastWarn(key.split(':')[0] + ' est obligatoire');
@@ -88,7 +121,7 @@ export const onCreateProduct = ({
 				...dataProduct,
 				featuresProduct: dataFeatureProduct,
 				category_id: fieldSelectOne || fieldSelect?.split(',')[len - 1],
-				product_id 
+				product_id,
 			},
 			photos: filesData,
 		});

@@ -4,6 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { LogOut, Mail, MapPinned, Pen, PhoneCall, Users } from 'lucide-react';
 import AvatarComponent from '../ui/AvatarComponent';
+import { getUrlImage } from '@/lib/utils';
 
 export default function HeaderProfile({
 	openDialog,
@@ -27,7 +28,7 @@ export default function HeaderProfile({
 	created_at: string;
 }) {
 	const backgroundImageStyle = {
-		backgroundImage: `url(${avatar_url})`,
+		backgroundImage: `url(${getUrlImage(avatar_url)})`,
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
@@ -86,7 +87,7 @@ export default function HeaderProfile({
 		>
 			<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
 			<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
-				<AvatarComponent name="5" url={avatar_url || ''} style="size-[50px]" />
+				<AvatarComponent name="5" url={getUrlImage(avatar_url)} style="size-[50px]" />
 				<div className="flex flex-col items-baseline ">
 					<div
 						className={clsx(

@@ -341,7 +341,7 @@ const ProviderSchema = z.object({
 	location: z.string(),
 	email: z.string().email(),
 	use_whatsapp: z.number(),
-	avatar_url: z.string().url(),
+	avatar_url: z.string(),
 	phone: z.string(),
 	created_at: z.string(),
 	updated_at: z.string(),

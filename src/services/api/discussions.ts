@@ -11,7 +11,7 @@ const AccountSchema = z.object({
 	location: z.string(),
 	email: z.string().email(),
 	useWhatsapp: z.number(),
-	avatarUrl: z.string().url(),
+	avatarUrl: z.string(),
 	// access_id: z.string(),
 	phone: z.string(),
 	// acl_id: z.string().nullable(),
@@ -84,7 +84,6 @@ export const getDiscussions = async (request: FilterDiscussionType) => {
 		body: JSON.stringify({ ...request, limit: 6 }),
 	});
 	const data = await response.json();
-	console.log('🚀 ~ getDiscussions55555 ~ data:', data);
 	const discussions = z
 		.object({
 			total: z.number(),

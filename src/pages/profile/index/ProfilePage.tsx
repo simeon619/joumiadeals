@@ -2,6 +2,7 @@
 import AvatarComponent from '@/components/ui/AvatarComponent';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { noticesAccountRoot, productsOtherRoot } from '@/lib/route';
+import { getUrlImage } from '@/lib/utils';
 import { formatDate } from '@/utils/formating';
 import { accountQueryOptions, getLikeOptions, useToggleLikeMutation } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -17,7 +18,7 @@ export default function ProfilePage() {
 	const { data: like } = useSuspenseQuery(getLikeOptions({ id: provider_id, type: 'account' }));
 	const { mutate: toggleLike } = useToggleLikeMutation();
 	const backgroundImageStyle = {
-		backgroundImage: `url(${account?.avatar_url})`,
+		backgroundImage: `url(${getUrlImage(account?.avatar_url)})`,
 		backgroundSize: 'cover',
 		backgroundPosition: 'center',
 		backgroundRepeat: 'no-repeat',
@@ -30,17 +31,17 @@ export default function ProfilePage() {
 		<div className="flex w-full flex-col justify-center">
 			<div
 				style={backgroundImageStyle}
-				className="relative mt-4 flex items-start justify-start gap-14 overflow-hidden rounded-md p-2 backdrop-blur-2xl"
+				className="relative mt-4 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2 backdrop-blur-2xl"
 			>
 				<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
 				<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
-					<AvatarComponent name="5" url={account.avatar_url || ''} style="size-[50px]" />
+					<AvatarComponent name="5" url={getUrlImage(account.avatar_url)} style="size-[50px]" />
 					<div className="flex flex-row items-baseline gap-2">
 						<div className="flex flex-col gap-1">
 							<span className="text-xs font-bold">{account?.name}</span>
 							<div
 								className={clsx(
-									'flex flex-row items-center justify-between gap-5 rounded-lg border-2 px-2 py-1 text-white shadow-lg',
+									'flex flex-row items-center justify-between gap-5 rounded-lg border-2 bg-black/50 px-2 py-1 text-white shadow-lg',
 									{
 										'border-blue-400/40': like.mylike === 1,
 										'border-red-400/40': like.mylike === -1,

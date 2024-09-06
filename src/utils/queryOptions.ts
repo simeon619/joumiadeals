@@ -127,6 +127,7 @@ const FilterSchema = z.object({
 	text: z.string().optional(),
 	price: z.tuple([z.number().nullable(), z.number().nullable()]).optional(),
 	status: z.number(),
+	location : z.string().optional(),
 	features: z.record(z.union([z.string(), z.array(z.union([z.string(), z.number()]))])).optional(),
 	// features: z
 	// 	.object({

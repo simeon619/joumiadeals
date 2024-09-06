@@ -7,13 +7,11 @@ import { useTitle } from 'react-use';
 export default function IndexLayout() {
 	useTitle(titleSite);
 	return (
-		<div className="flex justify-center">
-			<div className="flex w-full flex-col font-poppins">
-				<Header />
-				<CategoriseMenu />
-				<hr />
-				<Outlet />
-			</div>
+		<div className="md:container md:mx-auto">
+			<Header />
+			<CategoriseMenu />
+			<hr />
+			<Outlet />
 		</div>
 	);
 }

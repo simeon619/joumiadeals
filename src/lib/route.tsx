@@ -197,12 +197,10 @@ export const productsOtherRoot = createRoute({
 	}),
 	loader: (opts) => {
 		opts.context.queryClient.ensureQueryData(getProductsOptions(opts.deps));
-		// opts.context.queryClient.ensureQueryData(getAllFavouriteProductIds());
 		opts.context.queryClient.ensureQueryData(accountQueryOptions(opts.deps.provider_id));
 	},
 	wrapInSuspense: true,
 	component: OtherAnnouncePage,
-	// errorComponent: () => <h1>TODO IMPLEMENT COMPONENT ERREUR</h1>,
 });
 
 export const noticesAccountRoot = createRoute({
@@ -214,8 +212,6 @@ export const noticesAccountRoot = createRoute({
 		queryClient.ensureQueryData(getDiscussionsQueryOptions({ filter, page, provider_id })),
 	component: AvisPage,
 });
-
-// export const comments
 
 export const productsRoot = createRoute({
 	getParentRoute: () => indexLayout,

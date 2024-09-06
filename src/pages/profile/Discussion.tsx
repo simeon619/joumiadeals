@@ -3,7 +3,7 @@ import AvatarComponent from '@/components/ui/AvatarComponent';
 import ModalReport from '@/components/ui/ModalReport';
 import { discussionRoot } from '@/lib/route';
 import { transmit } from '@/lib/transmit';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getAsyncUrlImage, getUrlImage } from '@/lib/utils';
 import {
 	checkUnreadMessages,
 	DiscussionSchemaType,
@@ -429,7 +429,16 @@ const RenderMessage = ({ message, right }: { message: string; right: boolean }) 
 
 const PpProviderProduct = ({ discSelect }: { discSelect: DiscussionSchemaType | undefined }) => {
 	const InfoUser = useAuth((state) => state.InfoUser);
+	const [avatar, setAvatar] = useState<string>('/img/default-avatar.png');
 	const user = discSelect?.provider?.id === InfoUser.id ? discSelect?.client : discSelect?.provider;
+	useEffect(() => {
+		if (user?.avatarUrl) {
+			getAsyncUrlImage(user.avatarUrl)
+				.then((url) => setAvatar(url))
+				.catch(() => setAvatar('/img/default-avatar.png'));
+		}
+	}, [user?.avatarUrl]);
+
 	return (
 		<div className="relative mr-2 flex flex-row gap-x-2">
 			<div className="relative">
@@ -438,8 +447,8 @@ const PpProviderProduct = ({ discSelect }: { discSelect: DiscussionSchemaType | 
 					style="size-10 rounded-md border-2 border-primary "
 				/>
 				<AvatarComponent
-					url={user?.avatarUrl}
-					style="size-7 rounded-full absolute bottom-0 right-0  transform translate-x-2 translate-y-2"
+					url={avatar}
+					style="size-7 rounded-full absolute bottom-0 right-0 transform translate-x-2 translate-y-2"
 					name={user?.name}
 				/>
 			</div>
@@ -519,6 +528,7 @@ const ListMessage = ({
 	info?: string;
 }) => {
 	const InfoUser = useAuth((state) => state.InfoUser);
+	// const [avatar, setAvatar] = useState<string>('/img/default-avatar.png');
 	const downloadFile = async (urlFile: string) => {
 		try {
 			const response = await fetch(urlFile, {
@@ -546,12 +556,12 @@ const ListMessage = ({
 		}
 	};
 	if (messages.length === 0) return null;
-
 	return (
 		<div className="flex flex-col gap-y-3">
 			<div className="text-center text-xs text-slate-400">{info}</div>
 			{messages.map((message) => {
 				const right = message.accountId == InfoUser.id;
+				// let avatar = '';
 				const avatarUrl =
 					message.accountId == discSelect?.client?.id
 						? discSelect?.client?.avatarUrl
@@ -561,16 +571,13 @@ const ListMessage = ({
 						? discSelect?.client?.name
 						: discSelect?.provider?.name;
 
+				// getUrlImage(avatarUrl)
+				// 	.then((url) => avatar = url)
+				// 	.catch(() => avatar = '/img/default-avatar.png');
 				return (
 					<div key={message.id} className={twMerge('flex', right ? 'justify-end' : 'justify-start')}>
 						<div className={twMerge('flex items-start gap-x-2')}>
-							{!right && (
-								<AvatarComponent
-									style="size-7 rounded-full border-2 border-slate-300"
-									url={avatarUrl}
-									name={avatarName}
-								/>
-							)}
+							{!right && <AvatarComponent style="size-7 rounded-full" url={getUrlImage(avatarUrl)} name={avatarName} />}
 							<div
 								className={twMerge(
 									'flex flex-col mt-5',
@@ -595,13 +602,7 @@ const ListMessage = ({
 								)}
 								<span className="mt-1 text-[.68rem] text-gray-500">{formatDate(message.createdAt)}</span>
 							</div>
-							{right && (
-								<AvatarComponent
-									style="size-7 rounded-full border-2 border-slate-300"
-									url={avatarUrl}
-									name={avatarName}
-								/>
-							)}
+							{right && <AvatarComponent style="size-7 rounded-full" url={getUrlImage(avatarUrl)} name={avatarName} />}
 						</div>
 					</div>
 				);

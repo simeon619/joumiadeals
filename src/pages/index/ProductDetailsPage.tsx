@@ -3,7 +3,7 @@ import ActionFavourite from '@/components/ui/ActionFavourite';
 import { type CarouselApi } from '@/components/ui/carousel';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { discussionRoot, productDetailsRoot, productsOtherRoot } from '@/lib/route';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, getUrlImage } from '@/lib/utils';
 import { URL_IMAGE } from '@/utils/constante';
 import { formatDate } from '@/utils/formating';
 import {
@@ -222,7 +222,7 @@ export default function ProductDetailPage() {
 								}
 								className="group flex w-full flex-row items-center justify-between p-4"
 							>
-								<img src={product.provider.avatar_url} className="size-14 rounded-full" alt="" />
+								<img src={getUrlImage(product.provider.avatar_url)} loading="lazy" className="size-7 rounded-full" alt="" />
 								<div className={`flex flex-col items-start gap-y-2`}>
 									<div className={`flex flex-col items-start`}>
 										<span className="text-[.79rem] font-bold">{product.provider.name}</span>

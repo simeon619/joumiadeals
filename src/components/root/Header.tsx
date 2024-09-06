@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { productsRoot } from '@/lib/route';
-import { handleConnect } from '@/lib/utils';
+import { getUrlImage, handleConnect } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
 import { filterCategory } from '@/utils/helpers';
 import { get_second_cat } from '@/utils/mock/Menucaegorie';
@@ -22,6 +22,7 @@ import FilterProduct from '../product/filter/FilterProduct';
 import AvatarComponent from '../ui/AvatarComponent';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
+import CategoriseMenu from '../ui/CategoriseMenu';
 
 const SearchSchema = z.object({
 	search: z.string(),
@@ -49,11 +50,6 @@ export default function Header() {
 
 	const styleFilter = clsx(
 		'absolute -z-1 flex w-full items-center justify-center border-t-[1px] border-gray-100  bg-white p-1 shadow-sm'
-		// {
-		// 	'bottom-[0%] -z-10': value <= 0.15,
-		// 	'bottom-[-86%] shadow-md z-10': value > 0.15 && direction === 'up',
-		// 	'-z-10 opacity-0': direction === 'down',
-		// }
 	);
 	const searchTerm = watch('search');
 	const [currentTab, setCurrentTab] = useState(0);
@@ -139,15 +135,15 @@ export default function Header() {
 	return (
 		<div
 			className={twMerge(
-				'sticky top-0 z-20 flex w-full justify-center flex-col items-center bg-white',
+				'fixed top-0 z-50 inset-x-0 flex justify-center flex-col items-center bg-white',
 				isShadow && 'shadow-md'
 			)}
 		>
-			<div className="flex flex-col items-center  bg-white py-2">
+			<div className=" flex flex-col items-center bg-white py-2">
 				<div className={`relative flex items-center justify-between gap-x-3`}>
 					<Name />
 					<SetAdvert />
-					<div className={`relative flex min-w-[270px]  items-center rounded-xl bg-slate-100 px-2`}>
+					<div className={`relative flex min-w-[270px] items-center rounded-xl bg-slate-100 px-2`}>
 						<input
 							{...register('search')}
 							name={'search'}
@@ -242,7 +238,7 @@ export default function Header() {
 								to={'/myprofile'}
 								search={{ provider_id: InfoUser.id, filter: { status: 5 } }}
 							>
-								<AvatarComponent name={InfoUser.name} url={InfoUser.avatar_url || ''} />
+								<AvatarComponent name={InfoUser.name} url={getUrlImage(InfoUser?.avatar_url)} />
 								<div className={UnderlineHover} />
 							</Link>
 						) : (

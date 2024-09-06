@@ -12,31 +12,28 @@ export default function SimilaireProduct({ categoryId }: { categoryId: string })
 
 	const scrollLeft = () => {
 		if (scrollableRef.current) {
-			const { scrollLeft, scrollWidth, clientWidth } = scrollableRef.current;
+			const { scrollLeft, scrollWidth, clientWidth , } = scrollableRef.current;
 
 			if (scrollLeft === 0) {
-				// Si on est au début, sauter à la fin
 				scrollableRef.current.scrollLeft = scrollWidth - clientWidth;
 			} else {
 				scrollableRef.current.scrollBy({
-					left: -200, // Défiler vers la gauche
+					left: -200,
 					behavior: 'smooth',
 				});
 			}
 		}
 	};
 
-	// Fonction pour défiler vers la droite avec boucle infinie
 	const scrollRight = () => {
 		if (scrollableRef.current) {
 			const { scrollLeft, scrollWidth, clientWidth } = scrollableRef.current;
 
 			if (scrollLeft + clientWidth >= scrollWidth) {
-				// Si on est à la fin, sauter au début
 				scrollableRef.current.scrollLeft = 0;
 			} else {
 				scrollableRef.current.scrollBy({
-					left: 200, // Défiler vers la droite
+					left: 200,
 					behavior: 'smooth',
 				});
 			}

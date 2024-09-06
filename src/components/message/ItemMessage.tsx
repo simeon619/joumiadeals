@@ -5,6 +5,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Loader, ThumbsDown, ThumbsUp, Users } from 'lucide-react';
 import AvatarComponent from '../ui/AvatarComponent';
+import { getUrlImage } from '@/lib/utils';
 
 export default function ItemMessage({ message }: { message: MessageSchemaType }) {
 	const { data: account, isPending } = useQuery(accountQueryOptions(message.accountId));
@@ -26,7 +27,7 @@ export default function ItemMessage({ message }: { message: MessageSchemaType })
 	return (
 		<div key={message.id} className="rounded-lg bg-white p-2 shadow-sm">
 			<div className="flex flex-row items-center gap-x-1">
-				<AvatarComponent url={account?.avatar_url} style="size-[30px]" />
+				<AvatarComponent url={getUrlImage(account?.avatar_url)} style="size-[30px]" />
 				<span className="font-roboto text-xs text-gray-900">{account?.name}</span>
 				<span className="block text-[.70rem] text-gray-500">{formatDate(message.createdAt)}</span>
 			</div>

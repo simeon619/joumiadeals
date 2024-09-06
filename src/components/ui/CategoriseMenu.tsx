@@ -28,21 +28,21 @@ export default function CategoriseMenu() {
 		<>
 			<NavigationMenu
 				className={twMerge(
-					`w-app flex self-center`,
+					`w-full flex self-center mt-12`,
 					state.location.pathname.includes('/myprofile') ? 'hidden' : ''
 				)}
 			>
-				<NavigationMenuList className="gap-x-3 py-1 font-poppins">
+				<NavigationMenuList className="flex w-full justify-between pt-1 font-poppins">
 					{Object.keys(MenuCat).map((Categorie, i) => {
 						const value = Categorie as keyof typeof MenuCat;
 						const data = MenuCat[value];
 						return (
-							<NavigationMenuItem key={i} value={Categorie}>
+							<NavigationMenuItem key={i} value={Categorie} className="flex w-full justify-between">
 								<NavigationMenuTrigger className="relative text-[0.775rem] font-light capitalize text-slate-800">
 									{Categorie.split(':')[0]}
 									<div className={UnderlineHover} />
 								</NavigationMenuTrigger>
-								<NavigationMenuContent className={'w-[1030px]'}>
+								<NavigationMenuContent className={'flex min-w-max flex-col justify-start'}>
 									<div className="flex flex-row justify-start font-poppins">
 										<div className="flex w-1/6  justify-center gap-x-3  bg-slate-100 p-6">
 											<img

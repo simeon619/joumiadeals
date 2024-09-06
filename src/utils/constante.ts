@@ -4,7 +4,7 @@ export const Nbr_Image_Upload = 7;
 export const LimitItemPaginate = 15;
 
 export const SeeAnnounce = "J'ai vue votre annonce sur AdjameDeals";
-export const titleSite = 'adjameDeals - Votre site de annonces en ligne';
+export const titleSite = 'Amedeals - Votre site de annonces en ligne';
 
 export const adviceTitleAnnouce = [
 	'mettez ci-possible uniquement la marque/modele.',

@@ -10,7 +10,7 @@ export default function WrapProduct({
 	getData,
 }: {
 	componentRoot: any;
-	LayoutProduct: React.FC<{ products: ProductsMinType }>;
+	LayoutProduct: React.FC<{ products: ProductsMinType , componentRoot?: any}>;
 	getData: any;
 }) {
 	const searchParams = componentRoot.useSearch();
@@ -36,6 +36,7 @@ export default function WrapProduct({
 			<Suspense fallback={<div>Loading...</div>}>
 				<LayoutProduct
 					products={deferredValue?.products || deferredValue?.favorites || deferredValue?.visited || []}
+					componentRoot={componentRoot}
 				/>
 				{deferredValue?.total === 0 && <div>Aucun produit</div>}
 			</Suspense>

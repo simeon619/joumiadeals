@@ -15,7 +15,7 @@ export default function ImgComponent({
 }) {
 	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 	const [fade, setFade] = useState(true);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 	let timeoutId: NodeJS.Timeout | undefined;
 	let timeoutId2: NodeJS.Timeout | undefined;
 	const handleImageChange = (index: number) => {
@@ -65,15 +65,19 @@ export default function ImgComponent({
 			<img
 				src={`${URL_IMAGE}${photos[currentImageIndex]}`}
 				alt={title}
-				className={`size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500 ${
-					isLoading ? 'blur-[4px]' : 'blur-0'
-				}`}
+				className={clsx(
+					`size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`,
+					{
+						'blur-[4px]': isLoading,
+						'blur-none	': !isLoading,
+					}
+				)}
 				loading="lazy"
 				onLoad={handleImageLoad}
 				onError={(e) => {
 					e.currentTarget.src = '/img/imgError.png';
 				}}
-			/>
+			/>	
 			<div
 				className={clsx('absolute inset-x-0 bottom-[-10px] flex justify-center', {
 					hidden: photos.length <= 1,
@@ -82,7 +86,7 @@ export default function ImgComponent({
 				{photos.map((_, index) => (
 					<button
 						key={index}
-						className={`mx-1 size-2 rounded-full p-1 hover:bg-white ${currentImageIndex === index ? 'bg-primary' : 'bg-gray-400'}`}
+						className={`mx-1 size-2 rounded-full p-1 hover:bg-black ${currentImageIndex === index ? 'bg-primary' : 'bg-black'}`}
 						onMouseOver={(e) => {
 							e.preventDefault();
 							e.stopPropagation();

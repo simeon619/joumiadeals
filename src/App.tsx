@@ -7,9 +7,7 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<RouterProvider router={router} />
-			<div>
-				<Toaster />
-			</div>
+			<Toaster />
 		</QueryClientProvider>
 	);
 }

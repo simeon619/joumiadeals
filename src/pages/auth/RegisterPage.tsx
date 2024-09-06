@@ -3,7 +3,7 @@ import { InputOTPTel } from '@/components/auth/InputOTPTel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SelectComponent from '@/components/ui/SelectComponent';
 import { myprofileRoot } from '@/lib/route';
-import { redirectToConnect, truncateFirstName } from '@/lib/utils';
+import { getUrlImage, redirectToConnect, truncateFirstName } from '@/lib/utils';
 import { inputOTPtel } from '@/services/state/App/inputOtp';
 import { useAuth } from '@/services/state/User/auth';
 import { cities } from '@/utils/mock/city';
@@ -89,7 +89,7 @@ export default function RegisterPage() {
 						<div>
 							<h1 className=" font-poppins text-xl">Bonjour {truncateFirstName(name)}</h1>
 							<Avatar className="bg-primary text-primary">
-								<AvatarImage src={avatar_url} alt={name} />
+								<AvatarImage src={getUrlImage(avatar_url)} />
 								<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
 							</Avatar>
 						</div>

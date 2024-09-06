@@ -41,12 +41,6 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	const searchTerm = watch('search');
 	const price = watch(['price_min', 'price_max']);
 	const { filter: filtParams } = searchParams;
-	// const array = [
-	// 	'date croissant',
-	// 	'date decroissant',
-	// 	'prix croissant',
-	// 	'prix decroissant',
-	// ] as const;
 	const [orderBy, setOrderBy] = useState<keyof typeof filt>();
 
 	useEffect(() => {

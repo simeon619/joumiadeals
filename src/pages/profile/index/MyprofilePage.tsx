@@ -4,7 +4,7 @@ import PopUpComponent from '@/components/ui/PopUpComponent';
 import SelectComponent from '@/components/ui/SelectComponent';
 import SwitchInputComponent from '@/components/ui/SwitchInputComponent';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
-import { ToastError } from '@/lib/utils';
+import { getUrlImage, ToastError } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
 import { URL_IMAGE } from '@/utils/constante';
 import { cities } from '@/utils/mock/city';
@@ -90,6 +90,7 @@ export default function MyprofilePage() {
 	const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
 		maxFiles: 1,
 		autoFocus: true,
+		accept: { 'image/*': ['.png'] },
 	});
 
 	acceptedFiles.forEach((file) => {
@@ -107,11 +108,7 @@ export default function MyprofilePage() {
 	return (
 		<>
 			<HeaderProfile
-				avatar_url={
-					InfoUser?.avatar_url?.startsWith('http')
-						? InfoUser?.avatar_url
-						: URL_IMAGE + InfoUser?.avatar_url
-				}
+				avatar_url={getUrlImage(InfoUser?.avatar_url)}
 				name={InfoUser?.name}
 				created_at={InfoUser?.created_at}
 				idUser={InfoUser?.id}
@@ -173,9 +170,7 @@ export default function MyprofilePage() {
 								src={
 									files[0]?.buffer
 										? files[0]?.buffer
-										: InfoUser?.avatar_url?.startsWith('http')
-											? InfoUser?.avatar_url
-											: URL_IMAGE + InfoUser?.avatar_url
+										: getUrlImage(InfoUser?.avatar_url)
 								}
 								alt="avatar"
 								className="size-20 rounded-full"
