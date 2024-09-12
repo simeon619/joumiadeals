@@ -6,6 +6,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
+import clsx from 'clsx';
 import { useEffect, useMemo } from 'react';
 import { twMerge } from 'tailwind-merge';
 export default function SelectCategorie({
@@ -13,7 +14,6 @@ export default function SelectCategorie({
 	label,
 	defaultValue,
 	required,
-	placeholder,
 	id,
 	isfeature,
 }: {
@@ -74,16 +74,22 @@ export default function SelectCategorie({
 			>
 				{label}
 			</span>
-			<Select name={label} onValueChange={handleChange} defaultValue={String(defaultValue)}>
+			<Select
+				name={label}
+				onValueChange={handleChange}
+				defaultValue={defaultValue || String(values[0])}
+			>
 				<SelectTrigger className="mt-1 rounded-md border border-slate-300 bg-white p-1 text-xs text-gray-600 shadow-sm  hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
 					<SelectValue placeholder={values[0]} />
 				</SelectTrigger>
 				<SelectContent className="rounded-2xl bg-white">
 					{values?.map((value, i) => {
-						if (i === 0) return null;
+						// if (i === 0) return null;
 						return (
 							<SelectItem
-								className="text-sm capitalize text-gray-700 focus:bg-blue-100"
+								className={clsx('text-sm capitalize text-gray-700 focus:bg-blue-100', {
+									hidden: i === 0,
+								})}
 								key={i}
 								value={String(value)}
 							>

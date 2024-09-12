@@ -83,7 +83,7 @@ export default function HeaderProfile({
 		// </div>
 		<div
 			style={backgroundImageStyle}
-			className="relative mt-4 flex items-start justify-start gap-14 overflow-hidden rounded-md p-2 backdrop-blur-2xl"
+			className="w-full relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md p-2 backdrop-blur-2xl"
 		>
 			<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
 			<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">

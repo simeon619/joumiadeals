@@ -2,7 +2,6 @@
 import { InputOTPTel } from '@/components/auth/InputOTPTel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SelectComponent from '@/components/ui/SelectComponent';
-import { myprofileRoot } from '@/lib/route';
 import { getUrlImage, redirectToConnect, truncateFirstName } from '@/lib/utils';
 import { inputOTPtel } from '@/services/state/App/inputOtp';
 import { useAuth } from '@/services/state/User/auth';
@@ -29,7 +28,6 @@ export default function RegisterPage() {
 	const router = useRouter();
 	const [city, setCity] = useState<string>(cities[0]);
 	const { setError, value: tel } = inputOTPtel();
-	const navigate = useNavigate();
 	const searchParams = router.latestLocation.search as {
 		name: string;
 		email: string;
@@ -37,7 +35,7 @@ export default function RegisterPage() {
 		oauth_provider_name: string;
 		oauth_client_id: string;
 	};
-	const { register: registerUser, isAuth, InfoUser } = useAuth();
+	const { register: registerUser, isAuth } = useAuth();
 	const name = searchParams.name;
 	const email = searchParams.email!;
 	const avatar_url = searchParams.avatar_url as string;
@@ -50,15 +48,15 @@ export default function RegisterPage() {
 		}
 	}, []);
 
-	useLayoutEffect(() => {
-		if (isAuth && InfoUser.id) {
-			navigate({
-				to: myprofileRoot.to,
-				search: { provider_id: InfoUser.id, filter: { status: 5 } },
-			});
-		}
-	}, [isAuth, InfoUser]);
-	const onSubmit = () => {
+	// useLayoutEffect(() => {
+	// 	if (isAuth && InfoUser.id) {
+	// 		navigate({
+	// 			to: myprofileRoot.to,
+	// 			search: { provider_id: InfoUser.id, filter: { status: 5 } },
+	// 		});
+	// 	}
+	// }, [isAuth, InfoUser]);
+	const onSubmit = async () => {
 		if (tel.toString().length !== telLength) {
 			setError(`numéro de téléphone doit avoir ${telLength} caractères.`);
 			return;
@@ -72,43 +70,54 @@ export default function RegisterPage() {
 			email,
 			oauth_client_id,
 			oauth_provider_name,
-			phone: tel.toString(),
+			phone: '+225' + tel.toString(),
 		};
-		registerUser(dataToSend);
-		// close();
+		await registerUser(dataToSend);
+		close();
 	};
 
 	return (
 		<div className="flex h-screen justify-center bg-gray-50">
-			<div className=" mt-12 flex h-1/3 max-h-[500px] min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white px-8 shadow-md">
-				<div className="mt-5 flex w-full flex-col gap-y-4">
-					<div className="flex flex-col gap-y-4">
-						<span className="min-w-[320px] max-w-[400px] font-poppins text-sm">
-							Ajoutez ces dernier detail sur vous
-						</span>
-						<div>
-							<h1 className=" font-poppins text-xl">Bonjour {truncateFirstName(name)}</h1>
-							<Avatar className="bg-primary text-primary">
-								<AvatarImage src={getUrlImage(avatar_url)} />
-								<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
-							</Avatar>
+			{isAuth ? (
+				<div className="mt-12 flex h-1/3 max-h-[500px] min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white px-8 shadow-md">
+					<h1 className="font-poppins text-xl">Bonjour {name}</h1>
+					<Avatar className="bg-primary text-primary">
+						<AvatarImage src={getUrlImage(avatar_url)} />
+						<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
+					</Avatar>
+					{/* Autres éléments spécifiques à l'utilisateur authentifié */}
+				</div>
+			) : (
+				<div className=" mt-12 flex h-1/3 max-h-[500px] min-h-[400px] flex-col items-center justify-center rounded-2xl bg-white px-8 shadow-md">
+					<div className="mt-5 flex w-full flex-col gap-y-4">
+						<div className="flex flex-col gap-y-4">
+							<span className="min-w-[320px] max-w-[400px] font-poppins text-sm">
+								Ajoutez ces dernier detail sur vous
+							</span>
+							<div>
+								<h1 className=" font-poppins text-xl">Bonjour {truncateFirstName(name)}</h1>
+								<Avatar className="bg-primary text-primary">
+									<AvatarImage src={getUrlImage(avatar_url)} />
+									<AvatarFallback>{name?.[0] + name?.[1]}</AvatarFallback>
+								</Avatar>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div className="mt-5 w-full">
-					<div className="mb-6 flex flex-col gap-y-1">
-						<InputOTPTel groupSize={4} length={telLength} label="Numéro de téléphone" />
+					<div className="mt-5 w-full">
+						<div className="mb-6 flex flex-col gap-y-1">
+							<InputOTPTel groupSize={4} length={telLength} label="Numéro de téléphone" />
+						</div>
+						<SelectComponent values={cities} setValues={setCity} label="Choisir adresse de vente" />
+						<button
+							type="submit"
+							onClick={onSubmit}
+							className="mt-5 w-full rounded-2xl bg-primary p-2 text-white"
+						>
+							Enregistrez
+						</button>
 					</div>
-					<SelectComponent values={cities} setValues={setCity} label="Choisir adresse de vente" />
-					<button
-						type="submit"
-						onClick={onSubmit}
-						className="mt-5 w-full rounded-2xl bg-primary p-2 text-white"
-					>
-						Enregistrez
-					</button>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

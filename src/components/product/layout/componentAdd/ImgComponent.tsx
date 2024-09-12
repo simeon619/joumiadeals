@@ -42,7 +42,7 @@ export default function ImgComponent({
 	return (
 		<div
 			className={clsx(
-				'group relative flex flex-none justify-center rounded-md border bg-slate-400',
+				'group relative flex aspect-4/3 flex-none justify-center rounded-md border bg-slate-400',
 				style
 			)}
 			style={{
@@ -66,7 +66,7 @@ export default function ImgComponent({
 				src={`${URL_IMAGE}${photos[currentImageIndex]}`}
 				alt={title}
 				className={clsx(
-					`size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`,
+					` size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`,
 					{
 						'blur-[4px]': isLoading,
 						'blur-none	': !isLoading,
@@ -77,7 +77,7 @@ export default function ImgComponent({
 				onError={(e) => {
 					e.currentTarget.src = '/img/imgError.png';
 				}}
-			/>	
+			/>
 			<div
 				className={clsx('absolute inset-x-0 bottom-[-10px] flex justify-center', {
 					hidden: photos.length <= 1,

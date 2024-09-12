@@ -40,18 +40,6 @@ import { ArrowLeftCircle, Home } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 
-const tipsForClient = [
-	'ForClient',
-	'Ne partagez jamais vos informations personnelles sensibles (comme votre numéro de carte bancaire) avec des inconnus.',
-	'Rencontrez toujours les acheteurs/vendeurs dans des lieux publics et bien éclairés.',
-	'Vérifiez toujours les informations du vendeur/acheteur avant de conclure une transaction.',
-	'Méfiez-vous des offres qui semblent trop belles pour être vraies.',
-	'Utilisez les plateformes de paiement sécurisées recommandées par le site.',
-	'Signalez toute activité suspecte ou annonce frauduleuse aux administrateurs du site.',
-	'Gardez une trace de toutes les communications et transactions.',
-	'Ne cliquez pas sur les liens suspects ou non vérifiés dans les emails ou messages.',
-];
-
 const tipsTitle = [
 	field_annonce[0],
 	'Soyez clair et précis sur ce que vous vendez.',
@@ -80,12 +68,7 @@ export default function CreateProduct() {
 	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
 	const { isAuth, InfoUser } = useAuth((state) => state);
-	const {
-	
-		fieldCharac,
-		setFieldCharac,
-	
-	} = useDataInputState((state) => state);
+	const { fieldCharac, setFieldCharac } = useDataInputState((state) => state);
 	const dataProduct = useInputCategorie((state) => state.dataProduct);
 	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
 	const resetFile = useInputCategorie((state) => state.resetFile);
@@ -107,7 +90,7 @@ export default function CreateProduct() {
 		mutate: createProduct,
 		isSuccess: isSuccessCreateProduct,
 		isPending: isPendingCreateProduct,
-	} = useCreateProductMutation();	
+	} = useCreateProductMutation();
 
 	useEffect(() => {
 		handleHierachie(null);
@@ -155,7 +138,7 @@ export default function CreateProduct() {
 		setResult_cat_filt([]);
 		const result_cat = get_children(categoryId || null, categories);
 		setResult_cat(result_cat);
-		const parent_cat = getCategorieById(categoryId || null, categories);
+		const parent_cat = getCategorieById(categoryId, categories) as any;
 		setParent_cat(parent_cat);
 		setCategory(undefined);
 		setStepC((prev) => {
@@ -176,10 +159,10 @@ export default function CreateProduct() {
 		setFieldCharac([]);
 		setFieldSelect('');
 		const newFeatures: f_form_type[] = [];
-		Ids.forEach((id) => {
+		for (const id of Ids) {
 			const feature = features.filter((feature) => feature.category_id === id);
 			newFeatures.push(...feature);
-		});
+		}
 		setFieldCharac(newFeatures);
 		setFieldSelect(Ids.join(','));
 		setShowModal(false);
@@ -239,7 +222,7 @@ export default function CreateProduct() {
 							required: 1,
 							min: 3,
 							max: 850,
-							match:  /^[a-zàâçéèêëîïôûùüÿñæœ(),;:"'&~$%@0-9\\// .-]*$/gi,
+							match: /^[a-zàâçéèêëîïôûùüÿñæœ(),;:"'&~$%@0-9\\// .-]*$/gi,
 							feature_id: '',
 						}}
 					/>
@@ -348,7 +331,7 @@ export default function CreateProduct() {
 												dataProduct,
 												fieldSelect,
 												errorInput,
-												filesData
+												filesData,
 											})
 										}
 									>
@@ -448,7 +431,7 @@ export default function CreateProduct() {
 							}}
 							className={clsx('my-4  rounded-sm bg-primary px-4 py-1 text-white', {
 								hidden: result_cat.length > 0,
-								visible: result_cat.length === 0
+								visible: result_cat.length === 0,
 							})}
 						>
 							Validez

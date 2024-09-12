@@ -6,7 +6,6 @@ import SwitchInputComponent from '@/components/ui/SwitchInputComponent';
 import { useResetScrollBar } from '@/hooks/useresetScroll';
 import { getUrlImage, ToastError } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
-import { URL_IMAGE } from '@/utils/constante';
 import { cities } from '@/utils/mock/city';
 import { Link, Outlet, useRouter } from '@tanstack/react-router';
 import { PenLine, X } from 'lucide-react';
@@ -90,7 +89,9 @@ export default function MyprofilePage() {
 	const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
 		maxFiles: 1,
 		autoFocus: true,
-		accept: { 'image/*': ['.png'] },
+		accept: {
+			'image/jpg': ['.jpg', '.png', '.webp', '.jpeg'],
+		},
 	});
 
 	acceptedFiles.forEach((file) => {
@@ -118,15 +119,14 @@ export default function MyprofilePage() {
 				phone={InfoUser?.phone}
 				email={InfoUser?.email}
 			/>
-			<div className="my-2 inline-flex gap-x-5 self-start rounded-lg border bg-slate-100 p-1">
+			<div className="my-2 inline-flex w-full min-w-full gap-x-5 self-start rounded-lg border bg-slate-100 p-1">
 				{(
 					[
 						['/myprofile', 'Mes annonces', false, InfoUser?.id],
-						//['/myprofile/discussion', 'Discussions'],
 						['/myprofile/favourite', 'Favoris'],
 						['/myprofile/historique', 'Mon historique'],
 					] as const
-				).map(([to, label, exact, provider_id]) => {
+				).map(([to, label, , provider_id]) => {
 					return (
 						<Link
 							key={to}
@@ -167,27 +167,13 @@ export default function MyprofilePage() {
 					<div className="flex w-full flex-col items-start justify-start gap-y-4 ">
 						<button className="group relative " {...getRootProps()}>
 							<img
-								src={
-									files[0]?.buffer
-										? files[0]?.buffer
-										: getUrlImage(InfoUser?.avatar_url)
-								}
+								src={files[0]?.buffer ? files[0]?.buffer : getUrlImage(InfoUser?.avatar_url)}
 								alt="avatar"
 								className="size-20 rounded-full"
 							/>
 							<div className="absolute inset-0 flex items-center justify-center rounded-full group-hover:bg-black/30" />
 							<PenLine size={19} className="absolute -right-3 bottom-1 rounded-full text-black" />
-							<input
-								{...getInputProps({
-									role: 'button',
-									'aria-label': 'drag and drop area',
-									accept: 'image/jpg, image/jpeg , image/webp',
-								})}
-								type="file"
-								accept="image/*"
-								id="input_file"
-								style={{ display: 'none' }} // Alternative à `hidden`
-							/>
+							<input {...getInputProps()} />
 						</button>
 
 						<input

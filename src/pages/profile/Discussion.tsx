@@ -106,10 +106,6 @@ export default function Discussion() {
 		markAsRead(disc.discussion_id);
 	}, [Discussions, searchParams]);
 	const [modalReport, setModalReport] = useState(false);
-	const openModalReport = () => {
-		setModalReport(true);
-		document.body.style.overflow = 'hidden';
-	};
 	const closeModalReport = () => {
 		setModalReport(false);
 		document.body.style.overflow = 'visible';
@@ -170,7 +166,7 @@ export default function Discussion() {
 	return (
 		<div
 			className={
-				'mt-1 flex max-h-screen w-app self-center overflow-y-auto bg-slate-200 scrollbar-thin'
+				'mt-1 flex max-h-screen justify-center self-center overflow-y-auto bg-slate-200 scrollbar-thin'
 			}
 		>
 			<div className="grid h-[85dvh] max-h-[85dvh] grid-cols-16 gap-x-2 p-2 ">
@@ -300,86 +296,6 @@ export default function Discussion() {
 						</div>
 					</div>
 				</div>
-				{/* <div className="col-start-12 col-end-17 overflow-y-auto overflow-x-hidden rounded-xl bg-white px-3 scrollbar-thin">
-					<div className={'sticky top-0 bg-white'}>
-						<div className={'mx-auto justify-around break-words bg-white p-2'}>
-							{discSelect && <div>{discSelect?.product?.title}</div>}
-						</div>
-						<div>
-							<Carousel className="max-h-[300px] w-full bg-black">
-								<CarouselContent>
-									{discSelect?.product?.photos.map((image: any, index: Key) => (
-										<CarouselItem key={index}>
-											<div
-												aria-label="product image"
-												className="h-[300px] w-full rounded-sm bg-contain bg-center bg-no-repeat"
-												style={{
-													backgroundImage: `url(${URL_IMAGE}${image})`,
-												}}
-												role="img"
-											></div>
-										</CarouselItem>
-									))}
-								</CarouselContent>
-								<CarouselPrevious />
-								<CarouselNext />
-							</Carousel>
-						</div>
-					</div>
-					<div className="overflow-hidden">
-						<div className="text-base font-bold text-slate-900">Caracteristiques</div>
-						<div className={`flex h-1/2 flex-wrap items-center gap-x-3 py-1`}>
-							{features.map((key, index) => {
-								return (
-									<div key={index} className={'flex flex-row items-start gap-x-1 p-2 text-sm text-gray-800'}>
-										<div className={` items-center rounded-full bg-slate-100 p-[.2rem]`}>
-											<BadgeInfo size={18} strokeWidth={0.75} color="black" />
-										</div>
-										<span className={`flex flex-col text-xs font-light`}>
-											<span className={`capitalize text-gray-500`}>{key.name}</span>
-											<span className={`text-[.83rem] capitalize text-slate-950`}>{key.value}</span>
-										</span>
-									</div>
-								);
-							})}
-						</div>
-					</div>
-					<div className="overflow-hidden">
-						<div className="text-xs text-slate-400">Description</div>
-						<pre className="whitespace-pre-wrap break-words p-1 font-poppins text-sm">
-							{discSelect?.product?.description}
-						</pre>
-					</div>
-
-					<div className={`flex items-center justify-center gap-x-2 rounded-md bg-slate-600 px-8 py-2`}>
-						<a
-							href={`https://api.whatsapp.com/send?phone=+225${discSelect?.provider?.phone}&text=${encodeURIComponent(SeeAnnounce)}`}
-							target="_blank"
-							rel="noreferrer"
-							className={`text-white`}
-						>
-							<img
-								src={'/img/whatsapp.png'}
-								alt=""
-								className={`size-7 bg-cover bg-center bg-no-repeat text-white`}
-							/>
-						</a>
-						<div className={`flex gap-x-2 rounded-md bg-green-600 p-1`}>
-							<Phone color="white" size={20} />
-						</div>
-						<Link
-							to={`/product/$productId`}
-							// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-							params={{ productId: discSelect?.product?.id! }}
-							className=""
-						>
-							retour au produit
-						</Link>
-					</div>
-					<button onClick={() => openModalReport()} className={`text-xs underline`}>
-						signalez l&apos;annonce
-					</button>
-				</div> */}
 			</div>
 			<ModalReport
 				showPopUp={modalReport}
@@ -577,7 +493,13 @@ const ListMessage = ({
 				return (
 					<div key={message.id} className={twMerge('flex', right ? 'justify-end' : 'justify-start')}>
 						<div className={twMerge('flex items-start gap-x-2')}>
-							{!right && <AvatarComponent style="size-7 rounded-full" url={getUrlImage(avatarUrl)} name={avatarName} />}
+							{!right && (
+								<AvatarComponent
+									style="size-7 rounded-full"
+									url={getUrlImage(avatarUrl)}
+									name={avatarName}
+								/>
+							)}
 							<div
 								className={twMerge(
 									'flex flex-col mt-5',
@@ -586,11 +508,11 @@ const ListMessage = ({
 							>
 								<RenderMessage message={message.text} right={right} />
 								{message.files.length > 0 && (
-									<div className="group relative mt-2">
+									<div className="group relative mt-2 overflow-hidden ">
 										<img
 											src={URL_IMAGE + message.files[0]}
 											alt=""
-											className="h-[350px] bg-contain bg-center bg-no-repeat shadow-md"
+											className="h-[350px] rounded-md border border-gray-500 bg-contain bg-center bg-no-repeat shadow-md"
 										/>
 										<button
 											onClick={() => downloadFile(URL_IMAGE + message.files[0])}
@@ -602,7 +524,13 @@ const ListMessage = ({
 								)}
 								<span className="mt-1 text-[.68rem] text-gray-500">{formatDate(message.createdAt)}</span>
 							</div>
-							{right && <AvatarComponent style="size-7 rounded-full" url={getUrlImage(avatarUrl)} name={avatarName} />}
+							{right && (
+								<AvatarComponent
+									style="size-7 rounded-full"
+									url={getUrlImage(avatarUrl)}
+									name={avatarName}
+								/>
+							)}
 						</div>
 					</div>
 				);

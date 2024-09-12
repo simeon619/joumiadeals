@@ -30,41 +30,46 @@ export default function ModalViewImage({
 	// const [api, setApi] = useState<CarouselApi>();
 
 	return (
-		<PopUpComponent styleContainer=" h-full w-full overflow-auto" isOpen={showPopUp}>
-			<div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 dark:bg-white/80">
+		<PopUpComponent
+			styleContainer="relative bg-white flex items-center size-full justify-start"
+			isOpen={showPopUp}
+			// setHide={closePopUp}
+		>
+			<button onClick={() => closePopUp()}>
+				<X
+					role="img"
+					aria-label="close"
+					className="absolute right-2 top-2 z-10 size-7 rounded-full border  bg-white text-red-600"
+				/>
+			</button>
+			<div className="mx-[180px] grid w-full grid-cols-3">
 				<Carousel
 					setApi={setApi}
-					className="relative min-h-[300px] w-2/3 min-w-[300px] max-w-[800px] bg-slate-50 py-5"
+					className="col-start-1 col-end-3 flex w-full items-center justify-center "
 				>
-					<button onClick={() => closePopUp()}>
-						<X
-							role="img"
-							aria-label="close"
-							className="absolute left-2 top-2 z-10 size-7 rounded-full border  bg-white text-red-600"
-						/>
-					</button>
 					<CarouselContent>
 						{product.photos.map((image, index) => (
 							<CarouselItem key={index}>
-								<div
-									aria-label="product image"
-									className="h-[70vw] w-full rounded-sm bg-contain bg-center bg-no-repeat sm:h-[50vw] md:h-[40vw] lg:h-[30vw] xl:h-[25vw] 2xl:h-[20vw]"
-									style={{
-										backgroundImage: `url(${URL_IMAGE}${image})`,
-									}}
-									role="img"
-								></div>
+								<div className="aspect-[4/3] h-[500px] w-[80%] rounded-sm">
+									<img
+										aria-label="product image"
+										className="size-full bg-center bg-no-repeat object-cover"
+										src={`${URL_IMAGE}${image}`}
+										alt="Product"
+									/>
+								</div>
 							</CarouselItem>
 						))}
 					</CarouselContent>
 					<CarouselPrevious className="-ml-10" />
 					<CarouselNext className="-mr-10" />
 				</Carousel>
-				<div className="flex flex-col items-center justify-center gap-x-1">
-					<div>
-						<span>{product.title}</span>
-					</div>
-					<div className="flex h-40 items-stretch justify-center gap-x-1">
+				<div className="col-start-3 col-end-4 flex flex-col justify-start gap-2 px-3">
+					<span className="text-xs">
+						{current}/{product.photos.length}
+					</span>
+					<span className="text-xl">{product.title}</span>
+					<div className="flex flex-wrap items-stretch justify-start gap-3 ">
 						{product.photos.map((image, index) => (
 							<button
 								onClick={() => {
@@ -73,19 +78,14 @@ export default function ModalViewImage({
 								key={index}
 								aria-label="product image"
 								className={twMerge(
-									'rounded-sm bg-contain bg-center bg-no-repeat size-[60px] border',
+									'rounded-sm bg-contain bg-center bg-no-repeat size-[90px] border',
 									current === index + 1 ? 'bg-primary/10' : ''
 								)}
 								style={{
 									backgroundImage: `url(${URL_IMAGE}${image})`,
-									// width: '100px',
-									// height: '100px',
 								}}
 							></button>
 						))}
-						<span>
-							{current}/{product.photos.length}
-						</span>
 					</div>
 				</div>
 			</div>

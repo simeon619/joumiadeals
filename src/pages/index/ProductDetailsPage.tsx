@@ -209,7 +209,7 @@ export default function ProductDetailPage() {
 						</span>
 					</div>
 					<div className={`col-start-9 col-end-13`}>
-						<div className="m-3 rounded-md border">
+						<div className="m-3 rounded-md border pt-3">
 							<button
 								onClick={() =>
 									navigate({
@@ -220,26 +220,36 @@ export default function ProductDetailPage() {
 										},
 									})
 								}
-								className="group flex w-full flex-row items-center justify-between p-4"
+								className="group flex w-full flex-row items-center justify-center gap-x-7 bg-slate-100 py-2 hover:bg-slate-200"
 							>
-								<img src={getUrlImage(product.provider.avatar_url)} loading="lazy" className="size-7 rounded-full" alt="" />
-								<div className={`flex flex-col items-start gap-y-2`}>
-									<div className={`flex flex-col items-start`}>
-										<span className="text-[.79rem] font-bold">{product.provider.name}</span>
+								<img
+									src={getUrlImage(product.provider.avatar_url)}
+									loading="lazy"
+									className="size-[62px] rounded-full border border-black/60 shadow-lg"
+									alt=""
+								/>
+								<div className={`flex flex-row items-center justify-center gap-x-2`}>
+									<div className={`flex flex-col items-start gap-y-2`}>
+										<div className={`flex flex-col items-start`}>
+											<span className="text-[.79rem] font-bold">{product.provider.name}</span>
+										</div>
+										<span className={`flex items-baseline justify-center  gap-1 text-xs text-gray-500`}>
+											<UserCheck size={12} />
+											Inscrit {formatDate(product.provider.created_at)}
+										</span>
 									</div>
-									<span className={`flex items-baseline justify-center  gap-1 text-xs text-gray-500`}>
-										<UserCheck size={12} />
-										Inscrit {formatDate(product.provider.created_at)}
-									</span>
+									<ChevronRight
+										size={20}
+										className="text-gray-500 transition-all duration-300 group-hover:translate-x-[10px] group-hover:text-gray-900"
+									/>
 								</div>
-								<ChevronRight size={20} className="text-gray-500 group-hover:text-gray-900" />
 							</button>
 							<div>
 								<div className="flex flex-col gap-y-2 p-5">
 									<p className={`text-[.75rem] font-bold`}>Contactez via :</p>
 									{product.provider.phone && (
 										<a
-											href={`https://api.whatsapp.com/send?phone=+225${product.provider.phone}&text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
+											href={`https://api.whatsapp.com/send?phone=${product.provider.phone}&text=${encodeURIComponent(shareText)}%20${encodeURIComponent(shareUrl)}`}
 											target="_blank"
 											rel="noreferrer"
 											className={`flex items-center justify-center gap-x-2 rounded-md bg-slate-600 px-8 py-2 text-white`}
@@ -253,7 +263,7 @@ export default function ProductDetailPage() {
 										</a>
 									)}
 									<a
-										href={'tel:+225' + product.provider.phone}
+										href={'tel:' + product.provider.phone}
 										className="flex items-center justify-center  gap-x-1 rounded-md bg-green-600 px-8 py-2 text-white"
 									>
 										<Phone size={17} color="white" />

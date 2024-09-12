@@ -92,7 +92,7 @@ export async function getFeaturesCategory({ category_id }: { category_id: string
 			body: JSON.stringify({ category_id }),
 		});
 		const data = await response.json();
-		console.log('🚀 ~ data:', data);
+		// console.log('🚀 ~ data:', data);
 		const validationResult = z.array(f_form_min_schema).safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);
@@ -112,7 +112,7 @@ export async function getAllFeatures() {
 			body: JSON.stringify({}),
 		});
 		const data = await response.json();
-		// console.log('🚀 ~ data:', data);
+		console.log('🚀 ~ data:', data);
 		const validationResult = z.array(f_form_min_schema).safeParse(data);
 		if (!validationResult.success) {
 			throw new Error(validationResult.error.message);

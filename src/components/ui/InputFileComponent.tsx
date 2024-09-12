@@ -36,9 +36,7 @@ export default function InputFileComponent({
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		accept: {
-			'image/jpeg': [],
-			'image/jpg': [],
-			'image/webp': [],
+		'image/jpg': ['.jpg', '.png', '.webp', '.jpeg'],
 		},
 		noClick: false,
 		multiple: true,
@@ -63,7 +61,7 @@ export default function InputFileComponent({
 		},
 	});
 	return (
-		<div className="my-2  w-full">
+		<div className="my-2 w-full">
 			<div {...getRootProps()}>
 				<span className="block py-1 text-sm font-medium text-slate-700 after:ml-0.5 after:text-gray-500 after:content-['*']">
 					{name}

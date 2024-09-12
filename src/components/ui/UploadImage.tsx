@@ -43,13 +43,17 @@ export default memo(function UploadImage({ images }: { images: Files }) {
 				return (
 					<div
 						className={twMerge(
-							'relative h-[120px] w-[155px]  cursor-grab overflow-hidden bg-slate-400/10'
+							'relative h-[120px] w-[155px] cursor-grab overflow-hidden bg-slate-400/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500'
 						)}
 						key={i}
+						tabIndex={0} // Rend l'élément focusable au clavier
 						draggable="true"
 						onDragStart={() => handleDragStart(i)}
 						onDragOver={() => handleDragOver(i)}
 						onDragEnd={handleDragEnd}
+						role="button"
+						aria-pressed={draggedIndex === i}
+						aria-label={`Image preview ${i === 0 ? 'photo principale' : `image ${i + 1} de ${Nbr_Image_Upload}`}`}
 					>
 						<div
 							className={` rounded-sm bg-cover bg-center bg-no-repeat object-contain`}

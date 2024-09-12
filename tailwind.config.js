@@ -19,7 +19,7 @@ export const theme = {
 		colors: {
 			border: 'hsl(var(--border))',
 			primary: 'rgb(101 163 13)',
-			filt : "#1D3A8A",
+			filt: '#1D3A8A',
 			// primary: '#115570',
 			input: 'hsl(var(--input))',
 			ring: 'hsl(var(--ring))',
@@ -69,10 +69,10 @@ export const theme = {
 				from: { height: 'var(--radix-accordion-content-height)' },
 				to: { height: '0' },
 			},
-			"caret-blink": {
-				"0%,70%,100%": { opacity: "1" },
-				"20%,50%": { opacity: "0" },
-			  },
+			'caret-blink': {
+				'0%,70%,100%': { opacity: '1' },
+				'20%,50%': { opacity: '0' },
+			},
 		},
 		width: {
 			app: '1040px',
@@ -88,7 +88,7 @@ export const theme = {
 		animation: {
 			'accordion-down': 'accordion-down 0.2s ease-out',
 			'accordion-up': 'accordion-up 0.2s ease-out',
-			"caret-blink": "caret-blink 1.25s ease-out infinite",
+			'caret-blink': 'caret-blink 1.25s ease-out infinite',
 		},
 		gridTemplateColumns: {
 			16: 'repeat(16, minmax(0, 1fr))',
@@ -129,7 +129,7 @@ export const theme = {
 			80: '80',
 			90: '90',
 			99: '99',
-			100: '100'
+			100: '100',
 		},
 		invert: {
 			0: '0',
@@ -153,8 +153,11 @@ export const theme = {
 			90: '.9',
 			95: '.95',
 			100: '1',
-		  }
-
+		},
+		aspectRatio: {
+			'4/3': '4 / 3',
+			'16/9': '16 / 9',
+		},
 	},
 };
 // eslint-disable-next-line no-undef

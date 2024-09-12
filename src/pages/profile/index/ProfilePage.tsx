@@ -31,7 +31,7 @@ export default function ProfilePage() {
 		<div className="flex w-full flex-col justify-center">
 			<div
 				style={backgroundImageStyle}
-				className="relative mt-4 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2 backdrop-blur-2xl"
+				className="relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2 backdrop-blur-2xl"
 			>
 				<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
 				<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">

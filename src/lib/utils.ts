@@ -94,7 +94,7 @@ export const onCreateProduct = ({
 	errorInput: Record<string, any>;
 	createProduct: (args: any) => void;
 }) => {
-	console.log({ dataProduct, dataFeatureProduct });
+	console.log({ dataFeatureProduct });
 
 	for (const [key, value] of Object.entries({ ...dataProduct, ...dataFeatureProduct })) {
 		if (value === null || value === '') {
@@ -103,7 +103,7 @@ export const onCreateProduct = ({
 			return ToastWarn('Le champ ' + key.split(':')[0] + 'doit être supérieur à 0');
 		}
 	}
-	for (const [key, value] of Object.entries(errorInput)) {
+	for (const [key, value] of Object.entries(errorInput)) {	
 		if (value) {
 			return ToastWarn(key.split(':')[0] + ' est mal défini');
 		}

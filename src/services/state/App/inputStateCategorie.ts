@@ -13,7 +13,6 @@ export const useInputCategorie = create(
 			},
 			(set, get) => ({
 				setDataProduct: async (value: { [k: string]: string | number | undefined | null }) => {
-					console.log('required', value);
 					set((state) => ({
 						dataProduct: {
 							...state.dataProduct,

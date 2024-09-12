@@ -18,6 +18,5 @@ export const headers = () => {
 	myHeaders.append('Accept', 'application/json');
 	myHeaders.append('Content-Type', 'application/json');
 	myHeaders.append('Authorization', `Bearer ${localStorage.getItem('token')}`);
-
 	return myHeaders;
 };

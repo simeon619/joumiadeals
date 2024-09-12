@@ -28,7 +28,7 @@ export default function LayoutProduct2({
 		<div className="w-full">
 			<div className="flex w-full flex-col items-start justify-start gap-2 p-4">
 				<h1 className="text-start font-roboto text-lg">
-					Annonce {getCategorieById(search.filter.category_id, categories)?.label} : {' '}
+					Annonce {getCategorieById(search.filter.category_id, categories)?.label} :{' '}
 					{filterFrom.location ? filterFrom.location : "Toute la Cote d'ivoire"}
 				</h1>
 				<h5 className="text-start font-roboto text-slate-500 ">{products.length} annonces</h5>
@@ -54,7 +54,7 @@ const ItemProduct = ({
 			key={product.product_id}
 			params={{ productId: product.product_id }}
 			className={clsx(
-				'group my-2 flex max-w-[80%] flex-col rounded-lg border-[1px] border-slate-300 bg-slate-100/10 pb-3 transition-all duration-200 ease-linear hover:bg-slate-100/20'
+				'group my-2 mb-8 flex max-w-[850px] flex-col border-b-[1px] border-gray-500 bg-slate-100/10 pb-5 transition-all duration-200 ease-linear hover:bg-slate-100/20'
 			)}
 		>
 			<button
@@ -74,7 +74,7 @@ const ItemProduct = ({
 				// to={'/o_profile/announceOther'}
 				// search={{ provider_id: product.provider_id, filter: { status: 5 } }}
 				className={clsx(
-					'mb-[1px] flex flex-row items-center gap-x-2 rounded-t-lg border bg-white p-1 shadow-sm transition-all duration-200 ease-linear hover:border-primary hover:bg-slate-100',
+					'mb-[1px] flex flex-row items-center gap-x-2 rounded-t-lg  bg-white p-1 transition-all duration-200 ease-linear hover:border-primary hover:bg-slate-100',
 					{
 						hidden: componentRoot.fullPath.includes('o_profile'),
 					}
@@ -88,9 +88,9 @@ const ItemProduct = ({
 				/>
 				<span className="font-poppins text-xs">{product.provider_name}</span>
 			</button>
-			<div className="flex flex-1 flex-col  border-slate-200">
+			<div className="flex flex-1 flex-col">
 				<div className="flex w-full flex-1 gap-2">
-					<ImgComponent photos={product.photos} title={product.title} style="w-[39%] h-[210px]">
+					<ImgComponent photos={product.photos} title={product.title} style="w-[310px] h-[210px]">
 						<ActionFavourite productId={product.product_id} style="absolute top-1 right-1 " />
 					</ImgComponent>
 
@@ -98,10 +98,10 @@ const ItemProduct = ({
 						<div className="flex size-full flex-col justify-between">
 							<div className="flex flex-col gap-y-4">
 								<div className="flex flex-col gap-y-2">
-									<span className="font-roboto text-[1.175rem] font-semibold text-slate-900 transition-all duration-200 ease-linear group-hover:text-primary">
+									<span className="line-clamp-1 font-roboto text-[.975rem] font-semibold text-slate-900 transition-all duration-200 ease-linear group-hover:text-primary">
 										{capitalizeFirstLetter(product.title)}
 									</span>
-									<span className="text-[.975rem] font-bold text-slate-900">
+									<span className="text-[.905rem] font-bold text-slate-900">
 										{formatPrice(product.price)}
 									</span>
 								</div>

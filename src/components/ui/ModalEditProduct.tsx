@@ -3,7 +3,9 @@ import { field_annonce, onCreateProduct } from '@/lib/utils';
 import { f_form_type, ProductsMinType } from '@/services/api/product_categorie';
 import { useInputCategorie } from '@/services/state/App/inputStateCategorie';
 import { Nbr_Image_Upload } from '@/utils/constante';
+import { get_all_parents } from '@/utils/mock/Menucaegorie';
 import {
+	getAllChildCategoriesOptions,
 	getAllfeaturesOptions,
 	getFeatureProductOptions,
 	useUpdateMutationproduct,
@@ -30,16 +32,17 @@ export default function ModalEditProduct({
 	const resetInput = useInputCategorie((state) => state.resetAll);
 	const setFiles = useInputCategorie((state) => state.setFile);
 	const dataFeatureProduct = useInputCategorie((state) => state.dataProductFeature);
-	const set = useInputCategorie((state) => state.setDataProductFeature);
+	const setInputCat = useInputCategorie((state) => state.setDataProduct);
 	const dataProduct = useInputCategorie((state) => state.dataProduct);
 	const errorInput = useInputCategorie((state) => state.errorInput);
 	const filesData = useInputCategorie((state) => state.filesData);
+	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
 	const { data: featuresProduct } = useSuspenseQuery(getFeatureProductOptions(product?.product_id));
 	useEffect(() => {
 		if (!product) return;
 		setFiles(product.photos);
-	}, [product?.product_id]);
+	}, [product, product?.product_id, setFiles]);
 	const {
 		mutate: updateProduct,
 		isSuccess: isSuccessUpdate,
@@ -49,32 +52,49 @@ export default function ModalEditProduct({
 		const value = featuresProduct.find((feature) => feature.feature_id == id)?.value;
 		return value;
 	};
+
 	useEffect(() => {
 		if (!product) return;
 
-		// Créez une copie de dataProduct pour éviter les mutations directes
 		const updatedDataProduct = { ...dataProduct };
-
 		updatedDataProduct[field_annonce[0]] = product?.title;
 		updatedDataProduct[field_annonce[1]] = product?.price;
 		updatedDataProduct[field_annonce[2]] = product?.description;
-
-		// Maintenant, vous pouvez mettre à jour le state ou la variable appropriée
-		set(updatedDataProduct); // Assurez-vous d'avoir cette fonction setDataProduct
-	}, [product, field_annonce]);
+		setInputCat(updatedDataProduct);
+	}, [product]);
 
 	useEffect(() => {
-		const featuresId = featuresProduct.map((feature) => feature.feature_id);
-		const fieldcharac = featuresId.map((id) => {
-			return features.find((f) => f.feature_id === id)!;
-		});
-		const tr = fieldcharac?.filter((f) => Boolean(f?.feature_id));
-		setFieldCharac(tr);
+		const get_IdFeatures = (productId: string | undefined) => {
+			if (!productId) return [];
+			const pathIds = get_all_parents(productId, categories);
+			return pathIds || [];
+		};
+
+		const featuresIds = featuresProduct.map((feature) => feature.feature_id);
+		const categoryFeatureIds = get_IdFeatures(product?.category_id);
+
+		const productFeatures = featuresIds
+			.map((id) => features.find((f) => f.feature_id === id))
+			.filter(Boolean) as f_form_type[];
+
+		const categoryFeatures = categoryFeatureIds
+			.flatMap((id) => {
+				const res = features.filter((f) => f.category_id === id);
+				return res;
+			})
+			.filter(Boolean) as f_form_type[];
+
+		if (productFeatures.length > 0) {
+			setFieldCharac(productFeatures);
+		} else {
+			setFieldCharac(categoryFeatures);
+		}
+
 		return () => {
 			resetInput();
 			setFieldCharac([]);
 		};
-	}, [features, featuresProduct, resetInput]);
+	}, [categories, features, featuresProduct, product?.category_id, resetInput]);
 
 	useEffect(() => {
 		if (isSuccessUpdate) {
@@ -92,13 +112,13 @@ export default function ModalEditProduct({
 		>
 			<div
 				role="presentation"
-				className={`flex max-h-[90vh] min-w-[400px] max-w-[450px] select-none flex-col items-center justify-center rounded-lg bg-white/40`}
+				className={`flex max-h-[90vh] min-w-[400px] max-w-[450px] select-none flex-col items-center justify-center rounded-lg bg-white/80`}
 				draggable={false}
 				onDrag={(e) => {
 					e.preventDefault();
 				}}
 			>
-				<div className={' flex items-center justify-center shadow-md'}>
+				<div className={' flex w-full items-center justify-center shadow-md'}>
 					<CloseModal closePopUp={closePopUp} style="text-red-600" />
 					<span className={'text-center text-xl'}>Modifier votre annonce</span>
 				</div>

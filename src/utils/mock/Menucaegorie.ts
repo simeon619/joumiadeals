@@ -305,7 +305,7 @@ export function get_all_parents(parent_id: string | null, cats: CategoryType) {
 	return parents.map((p) => p.id);
 }
 
-export const getCategorieById = (id: string | undefined, cats: CategoryType) => {
+export const getCategorieById = (id: string | null, cats: CategoryType) => {
 	const bu  = cats.find((category) => {
 		return category.id == id;
 	});
@@ -314,6 +314,7 @@ export const getCategorieById = (id: string | undefined, cats: CategoryType) => 
 		label: null,
 		icon: null,
 		is_parentable: 0,
+		parent_category_id: null,
 	}
 };
 

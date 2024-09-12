@@ -12,7 +12,7 @@ export default function SetAdvert({ style }: { style?: string }) {
 			)}
 		>
 			<PlusCircle color="white" size={15} />
-			<span className="whitespace-nowrap font-poppins text-[14px] font-bold text-white">
+			<span className="whitespace-nowrap font-poppins text-[14px] text-white">
 				Publier une annonce
 			</span>
 		</Link>

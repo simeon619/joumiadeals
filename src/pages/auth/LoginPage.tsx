@@ -8,7 +8,7 @@ import { useLayoutEffect } from 'react';
 
 export default function LoginPage() {
 	const router = useRouter();
-	const isAuth = useAuth((state) => state.isAuth);
+	// const isAuth = useAuth((state) => state.isAuth);
 	const searchParams = router.latestLocation.search as {
 		name: string;
 		id: string;

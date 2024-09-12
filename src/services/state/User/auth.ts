@@ -17,18 +17,6 @@ const userSchema = z.object({
 	role: z.string(),
 });
 
-const userUpdateSchema = z.object({
-	avatar_url: z.string().nullable(),
-	created_at: z.string(),
-	email: z.string(),
-	id: z.number(),
-	location: z.string(),
-	name: z.string(),
-	use_whatsapp: z.any(),
-	phone: z.any(),
-	updated_at: z.string(),
-});
-
 const userUpdateToserverSchema = z.object({
 	location: z.string(),
 	use_whatsapp: z.any(),
@@ -103,16 +91,13 @@ export const useAuth = create(
 						ToastError('Une erreur est survenue, veuillez reessayer' + infoUser.error);
 						return;
 					}
-					ToastSuccess(' Connexion reussie');
-					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
-					// const token = JSON.parse(infoUser.data.token) ;
-					// console.log('🚀 ~ register: ~ infoUser.data.token:', JSON.parse(infoUser.data.token));
 					putInSto(infoUser.data.token);
+					ToastSuccess('Inscription reussie');
+					set(() => ({ isAuth: true, InfoUser: infoUser.data, loading: false, isConnect: true }));
 				},
 				login: (dataS: UserType) => {
 					console.log('🚀 ~ dataS:', dataS);
 					const infoUser = userSchema.safeParse(dataS);
-					console.log('🚀 ~ infoUser:', infoUser);
 					if (!infoUser.success) {
 						ToastError('Une erreur est survenues, veuillez reessayer');
 						console.log(infoUser.error);
@@ -159,7 +144,7 @@ export const useAuth = create(
 						if (key === 'use_whatsapp') value = Number(value);
 						formData.append(key, value);
 					}
-						console.log('🚀 ~ formData:', formData);
+					console.log('🚀 ~ formData:', formData);
 					const response = await fetch(`${BASE_URL}/edit_me`, {
 						method: 'PUT',
 						headers: getHeadersWithFormData(),
@@ -202,9 +187,7 @@ export const useAuth = create(
 						method: 'GET',
 						headers: getHeaders(),
 					});
-					if (!response.ok) {
-						set(() => ({ isAuth: false, InfoUser: {} as UserType }));
-					}
+					if (!response.ok) return;
 					const data = await response.json();
 					if (data.errors) {
 						set(() => ({ isAuth: false, InfoUser: {} as UserType }));

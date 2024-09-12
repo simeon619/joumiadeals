@@ -12,25 +12,23 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { Bell, Heart, Mail, Search } from 'lucide-react';
+import { Bell, Heart, Mail, Search, User2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebounce } from 'react-use';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
-import FilterProduct from '../product/filter/FilterProduct';
 import AvatarComponent from '../ui/AvatarComponent';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
-import CategoriseMenu from '../ui/CategoriseMenu';
 
 const SearchSchema = z.object({
 	search: z.string(),
 });
 type SearchSchemaType = z.infer<typeof SearchSchema>;
-const SIZE_ICON = 16;
+const SIZE_ICON = 18;
 const wrapIcon = 'group relative flex flex-col justify-center items-center gap-1';
-const contentIcon = 'whitespace-nowrap text-xs';
+const contentIcon = 'whitespace-nowrap text-[.85rem]';
 const UnderlineHover =
 	'absolute -bottom-1 block h-[2px] w-0 bg-primary opacity-0 transition-all duration-300 group-hover:w-full group-hover:opacity-100';
 const ElementShowSerach = 6;
@@ -215,23 +213,27 @@ export default function Header() {
 								})}
 						</div>
 					</div>
-					<div className="flex justify-between gap-x-3">
-						<Link to="/myprofile/historique" search={{ page: 1 }} className={wrapIcon}>
-							<Bell size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
-							<span className={contentIcon}>Mon historique</span>
-							<div className={UnderlineHover} />
-						</Link>
-						<Link to="/myprofile/favourite" search={{ page: 1 }} className={wrapIcon}>
-							<Heart size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
-							<span className={contentIcon}>Favoris</span>
-							<div className={UnderlineHover} />
-						</Link>
+					<div className="flex justify-between gap-x-5">
+						{isAuth && (
+							<>
+								<Link to="/myprofile/historique" search={{ page: 1 }} className={wrapIcon}>
+									<Bell size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
+									<span className={contentIcon}>Mon historique</span>
+									<div className={UnderlineHover} />
+								</Link>
+								<Link to="/myprofile/favourite" search={{ page: 1 }} className={wrapIcon}>
+									<Heart size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
+									<span className={contentIcon}>Favoris</span>
+									<div className={UnderlineHover} />
+								</Link>
 
-						<Link to="/discussion" search={{ filter: { type: 'private' } }} className={wrapIcon}>
-							<Mail size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
-							<span className={contentIcon}>Messages</span>
-							<div className={UnderlineHover} />
-						</Link>
+								<Link to="/discussion" search={{ filter: { type: 'private' } }} className={wrapIcon}>
+									<Mail size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
+									<span className={contentIcon}>Messages</span>
+									<div className={UnderlineHover} />
+								</Link>
+							</>
+						)}
 						{isAuth ? (
 							<Link
 								className={wrapIcon}
@@ -243,11 +245,12 @@ export default function Header() {
 							</Link>
 						) : (
 							<button className={wrapIcon} onClick={handleConnect}>
-								<img
+								{/* <img
 									src={'/img/google.png'}
 									alt=""
 									className={`size-5 bg-cover bg-center bg-no-repeat text-white`}
-								/>
+								/> */}
+								<User2Icon size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
 								<span className={contentIcon}>{'Se connecter'}</span>
 								<div className={UnderlineHover} />
 							</button>
@@ -255,7 +258,7 @@ export default function Header() {
 					</div>
 				</div>
 			</div>
-			<FilterProduct style={styleFilter} isHeader={true} />
+			{/* <FilterProduct style={styleFilter} isHeader={true} /> */}
 		</div>
 	);
 }

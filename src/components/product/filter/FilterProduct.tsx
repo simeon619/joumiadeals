@@ -9,12 +9,14 @@ import {
 import { productsRoot } from '@/lib/route';
 import { useSearchFilter, useShowPopupFilter } from '@/services/state/App/filterState';
 import { cities } from '@/utils/mock/city';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { useAnimate, useScroll } from 'framer-motion';
+// import { useAnimate, useScroll } from 'framer-motion';
+import { useRefDomTrigger } from '@/services/state/User/domState';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPinned, SlidersHorizontal } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFirstMountState } from 'react-use';
 import { PopUpFilter } from './PopUpFilter';
 
 const CLASSES = {
@@ -28,34 +30,47 @@ const CLASSES = {
 
 const anyWhereInCi = "Partout en Côte d'Ivoire";
 
-export default function FilterProduct({ style, isHeader }: { style: string; isHeader?: boolean }) {
+gsap.registerPlugin(ScrollTrigger);
+export default function FilterProduct({ style }: { style: string }) {
 	const filterFrom = useSearchFilter((state) => state.value);
 	const [localisation, setLocalisation] = useState<string>(filterFrom.location || anyWhereInCi);
 	const navigate = useNavigate({ from: productsRoot.fullPath });
 	const { setShowPopup } = useShowPopupFilter((state) => state);
-	const { scrollYProgress } = useScroll({ smooth: 1 });
-	const router = useRouterState();
-	const [scope, animate] = useAnimate();
-	const delta = useRef(0);
-	const lastScrollY = useRef(0);
-	const isFirstMount = useFirstMountState();
+	const scopeAnima = useRef(null);
+	const scopeTrigger = useRefDomTrigger((state) => state.scopeTrigger);
 
 	useEffect(() => {
-		if (isHeader) {
-			animate(scope.current, {
-				opacity: 0,
-				transform: 'translateY(-100%)',
-			});
-		}
-	}, [animate, isHeader, scope]);
-	useEffect(() => {
-		if (!isHeader) return;
-		animate(
-			scope.current,
-			{ opacity: 0, transform: 'translateY(-100%)' },
-			{ duration: 0.6, ease: 'linear' }
-		);
-	},[filterFrom.location]);
+		if (!scopeAnima.current || !scopeTrigger) return;
+		const animation = gsap.to(scopeAnima.current, {
+			position: 'fixed',
+			zIndex: 50,
+			left: 0,
+			right: 0,
+			top: 25,
+			marginTop: 25,
+			display: 'flex',
+			justifyItems: 'center',
+			justifyContent: 'center',
+			backgroundColor: 'rgb(255,255,255)',
+			borderBottom: '1px solid rgb(229, 231, 235)',
+			boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+			duration: 2,
+			ease: 'elastic.inOut',
+			scrollTrigger: {
+				trigger: scopeTrigger.current,
+				start: 'top top',
+				end: 'bottom top',
+				toggleActions: 'play reverse play reverse',
+				scrub: true,
+			},
+		});
+		return () => {
+			if (animation.scrollTrigger) {
+				animation.scrollTrigger.kill();
+			}
+			animation.kill();
+		};
+	}, [scopeTrigger]);
 
 	useEffect(() => {
 		setLocalisation(filterFrom.location || anyWhereInCi);
@@ -74,31 +89,6 @@ export default function FilterProduct({ style, isHeader }: { style: string; isHe
 		});
 	}, [localisation, navigate]);
 
-	useEffect(() => {
-		if (isFirstMount || !isHeader || !router.location.pathname.includes('products')) return;
-
-		const unsubscribe = scrollYProgress.on('change', (val) => {
-			delta.current = val - lastScrollY.current;
-			if (delta.current > 0 && val > 0.2) {
-				animate(
-					scope.current,
-					{ transform: 'translateY(100%)', opacity: 1 },
-					{ duration: 0.6, ease: 'linear' }
-				);
-			} else if (delta.current < 0 || val >= 0.2) {
-				animate(
-					scope.current,
-					{ transform: 'translateY(-100%)', opacity: 0 },
-					{ duration: 0.6, ease: 'linear' }
-				);
-			}
-
-			lastScrollY.current = val;
-		});
-
-		return unsubscribe;
-	}, [isFirstMount, isHeader, scrollYProgress, router.location.pathname, animate, scope]);
-
 	const handleOpen = () => {
 		setShowPopup(true);
 		document.body.style.overflow = 'hidden';
@@ -114,9 +104,17 @@ export default function FilterProduct({ style, isHeader }: { style: string; isHe
 	return (
 		<>
 			<div
-				ref={scope}
+				ref={scopeAnima}
 				className={style}
-				// style={isHeader ? { opacity: 0, transform: 'translateY(-100%)' } : {}}
+				style={{
+					minHeight: '60px',
+					position: 'relative',
+					zIndex: 1,
+					left: 0,
+					right: 0,
+					top: 20,
+					backgroundColor: 'rgb(255,255,255)',
+				}}
 			>
 				<div className="flex items-start gap-x-2">
 					<Select name="city" onValueChange={(value) => setLocalisation(value)} value={localisation}>
