@@ -133,15 +133,19 @@ export default function Header() {
 	return (
 		<div
 			className={twMerge(
-				'fixed top-0 z-50 inset-x-0 flex justify-center flex-col items-center bg-white',
-				isShadow && 'shadow-md'
+				'fixed top-0 z-50 inset-x-0 flex justify-center flex-col min-w-full items-center bg-white',
+				isShadow && 'shadow-lg'
 			)}
 		>
-			<div className=" flex flex-col items-center bg-white py-2">
-				<div className={`relative flex items-center justify-between gap-x-3`}>
-					<Name />
-					<SetAdvert />
-					<div className={`relative flex min-w-[270px] items-center rounded-xl bg-slate-100 px-2`}>
+			<div className="flex w-full flex-col items-center bg-white py-2">
+				<div className={`relative flex w-full items-center justify-center gap-x-3`}>
+					<div className="flex items-center gap-x-2 hd:hidden">
+						<Name />
+						<SetAdvert />
+					</div>
+					<div
+						className={`relative flex w-[270px] items-center rounded-xl bg-slate-100 px-2 hd:mx-6 hd:w-[800px]`}
+					>
 						<input
 							{...register('search')}
 							name={'search'}
@@ -150,8 +154,8 @@ export default function Header() {
 							}}
 							onBlur={handleBlurSearch}
 							type="text"
-							placeholder="Rechercher sur adjameDeals"
-							className="w-full border-0 bg-transparent p-2 text-[.9rem] placeholder:text-slate-600 focus:outline-none"
+							placeholder="Rechercher sur Amedeals"
+							className="w-full border-0 bg-transparent p-2 py-3 text-[.9rem] placeholder:text-slate-700 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
 							inputMode="text"
@@ -165,7 +169,7 @@ export default function Header() {
 						/>
 						<div
 							className={
-								` flex flex-col items-start py-2 absolute w-[100%] gap-y-2 left-0 top-12 z-50 bg-white shadow-2xl` +
+								`flex flex-col items-start py-3 absolute w-[100%] gap-y-2 left-0 top-12 z-70 bg-white shadow-2xl` +
 								serachContainer
 							}
 						>
@@ -213,7 +217,7 @@ export default function Header() {
 								})}
 						</div>
 					</div>
-					<div className="flex justify-between gap-x-5">
+					<div className="flex justify-between gap-x-5 hd:hidden">
 						{isAuth && (
 							<>
 								<Link to="/myprofile/historique" search={{ page: 1 }} className={wrapIcon}>
@@ -237,7 +241,7 @@ export default function Header() {
 						{isAuth ? (
 							<Link
 								className={wrapIcon}
-								to={'/myprofile'}
+								to={'/myprofile/annonces'}
 								search={{ provider_id: InfoUser.id, filter: { status: 5 } }}
 							>
 								<AvatarComponent name={InfoUser.name} url={getUrlImage(InfoUser?.avatar_url)} />
@@ -245,11 +249,6 @@ export default function Header() {
 							</Link>
 						) : (
 							<button className={wrapIcon} onClick={handleConnect}>
-								{/* <img
-									src={'/img/google.png'}
-									alt=""
-									className={`size-5 bg-cover bg-center bg-no-repeat text-white`}
-								/> */}
 								<User2Icon size={SIZE_ICON} strokeWidth={1.5} absoluteStrokeWidth />
 								<span className={contentIcon}>{'Se connecter'}</span>
 								<div className={UnderlineHover} />

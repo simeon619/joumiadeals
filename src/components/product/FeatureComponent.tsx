@@ -10,11 +10,13 @@ export default function FeatureComponent({
 }) {
 	const { data: features } = useSuspenseQuery(getFeatureProductOptions(productId));
 	return (
-		<div className="flex w-full flex-wrap justify-start gap-4 font-poppins">
+		<div className="flex w-[70%] flex-wrap justify-between gap-4 font-poppins lg:w-[100%] lg:justify-stretch lg:gap-0">
 			{features.slice(0, nbrFeature).map((feature, index) => (
-				<div key={index} className="flex flex-col rounded-lg p-1">
-					<span className="text-[.7rem] font-bold text-black">{feature.name}</span>
-					<span className=" text-[.75rem] text-gray-700">{feature.value}</span>
+				<div key={index} className={`flex flex-col rounded-lg`}>
+					<span className="text-[.7rem] font-bold text-black lg:hidden">{feature.name}</span>
+					<span className="inline text-[.75rem] text-gray-900 lg:text-[.85rem] lg:after:px-1 lg:after:content-['•']">
+						{feature.value}
+					</span>
 				</div>
 			))}
 		</div>

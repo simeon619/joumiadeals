@@ -1,10 +1,10 @@
+import { getUrlImage } from '@/lib/utils';
 import { formatDate } from '@/utils/formating';
 import { getLikeOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { LogOut, Mail, MapPinned, Pen, PhoneCall, Users } from 'lucide-react';
+import { CalendarCheck, LogOut, Mail, MapPinned, Phone } from 'lucide-react';
 import AvatarComponent from '../ui/AvatarComponent';
-import { getUrlImage } from '@/lib/utils';
 
 export default function HeaderProfile({
 	openDialog,
@@ -28,65 +28,21 @@ export default function HeaderProfile({
 	created_at: string;
 }) {
 	const backgroundImageStyle = {
-		backgroundImage: `url(${getUrlImage(avatar_url)})`,
-		backgroundSize: 'cover',
-		backgroundPosition: 'center',
-		backgroundRepeat: 'no-repeat',
+		backgroundSize: '100% 100%',
+		backgroundPosition: ' 0px 0px,0px 0px,0px 0px,0px 0px,0px 0px',
+		backgroundImage:
+			'repeating-linear-gradient(315deg, #00FFFF2E 92%, #073AFF00 100%),repeating-radial-gradient(75% 75% at 238% 218%, #00FFFF12 30%, #073AFF14 39%),radial-gradient(99% 99% at 109% 2%, #00C9FFFF 0%, #073AFF00 100%),radial-gradient(99% 99% at 21% 78%, #7B00FFFF 0%, #073AFF00 100%),radial-gradient(160% 154% at 711px -303px, #2000FFFF 0%, #073AFFFF 100%)',
 	};
 	const { data: like } = useSuspenseQuery(getLikeOptions({ id: idUser, type: 'account' }));
 
 	return (
-		// <div className="relative mt-4 flex flex-col items-center justify-center gap-y-5 rounded-sm border-2 border-gray-100 bg-slate-50 p-2">
-		// 	<div className="flex flex-col items-center gap-y-1">
-		// 		<AvatarComponent name={name} url={avatar_url || ''} style="size-15" />
-		// 		<div className="flex flex-row items-center justify-center gap-x-1">
-		// 			<span className="text-base">{name}</span>
-		// 			<button
-		// 				onClick={openDialog}
-		// 				className="group flex flex-row items-center justify-center gap-x-1 rounded-2xl border-b-[1px] border-primary p-1 transition-colors hover:bg-slate-200"
-		// 			>
-		// 				<span className="text-center text-xs text-black group-hover:text-primary ">Edit Profile</span>
-		// 				<Pen size={12} className="text-black group-hover:text-primary" />
-		// 			</button>
-		// 		</div>
-		// 	</div>
-		// 	<div className="flex flex-row gap-x-6">
-		// 		<div className="flex flex-row items-center justify-center gap-x-1">
-		// 			<Mail size={20} className="text-slate-700" />
-		// 			<span className="text-sm">{email}</span>
-		// 		</div>
-		// 		<div className="flex flex-row items-center justify-center gap-x-1">
-		// 			<MapPinned size={20} className="text-slate-700" />
-		// 			<span className="text-sm">{location}</span>
-		// 		</div>
-		// 		<div className="flex flex-row items-center justify-center gap-x-1">
-		// 			<PhoneCall size={20} className="text-slate-700" />
-		// 			<span className="text-sm">{phone} </span>
-		// 		</div>
-		// 	</div>
-		// 	<button
-		// 		aria-label="deconnexion"
-		// 		onClick={logout}
-		// 		className="absolute right-2 top-2 flex flex-row items-center gap-x-1"
-		// 	>
-		// 		<span className="text-sm text-red-600">Deconnexion</span>
-		// 		<LogOut className="cursor-pointer text-red-600" />
-		// 	</button>
-		// 	<button
-		// 		aria-label="parametre"
-		// 		onClick={() => {}}
-		// 		className="absolute left-2 top-2 flex flex-row items-center gap-x-1"
-		// 	>
-		// 		<Sliders className="cursor-pointer text-gray-900" />
-		// 		<span className="text-sm text-gray-900">Parametre</span>
-		// 	</button>
-		// </div>
-		<div
-			style={backgroundImageStyle}
-			className="w-full relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md p-2 backdrop-blur-2xl"
-		>
-			<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
-			<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
+		<div className="">
+			<div
+				style={backgroundImageStyle}
+				className="relative mt-20 flex h-[100px] min-w-[320px] rounded-md p-2"
+			>
+				{/* <div className="absolute inset-0 -z-10" /> */}
+				{/* <div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
 				<AvatarComponent name="5" url={getUrlImage(avatar_url)} style="size-[50px]" />
 				<div className="flex flex-col items-baseline ">
 					<div
@@ -107,8 +63,8 @@ export default function HeaderProfile({
 					</div>
 					<span className="text-xs font-bold">{name}</span>
 				</div>
-			</div>
-			<div className="flex flex-col items-center justify-center gap-3 self-center">
+			</div> */}
+				{/* <div className="flex flex-col items-center justify-center gap-3 self-center">
 				<div className="flex flex-row items-center justify-center gap-x-4">
 					<div className="flex flex-row items-center justify-center gap-x-1">
 						<PhoneCall size={17} className="text-gray-400" />
@@ -136,15 +92,69 @@ export default function HeaderProfile({
 						<Pen size={12} className="text-white group-hover:text-primary" />
 					</button>
 				</div>
+			</div> */}
+				<button
+					title="deconnexion"
+					aria-label="deconnexion"
+					onClick={logout}
+					className="group absolute right-2 top-2 flex flex-row items-center gap-x-1 rounded-lg bg-white p-2"
+				>
+					<span className="hidden text-xs font-bold text-red-600 group-hover:block">Deconnexion</span>
+					<LogOut size={20} className="cursor-pointer text-red-600" />
+				</button>
+				<div className="absolute bottom-[-72%] left-[3%] -translate-y-1/2">
+					<AvatarComponent
+						url={getUrlImage(avatar_url)}
+						style={clsx('size-[90px] border-[5px] border-white lg:size-[75px]')}
+					/>
+				</div>
 			</div>
-			<button
-				aria-label="deconnexion"
-				onClick={logout}
-				className="absolute right-2 top-2 flex flex-row items-center gap-x-1"
-			>
-				<span className="text-sm text-red-600">Deconnexion</span>
-				<LogOut className="cursor-pointer text-red-600" />
-			</button>
+			<div className="mb-5 ml-2 mt-2 flex flex-row flex-wrap items-start justify-between gap-2">
+				<div className="flex flex-col gap-1">
+					<div className="flex flex-row items-baseline gap-2 self-center">
+						<div className={clsx('flex flex-row items-center justify-between gap-[1px]')}>
+							<span title="Like cumulé" className="font-roboto text-xs">
+								{like.totalLikes || 0}
+							</span>
+							<span className="text-sm text-black">Votants</span>
+						</div>
+						<div title="Nombre de votes" className="flex flex-row items-center justify-center gap-[1px]">
+							<span className="font-roboto text-xs ">{like.totalVotes || 0}</span>
+							<span className="text-sm text-black">Vote</span>
+						</div>
+					</div>
+					<div className="flex items-center gap-x-1">
+						<span className="text-lg font-bold text-slate-900">{name}</span>
+						<div className="flex flex-row items-baseline">
+							<CalendarCheck size={15} className="text-blue-600" />
+							<span className="whitespace-nowrap text-xs">Inscrit {formatDate(created_at)}</span>
+						</div>
+					</div>
+					<div className="flex flex-wrap items-baseline gap-1">
+						<div className="flex flex-row items-baseline ">
+							<Mail size={15} className="text-red-600" />
+							<span className="text-[.85rem]  text-slate-600"> {email}</span>
+						</div>
+						<div className="flex flex-row items-baseline">
+							<MapPinned size={15} className="text-black" />
+							<span className="text-[.85rem] text-slate-600">{location}</span>
+						</div>
+						<div className="flex flex-row items-baseline ">
+							<Phone size={15} className="text-green-600" />
+							<span className="text-[.85rem] text-slate-600">{phone}</span>
+						</div>
+					</div>
+				</div>
+				<button
+					onClick={openDialog}
+					className="group rounded-2xl border border-black px-2 py-1 transition-colors"
+				>
+					<span className="text-center text-sm capitalize group-hover:text-primary lg:text-xs ">
+						modifier Profile
+					</span>
+					{/* <Pen size={12} className=" group-hover:text-primary" /> */}
+				</button>
+			</div>
 		</div>
 	);
 }

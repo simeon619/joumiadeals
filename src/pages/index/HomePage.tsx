@@ -1,4 +1,3 @@
-import SetAdvert from '@/components/ui/setAdvert';
 import {
 	Carousel,
 	CarouselContent,
@@ -6,11 +5,13 @@ import {
 	CarouselNext,
 	CarouselPrevious,
 } from '@/components/ui/carousel';
+import SetAdvert from '@/components/ui/setAdvert';
 import { dataSubCategorie } from '@/utils/mock/sousCatItem';
 export default function HomePage() {
 	return (
 		// <div className="flex flex-row justify-center gap-2 p-2">
 		<>
+			<div className="hd:mt-[69px]" />
 			<div className="flex flex-col  self-center py-1">
 				<div className="mt-2 flex flex-col items-center justify-center rounded-md bg-slate-200 p-2">
 					<h1 className="text-center font-poppins text-xl">Faites vos premiers revenue en vendant</h1>

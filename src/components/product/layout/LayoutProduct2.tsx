@@ -54,7 +54,7 @@ const ItemProduct = ({
 			key={product.product_id}
 			params={{ productId: product.product_id }}
 			className={clsx(
-				'group my-2 mb-8 flex max-w-[850px] flex-col border-b-[1px] border-gray-500 bg-slate-100/10 pb-5 transition-all duration-200 ease-linear hover:bg-slate-100/20'
+				'group my-2 mb-8 flex flex-col border-b-[1px] border-gray-500 bg-slate-100/10 pb-5 transition-all duration-200 ease-linear hover:bg-slate-100/20'
 			)}
 		>
 			<button
@@ -71,8 +71,6 @@ const ItemProduct = ({
 					e.preventDefault();
 					e.stopPropagation();
 				}}
-				// to={'/o_profile/announceOther'}
-				// search={{ provider_id: product.provider_id, filter: { status: 5 } }}
 				className={clsx(
 					'mb-[1px] flex flex-row items-center gap-x-2 rounded-t-lg  bg-white p-1 transition-all duration-200 ease-linear hover:border-primary hover:bg-slate-100',
 					{
@@ -88,36 +86,38 @@ const ItemProduct = ({
 				/>
 				<span className="font-poppins text-xs">{product.provider_name}</span>
 			</button>
-			<div className="flex flex-1 flex-col">
-				<div className="flex w-full flex-1 gap-2">
-					<ImgComponent photos={product.photos} title={product.title} style="w-[310px] h-[210px]">
-						<ActionFavourite productId={product.product_id} style="absolute top-1 right-1 " />
-					</ImgComponent>
+			<div className="flex w-full flex-1 gap-2 md:flex-col">
+				<ImgComponent
+					photos={product.photos}
+					title={product.title}
+					style={clsx('relative aspect-[4/3] w-[310px] sm:w-[100%]')}
+				>
+					<ActionFavourite productId={product.product_id} style="absolute top-1 right-1" />
+				</ImgComponent>
 
-					<div className="flex w-full flex-1 flex-row items-stretch justify-between gap-2 px-1 group-hover:rounded-2xl">
-						<div className="flex size-full flex-col justify-between">
-							<div className="flex flex-col gap-y-4">
-								<div className="flex flex-col gap-y-2">
-									<span className="line-clamp-1 font-roboto text-[.975rem] font-semibold text-slate-900 transition-all duration-200 ease-linear group-hover:text-primary">
-										{capitalizeFirstLetter(product.title)}
-									</span>
-									<span className="text-[.905rem] font-bold text-slate-900">
-										{formatPrice(product.price)}
-									</span>
-								</div>
-								<FeatureComponent productId={product.product_id} />
+				<div className="flex w-full flex-1 flex-row items-stretch justify-between gap-2 px-1 group-hover:rounded-2xl">
+					<div className="flex size-full flex-col justify-between">
+						<div className="flex flex-col gap-y-4">
+							<div className="flex flex-col gap-y-2">
+								<span className="line-clamp-1 font-roboto text-[.975rem] font-semibold text-slate-900 transition-all duration-200 ease-linear group-hover:text-primary md:text-[1.2rem]">
+									{capitalizeFirstLetter(product.title)}
+								</span>
+								<span className="text-[.905rem] font-bold text-slate-900">
+									{formatPrice(product.price)}
+								</span>
 							</div>
-							<div className="flex flex-row items-center gap-x-1 font-poppins">
-								<span className="px-1 text-xs font-light text-gray-900">{product.location}</span>
-								<div className="size-[3px] bg-gray-600" />
-								{product.express_time ? (
-									<></>
-								) : (
-									<span className="px-1 text-xs font-light text-gray-600">
-										{formatDate(product.product_created_at)}
-									</span>
-								)}
-							</div>
+							<FeatureComponent productId={product.product_id} />
+						</div>
+						<div className="flex flex-row items-center gap-x-1 font-poppins md:mt-3">
+							<span className="pr-1 text-xs font-light text-gray-900">{product.location}</span>
+							<div className="size-[3px] bg-gray-600" />
+							{product.express_time ? (
+								<></>
+							) : (
+								<span className="px-1 text-xs font-light text-gray-600">
+									{formatDate(product.product_created_at)}
+								</span>
+							)}
 						</div>
 					</div>
 				</div>

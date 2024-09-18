@@ -8,7 +8,7 @@ import Wrap1 from './Wrap1';
 export default function IndexLayout() {
 	useTitle(titleSite);
 	return (
-		<div className="h-dv">
+		<div className="h-fit w-screen">
 			<Header />
 			<CategoriseMenu />
 			<hr />

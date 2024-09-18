@@ -5,10 +5,9 @@ import { getProductsOptions } from '@/utils/queryOptions';
 import { useEffect, useRef } from 'react';
 
 // import FilterProduct from '@/components/product/filter/FilterProduct';
+import FilterProduct from '@/components/product/filter/FilterProduct';
 import WrapProduct from '@/components/product/WrapProduct';
 import { useSearchFilter } from '@/services/state/App/filterState';
-import clsx from 'clsx';
-import FilterProduct from '@/components/product/filter/FilterProduct';
 import { useRefDomTrigger } from '@/services/state/User/domState';
 export default function ProductsPage() {
 	const { setFilter } = useSearchFilter();
@@ -18,20 +17,21 @@ export default function ProductsPage() {
 
 	useEffect(() => {
 		setScopeTrigger(scopeTrigger);
-	  }, [setScopeTrigger]);
+	}, [setScopeTrigger]);
 
 	useEffect(() => {
 		setFilter(searchParams.filter);
 	}, [searchParams.filter]);
 
-	const styleFilter = clsx(
-		'my-2 flex items-start justify-start border-slate-300 p-2'
-	);
+	// const styleFilter = clsx(
+	// 	' '
+	// );
 
 	return (
 		<div className="relative flex flex-col self-center">
-			<FilterProduct  style={styleFilter} />
-			<div className="h-1 w-full bg-transparent" ref={scopeTrigger} />
+			<div className="hd:mt-[69px]" />
+			<FilterProduct />
+			<div aria-hidden="true" className="h-1 w-full bg-transparent" ref={scopeTrigger} />
 			<WrapProduct
 				LayoutProduct={LayoutProduct2}
 				componentRoot={productsRoot}

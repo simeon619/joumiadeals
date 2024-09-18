@@ -31,7 +31,7 @@ const CLASSES = {
 const anyWhereInCi = "Partout en Côte d'Ivoire";
 
 gsap.registerPlugin(ScrollTrigger);
-export default function FilterProduct({ style }: { style: string }) {
+export default function FilterProduct() {
 	const filterFrom = useSearchFilter((state) => state.value);
 	const [localisation, setLocalisation] = useState<string>(filterFrom.location || anyWhereInCi);
 	const navigate = useNavigate({ from: productsRoot.fullPath });
@@ -47,11 +47,11 @@ export default function FilterProduct({ style }: { style: string }) {
 			left: 0,
 			right: 0,
 			top: 25,
-			marginTop: 25,
+			marginTop: 35,
 			display: 'flex',
 			justifyItems: 'center',
 			justifyContent: 'center',
-			backgroundColor: 'rgb(255,255,255)',
+			// backgroundColor: 'rgb(255,255,250)',
 			borderBottom: '1px solid rgb(229, 231, 235)',
 			boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
 			duration: 2,
@@ -105,16 +105,15 @@ export default function FilterProduct({ style }: { style: string }) {
 		<>
 			<div
 				ref={scopeAnima}
-				className={style}
-				style={{
-					minHeight: '60px',
-					position: 'relative',
-					zIndex: 1,
-					left: 0,
-					right: 0,
-					top: 20,
-					backgroundColor: 'rgb(255,255,255)',
-				}}
+				className={'relative top-[20px] z-1 flex max-h-fit  items-start justify-start bg-white pb-2'}
+				// style={{
+				// 	minHeight: '60px',
+				// 	position: 'relative',
+				// 	zIndex: 1,
+				// 	left: 0,
+				// 	right: 0,
+				// 	top: 20,
+				// }}
 			>
 				<div className="flex items-start gap-x-2">
 					<Select name="city" onValueChange={(value) => setLocalisation(value)} value={localisation}>

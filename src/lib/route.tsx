@@ -106,7 +106,7 @@ export const registerRoot = createRoute({
 
 export const announceRoot = createRoute({
 	getParentRoute: () => myprofileRoot,
-	path: '/',
+	path: '/annonces',
 	validateSearch: (params) => RequestDataSchema.parse(params),
 	loaderDeps: ({ search: { provider_id, filter, page } }) => ({
 		provider_id,

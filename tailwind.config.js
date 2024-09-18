@@ -8,6 +8,28 @@ export const content = [
 ];
 export const prefix = '';
 export const theme = {
+	screens: {
+		xs: { max: '475px' },
+		// => @media (max-width: 475px) { ... }
+
+		sm: { max: '640px' },
+		// => @media (max-width: 640px) { ... }
+
+		md: { max: '768px' },
+		// => @media (max-width: 768px) { ... }
+
+		lg: { max: '1100px' },
+		// => @media (max-width: 1100px) { ... }
+
+		hd: { max: '990px' },
+		// => @media (max-width: 990px) { ... }
+
+		xl: { max: '1280px' },
+		// => @media (max-width: 1280px) { ... }
+
+		'2xl': { max: '1536px' },
+		// => @media (max-width: 1536px) { ... }
+	},
 	container: {
 		center: true,
 		padding: '2rem',
@@ -94,6 +116,9 @@ export const theme = {
 			16: 'repeat(16, minmax(0, 1fr))',
 			footer: '200px minmax(900px, 1fr) 100px',
 		},
+		backgroundImage: {
+			'custom-gradient': 'conic-gradient(#1e3a8a, #3b82f6, #9333ea, #f472b6, #10b981)',
+		},
 		gridColumnStart: {
 			13: '13',
 			14: '14',
@@ -157,6 +182,7 @@ export const theme = {
 		aspectRatio: {
 			'4/3': '4 / 3',
 			'16/9': '16 / 9',
+			'3/2': '3 / 2',
 		},
 	},
 };

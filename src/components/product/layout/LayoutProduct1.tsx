@@ -7,7 +7,7 @@ import ItemProductForL1 from './componentAdd/ItemProductForL1';
 
 export default function LayoutProduct1({ products }: { products: ProductsMinType }) {
 	return (
-		<div className="w-full  ">
+		<div className="w-full">
 			{products.map((product) => (
 				<ItemProductForL1 key={product.product_id} product={product} />
 			))}

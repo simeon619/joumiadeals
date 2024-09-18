@@ -18,6 +18,7 @@ const className = {
 	actionButton:
 		'flex flex-row items-center justify-center gap-1 border bg-white border-slate-100 p-1 rounded-md text-black',
 	text: 'text-xs',
+	containStyle: 'flex size-full flex-col items-start justify-between gap-4 rounded-lg bg-white',
 };
 export default function ContainAnnounceForL1({ product }: { product: ProductsMinType[0] }) {
 	const [modalState, setModalState] = useState({
@@ -29,7 +30,7 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 	const mutationStatus = useUpdateMutationproductStatus();
 	const [info, setInfo] = useState<string>('fonction non implémentée');
 	const [fn, setFn] = useState<ActionType>('ras');
-	const [p , setP] = useState<ProductsMinType[0]>();
+	const [p, setP] = useState<ProductsMinType[0]>();
 
 	const toggleModal = (modalType: keyof typeof modalState, isOpen: boolean) => {
 		setModalState({ ...modalState, [modalType]: isOpen });
@@ -40,7 +41,7 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 		mutationStatus.mutate({
 			product_id: product.product_id,
 			status: actionType,
-			comment: comment
+			comment: comment,
 		});
 		toggleModal('confirm', false);
 	};
@@ -50,7 +51,6 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 		e.stopPropagation();
 		toggleModal('popUp', true);
 		setP(product);
-
 	};
 
 	const action = (Vact: ActionType) => {
@@ -74,17 +74,19 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 	};
 	return (
 		<>
-			<div className={clsx(`flex size-full flex-col gap-2  px-2 py-1`)}>
+			<div className={clsx(`w-full px-2 py-1`)}>
 				{product.status === 'PAUSE' && (
-					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
-						<div className="flex items-start justify-between">
-							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
-								{product.title}
-							</h2>
-							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+					<div className={twMerge([className.containStyle, ''])}>
+						<div className="flex flex-col justify-between gap-3">
+							<div className="flex items-start justify-between">
+								<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+									{product.title}
+								</h2>
+								<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+							</div>
+							<FeatureComponent productId={product.product_id} nbrFeature={3} />
 						</div>
-						<FeatureComponent productId={product.product_id} nbrFeature={4} />
-						<div className={clsx('flex flex-row flex-wrap items-center justify-between')}>
+						<div className={clsx('flex w-full flex-row flex-wrap items-center justify-between')}>
 							<button
 								className={twMerge([
 									className.actionButton,
@@ -95,7 +97,6 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 									setInfo('Voulez vous republier cette annonce');
 									setFn('repost');
 									//
-
 								}}
 							>
 								<PlayCircle size={size_icon} />
@@ -128,36 +129,36 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 					</div>
 				)}
 				{product.status === 'AWAIT' && (
-					<div className="flex h-full flex-col justify-between gap-4 rounded-lg bg-white px-4">
-						<div className="flex items-start justify-between">
+					<div className={twMerge([className.containStyle, ''])}>
+						<div className="flex w-full flex-col justify-between gap-3">
 							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
 								{product.title}
 							</h2>
 							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+							<FeatureComponent productId={product.product_id} nbrFeature={3} />
 						</div>
-						<FeatureComponent productId={product.product_id} nbrFeature={3} />
-						<div className="flex flex-col gap-y-1">
-							<span
-								className={clsx(
-									'my-3 inline-block rounded-lg border-[1px]  bg-black px-2 py-1 text-center text-[.75rem] font-semibold text-yellow-400'
-								)}
-							>
-								Votre produit est en attente de validation. Il sera publié après vérification.
-							</span>
-							<span className="text-xs text-gray-500">{formatDate(product.product_created_at)}</span>
-						</div>
+						<span
+							className={clsx(
+								'my-3 inline-block rounded-lg border-[1px]  bg-black px-2 py-1 text-center text-[.75rem] font-semibold text-yellow-400'
+							)}
+						>
+							Votre produit est en attente de validation. Il sera publié après vérification.
+						</span>
+						<span className="text-xs text-gray-500">{formatDate(product.product_created_at)}</span>
 					</div>
 				)}
 				{product.status === 'VALID' && (
-					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
-						<div className="flex items-start justify-between">
-							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
-								{product.title}
-							</h2>
-							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+					<div className={twMerge([className.containStyle, ''])}>
+						<div className="flex flex-col justify-between gap-3">
+							<div className="flex flex-col items-start justify-between">
+								<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
+									{product.title}
+								</h2>
+								<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
+							</div>
+							<FeatureComponent productId={product.product_id} nbrFeature={3} />
 						</div>
-						<FeatureComponent productId={product.product_id} nbrFeature={4} />
-						<div className={clsx('flex flex-row flex-wrap items-center justify-between')}>
+						<div className={clsx('flex w-full flex-row flex-wrap items-center justify-between gap-2')}>
 							<button
 								title="Booster votre annonce"
 								className={twMerge([
@@ -214,7 +215,7 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 					</div>
 				)}
 				{(product.status === 'DELETED' || product.status === 'REJECTED') && (
-					<div className="flex h-full flex-col justify-between rounded-lg bg-white px-4">
+					<div className={twMerge([className.containStyle, ''])}>
 						<div className="flex items-start justify-between">
 							<h2 title={product.title} className="mr-5 line-clamp-2 font-bold text-stone-950">
 								{product.title}

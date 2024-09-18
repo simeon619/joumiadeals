@@ -42,7 +42,7 @@ export default function ImgComponent({
 	return (
 		<div
 			className={clsx(
-				'group relative flex aspect-4/3 flex-none justify-center rounded-md border bg-slate-400',
+				'group relative flex flex-none justify-center rounded-md border bg-slate-400',
 				style
 			)}
 			style={{

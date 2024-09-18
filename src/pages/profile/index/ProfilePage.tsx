@@ -18,10 +18,15 @@ export default function ProfilePage() {
 	const { data: like } = useSuspenseQuery(getLikeOptions({ id: provider_id, type: 'account' }));
 	const { mutate: toggleLike } = useToggleLikeMutation();
 	const backgroundImageStyle = {
-		backgroundImage: `url(${getUrlImage(account?.avatar_url)})`,
-		backgroundSize: 'cover',
-		backgroundPosition: 'center',
-		backgroundRepeat: 'no-repeat',
+		backgroundSize: '100% 100%',
+		backgroundPosition: '0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px',
+		backgroundImage: `
+		  repeating-linear-gradient(315deg, #FF00FF2E 92%, #FFA50000 100%),
+		  repeating-radial-gradient(75% 75% at 238% 218%, #FF00FF12 30%, #FFA50014 39%),
+		  radial-gradient(99% 99% at 109% 2%, #FF69B4FF 0%, #FFA50000 100%),
+		  radial-gradient(99% 99% at 21% 78%, #FF1493FF 0%, #FFA50000 100%),
+		  radial-gradient(160% 154% at 711px -303px, #8A2BE2FF 0%, #FF4500FF 100%)
+		`,
 	};
 
 	const handleLike = (value: -1 | 1) => {
@@ -31,9 +36,9 @@ export default function ProfilePage() {
 		<div className="flex w-full flex-col justify-center">
 			<div
 				style={backgroundImageStyle}
-				className="relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2 backdrop-blur-2xl"
+				className="relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2"
 			>
-				<div className="absolute inset-0 -z-10 backdrop-blur-xl backdrop-brightness-50" />
+				<div className="absolute inset-0 -z-10" />
 				<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
 					<AvatarComponent name="5" url={getUrlImage(account.avatar_url)} style="size-[50px]" />
 					<div className="flex flex-row items-baseline gap-2">

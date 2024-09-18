@@ -11,6 +11,7 @@
 	src: url('/fonts/BebasNeue-Regular.ttf');
 } */
 
+
 @font-face {
 	font-family: 'Poppins';
 	src: url('/fonts/Poppins-Regular.ttf');
@@ -32,6 +33,11 @@
 
 #root {
 	font-family: Poppins, sans-serif;
+	scroll-behavior: smooth;
+	scroll-padding-top: 5rem;
+	
+	font-family: Poppins, sans-serif;
+	font-size: 16px;
 }
 /* @font-face {
   font-family: "Roboto";
