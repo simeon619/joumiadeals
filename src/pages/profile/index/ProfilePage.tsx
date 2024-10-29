@@ -33,64 +33,54 @@ export default function ProfilePage() {
 		toggleLike({ id: provider_id, type: 'account', value });
 	};
 	return (
-		<div className="flex w-full flex-col justify-center">
+		<div className="flex w-full flex-col justify-center px-6">
 			<div
 				style={backgroundImageStyle}
-				className="relative mt-16 flex items-start justify-start gap-14 overflow-hidden rounded-md border p-2"
+				className="relative mb-[10px] mt-16  flex h-[80px] items-start justify-start gap-14 rounded-md border p-2"
 			>
-				<div className="absolute inset-0 -z-10" />
-				<div className="mb-3 flex flex-row items-stretch justify-center gap-3 text-white">
-					<AvatarComponent name="5" url={getUrlImage(account.avatar_url)} style="size-[50px]" />
-					<div className="flex flex-row items-baseline gap-2">
-						<div className="flex flex-col gap-1">
-							<span className="text-xs font-bold">{account?.name}</span>
-							<div
-								className={clsx(
-									'flex flex-row items-center justify-between gap-5 rounded-lg border-2 bg-black/50 px-2 py-1 text-white shadow-lg',
-									{
-										'border-blue-400/40': like.mylike === 1,
-										'border-red-400/40': like.mylike === -1,
-										'border-gray-600/40': like.mylike === 0,
-									}
-								)}
-							>
-								<ThumbsUp
-									size={18}
-									strokeWidth={1.8}
-									className={clsx('cursor-pointer hover:text-blue-400', {
-										'text-blue-900': like.mylike === 1,
-									})}
-									onClick={() => handleLike(1)}
-								/>
-								<span className="font-roboto text-xs text-white">{like.totalLikes || 0}</span>
-								<ThumbsDown
-									size={18}
-									strokeWidth={1.8}
-									className={clsx('cursor-pointer hover:text-red-400', {
-										'text-red-900': like.mylike === -1,
-									})}
-									onClick={() => handleLike(-1)}
-								/>
-								<div className="flex flex-row items-center justify-center gap-x-[1px] rounded-full bg-primary/20 px-2 py-1">
-									<Users size={14} strokeWidth={1.8} className="text-primary" />
-									<span className="font-roboto text-xs text-primary">{like.totalVotes || 0}</span>
-								</div>
-							</div>
-						</div>
+				{/* <div className="absolute inset-0 -z-10" /> */}
+				<AvatarComponent
+					name="5"
+					url={getUrlImage(account.avatar_url)}
+					style="size-[50px] absolute bottom-[5px]"
+				/>
+				<div
+					className={clsx(
+						' absolute bottom-1 right-1 flex flex-row items-center justify-between gap-3 rounded-md border bg-slate-800/50  px-2 py-1 text-white shadow-md transition-all duration-300 hover:shadow-xl',
+						{
+							'border-blue-500': like.mylike === 1,
+							'border-red-500': like.mylike === -1,
+							'border-gray-600': like.mylike === 0,
+						}
+					)}
+				>
+					<ThumbsUp
+						size={20}
+						strokeWidth={2}
+						className={clsx(
+							'cursor-pointer transition-transform duration-200 hover:scale-110 hover:text-blue-500',
+							{
+								'text-blue-600': like.mylike === 1,
+							}
+						)}
+						onClick={() => handleLike(1)}
+					/>
+					<span className="font-roboto text-sm font-semibold text-gray-200">{like.totalLikes || 0}</span>
+					<ThumbsDown
+						size={20}
+						strokeWidth={2}
+						className={clsx(
+							'cursor-pointer transition-transform duration-200 hover:scale-110 hover:text-red-500',
+							{
+								'text-red-600': like.mylike === -1,
+							}
+						)}
+						onClick={() => handleLike(-1)}
+					/>
+					<div className="flex flex-row items-center justify-center gap-2 rounded-full bg-primary/10 px-3 py-1">
+						<Users size={16} strokeWidth={2} className="text-primary" />
+						<span className="font-roboto text-sm text-gray-300">{like.totalVotes || 0}</span>
 					</div>
-				</div>
-				<div className="flex flex-col items-center justify-center gap-3 self-center">
-					<div className="flex flex-row items-center justify-center gap-x-4">
-						<div className="flex flex-row items-center justify-center gap-x-1">
-							<MapPinned size={20} className="text-primary" />
-							<span className="text-sm text-primary">{account?.location}</span>
-						</div>
-						<div className="flex flex-row items-center justify-center gap-x-1">
-							<PhoneCall size={20} className="text-slate-100" />
-							<span className="text-sm text-slate-100">{account?.phone}</span>
-						</div>
-					</div>
-					<span className="text-xs text-gray-400">Inscrit {formatDate(account.created_at)}</span>
 				</div>
 				<Popover>
 					<PopoverTrigger asChild>
@@ -106,7 +96,25 @@ export default function ProfilePage() {
 					</PopoverContent>
 				</Popover>
 			</div>
-			<div className="my-2 inline-flex gap-x-5 self-start rounded-lg border bg-slate-100 p-1">
+			<div className=" mb-8 flex w-full flex-wrap justify-between">
+				<div>
+					<span className="text-xs font-bold">{account?.name}</span>
+				</div>
+				<div className=" flex flex-col items-center justify-center gap-1 self-center">
+					<div className="flex flex-wrap items-center justify-center gap-x-4">
+						<div className="flex flex-row items-center justify-center gap-x-1">
+							<MapPinned size={15} className="text-primary" />
+							<span className="text-sm text-primary">{account?.location}</span>
+						</div>
+						<div className="flex flex-row items-center justify-center gap-x-1">
+							<PhoneCall size={14} className="" />
+							<span className="text-sm ">{account?.phone}</span>
+						</div>
+					</div>
+					<span className="text-xs text-gray-400">Inscrit {formatDate(account.created_at)}</span>
+				</div>
+			</div>
+			<div className="mb-2 inline-flex gap-x-5 self-start rounded-lg border bg-slate-100 p-1">
 				{(
 					[
 						[productsOtherRoot.to, 'les produits', false, account?.id],
@@ -145,7 +153,6 @@ export default function ProfilePage() {
 					);
 				})}
 			</div>
-
 			<hr />
 			<Outlet />
 		</div>

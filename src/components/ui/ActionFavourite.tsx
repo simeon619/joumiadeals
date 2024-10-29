@@ -14,9 +14,11 @@ import { twMerge } from 'tailwind-merge';
 export default function ActionFavourite({
 	productId,
 	style,
+	size = 18
 }: {
 	productId: string;
 	style?: string;
+	size?: number
 }) {
 	const deleteProductFavourite = useDeleteProductFavouriteMutation();
 	const { data: favouriteIds } = useSuspenseQuery(getAllFavouriteProductIds());
@@ -53,7 +55,7 @@ export default function ActionFavourite({
 				isFavourite ? fnDeleteFavourite(e) : fnAddFavourite(e);
 			}}
 		>
-			<Heart size={18} fill={isFavourite ? 'red' : 'white'} color={isFavourite ? 'red' : 'gray'} />
+			<Heart size={size} fill={isFavourite ? 'red' : 'white'} color={isFavourite ? 'red' : 'gray'} />
 		</button>
 	);
 }

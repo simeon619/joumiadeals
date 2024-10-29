@@ -18,7 +18,7 @@ export default function HomePage() {
 					<SetAdvert />
 				</div>
 				<div className="mt-6 flex flex-col items-center justify-center">
-					<div className="flex flex-col items-center justify-center">
+					{/* <div className="flex flex-col items-center justify-center">
 						<Carousel
 							opts={{
 								align: 'center',
@@ -57,7 +57,7 @@ export default function HomePage() {
 								Voir toutes les annonces &gt;&gt;&gt;
 							</span>
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</>

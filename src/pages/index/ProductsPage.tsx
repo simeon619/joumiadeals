@@ -28,7 +28,7 @@ export default function ProductsPage() {
 	// );
 
 	return (
-		<div className="relative flex flex-col self-center">
+		<div className="relative flex flex-col self-center px-3 ">
 			<div className="hd:mt-[69px]" />
 			<FilterProduct />
 			<div aria-hidden="true" className="h-1 w-full bg-transparent" ref={scopeTrigger} />

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import DisplayForumMessage from '@/components/message/DisplayForumMessage';
 import AvatarComponent from '@/components/ui/AvatarComponent';
-import ImagePagination from '@/components/ui/ImagePagination';
+import PopUpComponent from '@/components/ui/PopUpComponent';
 import { noticesAccountRoot } from '@/lib/route';
 import { formatPrice, getUrlImage } from '@/lib/utils';
 import { DiscussionSchemaType } from '@/services/api/discussions';
@@ -14,8 +14,10 @@ import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { ArrowDownNarrowWide, ArrowUpNarrowWide, Search } from 'lucide-react';
-import { useDeferredValue, useEffect, useRef, useState } from 'react';
+import { Key, useDeferredValue, useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
+import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 type ModifiedDiscussionSchemaType = Omit<DiscussionSchemaType, 'client' | 'provider'>;
 // type DiscussionType = ModifiedDiscussionSchemaType['account'] &
 // 	ModifiedDiscussionSchemaType['product'] & {
@@ -26,6 +28,7 @@ export default function AvisPage() {
 	const searchParams = noticesAccountRoot.useSearch();
 	const [sort, setSort] = useState<'created_at' | 'price'>('created_at');
 	const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+	const [showMenu, setShowMenu] = useState(false);
 	const [element, setElement] = useState<ModifiedDiscussionSchemaType>();
 	const { data: discussions, isLoading } = useSuspenseQuery(
 		getDiscussionsQueryOptions(searchParams)
@@ -91,7 +94,15 @@ export default function AvisPage() {
 		500,
 		[text]
 	);
-	// Ajoutez ces fonctions pour gérer les événements de clic
+
+	const handleClose = () => {
+		setShowMenu(false);
+		document.body.style.overflow = 'auto';
+	};
+	const handleOpen = () => {
+		setShowMenu(true);
+		document.body.style.overflow = 'hidden';
+	};
 	const handleDiscussionClick = (produit: any, discussion_id: number) => {
 		setElement({ ...produit, discussion_id });
 	};
@@ -100,89 +111,106 @@ export default function AvisPage() {
 		return <div>Loading...</div>;
 	}
 	return (
-		<div className="mt-2 w-full">
-			<div className="flex w-full flex-row gap-2">
-				<div className="sticky top-16 flex h-[60vh] w-[200px]  flex-col items-stretch gap-2 overflow-y-auto ">
-					<div className="flex flex-row gap-x-2 rounded-md bg-slate-100 p-2">
-						<Search size={18} className="text-gray-500" />
-						<input
-							placeholder="Rechercher discussion"
-							className="w-full truncate border-none bg-transparent text-xs text-gray-500 outline-none focus:ring-0"
-							onChange={(e) => setText(e.target.value)}
-						/>
-					</div>
-					<button
-						onClick={() => {
-							handleDiscussionClick(acc.account, acc.id);
-						}}
-						className="flex flex-row gap-x-2"
-					>
-						<div className="flex w-full flex-row items-start justify-start gap-2 border-b border-gray-200  p-2 shadow-md shadow-slate-100">
-							<img src={getUrlImage(acc.account?.avatarUrl)} alt="" className="size-[30px] rounded-lg" />
-							<div className="flex flex-col items-start gap-y-1">
-								<span className="text-xs font-bold">{acc.account?.name}</span>
-								<span className="text-xs text-gray-500">{acc.account?.location}</span>
-							</div>
+		<div className="relative mt-2 w-full">
+			<button
+				onClick={() => {
+					handleOpen();
+				}}
+				className="sticky top-8 z-5 mt-8 rounded-lg bg-black p-2 font-roboto text-xs text-white"
+			>
+				ouvrir discussions
+			</button>
+			<div className="relative flex w-full flex-row gap-2">
+				<div className="w-full">{<DiscussionDetail discussion={element} />}</div>
+				<PopUpComponent
+					isOpen={showMenu}
+					setHide={handleClose}
+					styleContainer={'flex w-full'}
+					position="center"
+					animationName="zoom"
+					zIndex={99}
+				>
+					<div className=" mt-5 flex  max-w-[280px] flex-col  items-stretch gap-2 overflow-y-auto rounded-lg bg-white p-2">
+						<div className="flex flex-row gap-x-2 rounded-md bg-slate-100 p-2">
+							<Search size={18} className="text-gray-500" />
+							<input
+								placeholder="Rechercher discussion"
+								className="w-full truncate border-none bg-transparent text-xs text-gray-500 outline-none focus:ring-0"
+								onChange={(e) => setText(e.target.value)}
+							/>
 						</div>
-					</button>
-					<h1 className="font-poppins text-[.75rem]">
-						{totalProduct} Discusion{totalProduct > 1 ? 's' : ''}{' '}
-					</h1>
-					<div className="flex flex-row items-center p-1">
-						<span className="mx-1 text-[.68rem] font-bold text-gray-500">Trier par</span>
-						<select
-							className="rounded-md border-none bg-gray-100 px-1 text-xs text-gray-500 outline-none focus:ring-0"
-							onChange={(e) => setSort(e.target.value as 'created_at' | 'price')}
-							value={sort}
-						>
-							<option value="created_at">Date</option>
-							<option value="price">Prix</option>
-						</select>
-						<motion.button
-							whileHover={{ scale: 1.1, rotate: 0, transition: { duration: 0.9 } }}
-							whileTap={{ scale: 0.9, rotate: 90, transition: { duration: 0.9 } }}
-							className="mx-1 text-xs font-bold text-gray-500 outline-none focus:ring-0"
-							onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-						>
-							{order === 'asc' && <ArrowDownNarrowWide size={16} className="text-gray-500" />}
-							{order === 'desc' && <ArrowUpNarrowWide size={16} className="text-gray-500" />}
-						</motion.button>
-					</div>
-					{deferredValue.map((discussion) => (
 						<button
-							key={discussion.discussion_id}
 							onClick={() => {
-								const data = discussion['product'] || discussion['account'];
-								handleDiscussionClick(data, discussion.discussion_id);
+								handleDiscussionClick(acc.account, acc.id);
 							}}
 							className="flex flex-row gap-x-2"
 						>
-							{discussion.product && (
-								<div
-									className={clsx(
-										'flex w-full flex-row items-center gap-2 rounded-md border border-gray-200 p-1 pb-2 shadow-2xl shadow-slate-100',
-										{ 'bg-gray-100 ': discussion.discussion_id === element?.discussion_id },
-										{ 'bg-white ': discussion.discussion_id !== element?.discussion_id }
-									)}
-								>
-									<img
-										src={URL_IMAGE + discussion.product?.photos[0]}
-										alt=""
-										className="size-[40px] rounded-lg"
-									/>
-									<div className="flex flex-col items-start gap-y-1 truncate">
-										<span className=" text-xs font-bold">{discussion.product?.title}</span>
-										<span className="text-xs text-gray-500">{formatPrice(discussion.product?.price)}</span>
-										<span className="rounded-md text-[.68rem] text-gray-500">
-											{formatDate(discussion.product?.createdAt)}
-										</span>
-									</div>
+							<div className="flex w-full flex-row items-start justify-start gap-2 border-b border-gray-200  p-2 shadow-md shadow-slate-100">
+								<img src={getUrlImage(acc.account?.avatarUrl)} alt="" className="size-[30px] rounded-lg" />
+								<div className="flex flex-col items-start gap-y-1">
+									<span className="text-xs font-bold">{acc.account?.name}</span>
+									<span className="text-xs text-gray-500">{acc.account?.location}</span>
 								</div>
-							)}
+							</div>
 						</button>
-					))}
-				</div>
-				<div className="w-full">{<DiscussionDetail discussion={element} />}</div>
+						<h1 className="font-poppins text-[.75rem]">
+							{totalProduct} Discusion{totalProduct > 1 ? 's' : ''}{' '}
+						</h1>
+						<div className="flex flex-row items-center p-1">
+							<span className="mx-1 text-[.68rem] font-bold text-gray-500">Trier par</span>
+							<select
+								className="rounded-md border-none bg-gray-100 px-1 text-xs text-gray-500 outline-none focus:ring-0"
+								onChange={(e) => setSort(e.target.value as 'created_at' | 'price')}
+								value={sort}
+							>
+								<option value="created_at">Date</option>
+								<option value="price">Prix</option>
+							</select>
+							<motion.button
+								whileHover={{ scale: 1.1, rotate: 0, transition: { duration: 0.9 } }}
+								whileTap={{ scale: 0.9, rotate: 90, transition: { duration: 0.9 } }}
+								className="mx-1 text-xs font-bold text-gray-500 outline-none focus:ring-0"
+								onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+							>
+								{order === 'asc' && <ArrowDownNarrowWide size={16} className="text-gray-500" />}
+								{order === 'desc' && <ArrowUpNarrowWide size={16} className="text-gray-500" />}
+							</motion.button>
+						</div>
+						{deferredValue.map((discussion) => (
+							<button
+								key={discussion.discussion_id}
+								onClick={() => {
+									const data = discussion['product'] || discussion['account'];
+									handleDiscussionClick(data, discussion.discussion_id);
+								}}
+								className="flex flex-row gap-x-2"
+							>
+								{discussion.product && (
+									<div
+										className={clsx(
+											'flex w-full flex-row items-center gap-2 rounded-md border border-gray-200 p-1 pb-2 shadow-2xl shadow-slate-100',
+											{ 'bg-gray-100 ': discussion.discussion_id === element?.discussion_id },
+											{ 'bg-white ': discussion.discussion_id !== element?.discussion_id }
+										)}
+									>
+										<img
+											src={URL_IMAGE + discussion.product?.photos[0]}
+											alt=""
+											className="size-[40px] rounded-lg"
+										/>
+										<div className="flex flex-col items-start gap-y-1 truncate">
+											<span className=" text-xs font-bold">{discussion.product?.title}</span>
+											<span className="text-xs text-gray-500">{formatPrice(discussion.product?.price)}</span>
+											<span className="rounded-md text-[.68rem] text-gray-500">
+												{formatDate(discussion.product?.createdAt)}
+											</span>
+										</div>
+									</div>
+								)}
+							</button>
+						))}
+					</div>
+				</PopUpComponent>
 			</div>
 		</div>
 	);
@@ -209,18 +237,51 @@ const DiscussionDetail = ({ discussion }: { discussion: any }) => {
 		return (
 			<div className="w-full text-center text-sm text-gray-500">Aucune discussion sélectionnée...</div>
 		);
-	console.log(discussion?.avatarUrl);
 
 	return (
 		<div className="flex w-full flex-col gap-y-2">
 			<div className={clsx({})}>
 				{discussion?.title && (
-					<div className="flex w-full flex-row items-start justify-start gap-2 border p-2 shadow-md shadow-slate-100">
-						{/* <img src={URL_IMAGE + discussion?.photos[0]} alt="" className="size-[30px] rounded-lg" /> */}
-						<ImagePagination
-							photos={discussion?.photos || []}
-							style={{ imageStyle: 'w-[400px] h-[200px] object-cover' }}
-						/>
+					<div className="flex w-full flex-col items-start justify-start gap-2 border p-2 shadow-md shadow-slate-100">
+						<Swiper
+							modules={[Navigation, Pagination, Scrollbar, A11y]}
+							style={{
+								//@ts-expect-error ddts
+								'--swiper-navigation-size': '20px',
+								//@ts-expect-error ddts
+								'--swiper-navigation-color': '#fff',
+								//@ts-expect-error ddts
+								'--swiper-pagination-color': '#728',
+							}}
+							zoom={true}
+							lazy={true}
+							// mousewheel={true}
+							slidesPerView={1}
+							spaceBetween={30}
+							preventClicksPropagation={true}
+							preventClicks={true}
+							// spaceBetween={12}
+							pagination={{ clickable: true, dynamicBullets: true }}
+							scrollbar={{ draggable: true }}
+							className="relative"
+						>
+							{discussion?.photos.map((i: any, index: Key | null | undefined) => (
+								<SwiperSlide key={index}>
+									<img
+										src={`${URL_IMAGE}${i}`}
+										alt={discussion?.title}
+										className={clsx(
+											`aspect-3/2 max-w-[300px] rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`
+										)}
+										loading="lazy"
+										onError={(e) => {
+											e.currentTarget.src = '/img/imgError.png';
+										}}
+									/>
+									<div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+								</SwiperSlide>
+							))}
+						</Swiper>
 						<div className="flex w-full flex-col items-start gap-2 border-b border-gray-200 p-2 shadow-slate-100">
 							<span className="text-[.95rem] font-bold">{discussion?.title}</span>
 							<span className="text-[.80rem] text-gray-500">{formatPrice(discussion?.price)}</span>
@@ -241,7 +302,11 @@ const DiscussionDetail = ({ discussion }: { discussion: any }) => {
 				)}
 			</div>
 			<div className="flex size-full flex-row items-start justify-start gap-2 border-b border-gray-200 p-1 shadow-xl shadow-slate-100">
-				<AvatarComponent style="size-[35px]" url={getUrlImage(InfoUser?.avatar_url)} name={InfoUser?.name} />
+				<AvatarComponent
+					style="size-[35px]"
+					url={getUrlImage(InfoUser?.avatar_url)}
+					name={InfoUser?.name}
+				/>
 				<textarea
 					placeholder="Ajouter un message..."
 					ref={textareaRef}

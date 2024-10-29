@@ -7,7 +7,7 @@ import ImgComponent from './componentAdd/ImgComponent';
 
 export default function LayoutMini({ products }: { products: ProductsMinType }) {
 	return (
-		<div className="flex flex-row flex-wrap items-center justify-center gap-x-14  overflow-x-auto">
+		<div className="flex flex-row flex-wrap items-center justify-center gap-x-2">
 			{products.map((product) => {
 				return (
 					<Link
@@ -27,11 +27,9 @@ export default function LayoutMini({ products }: { products: ProductsMinType }) 
 								productId={product.product_id}
 								style="flex flex-row items-center justify-center gap-1 text-white"
 							/>
-
 							<div className="mt-5 flex flex-col gap-y-1">
 								<span className="text-xs text-slate-900">{product.location}</span>
 								<span className="text-xs font-bold text-slate-500">
-									{' '}
 									{formatDate(product.product_created_at)}
 								</span>
 							</div>

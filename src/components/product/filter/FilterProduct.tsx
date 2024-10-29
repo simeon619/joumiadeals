@@ -17,14 +17,14 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPinned, SlidersHorizontal } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PopUpFilter } from './PopUpFilter';
+import PopUpFilter from './PopUpFilter';
 
 const CLASSES = {
 	titleFilter: 'block py-1 text-sm font-medium text-slate-700',
 	priceButton:
-		'flex rounded-xl border border-slate-400 max-w-[240px] bg-white py-2 px-2 text-slate-700 shadow-sm placeholder:text-slate-500 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
+		'flex rounded-xl border text-sm border-slate-400 bg-white p-[6px] xs:px-[12px] xs:py-[8px] text-slate-700 shadow-sm placeholder:text-slate-500 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm',
 	selectTrigger:
-		'flex h-10 rounded-xl border-slate-400 bg-white px-4 text-slate-700 shadow-sm placeholder:text-slate-500 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary',
+		'flex rounded-xl text-sm border-slate-400 bg-white px-2 text-slate-700 shadow-sm placeholder:text-slate-500 hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary',
 	selectItem: 'font-poppins text-slate-700 focus:bg-primary',
 };
 
@@ -43,27 +43,26 @@ export default function FilterProduct() {
 		if (!scopeAnima.current || !scopeTrigger) return;
 		const animation = gsap.to(scopeAnima.current, {
 			position: 'fixed',
-			zIndex: 50,
+			zIndex: 40,
 			left: 0,
 			right: 0,
 			top: 25,
-			marginTop: 35,
+			marginTop: 28,
 			display: 'flex',
-			justifyItems: 'center',
 			justifyContent: 'center',
-			// backgroundColor: 'rgb(255,255,250)',
 			borderBottom: '1px solid rgb(229, 231, 235)',
 			boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-			duration: 2,
-			ease: 'elastic.inOut',
+			duration: 2, // Durée de l'animation en secondes
+			ease: 'elastic.inOut', // Effet d'animation
 			scrollTrigger: {
 				trigger: scopeTrigger.current,
 				start: 'top top',
 				end: 'bottom top',
 				toggleActions: 'play reverse play reverse',
-				scrub: true,
+				scrub: true, // Active le "scrub" pour une animation fluide basée sur le scroll
 			},
 		});
+
 		return () => {
 			if (animation.scrollTrigger) {
 				animation.scrollTrigger.kill();
@@ -105,21 +104,13 @@ export default function FilterProduct() {
 		<>
 			<div
 				ref={scopeAnima}
-				className={'relative top-[20px] z-1 flex max-h-fit  items-start justify-start bg-white pb-2'}
-				// style={{
-				// 	minHeight: '60px',
-				// 	position: 'relative',
-				// 	zIndex: 1,
-				// 	left: 0,
-				// 	right: 0,
-				// 	top: 20,
-				// }}
+				className={'relative top-[20px] z-1 flex max-h-fit  items-start justify-start bg-white py-2'}
 			>
-				<div className="flex items-start gap-x-2">
+				<div className="flex  items-center justify-center gap-2">
 					<Select name="city" onValueChange={(value) => setLocalisation(value)} value={localisation}>
 						<SelectTrigger className={CLASSES.selectTrigger}>
-							<MapPinned size={18} className="mx-1 text-slate-600" />
-							<SelectValue placeholder={cities[0]} />
+							<MapPinned size={18} className="mr-1 text-slate-600" />
+							<SelectValue className="text-xs" placeholder={cities[0]} />
 						</SelectTrigger>
 						<SelectContent className="bg-white">
 							{cityFilter.map((value) => (
@@ -134,7 +125,7 @@ export default function FilterProduct() {
 						className={clsx(CLASSES.priceButton, 'flex items-center justify-center gap-1')}
 					>
 						<SlidersHorizontal size={15} className="text-slate-700" />
-						<span className="text-slate-700">Filtres</span>
+						<span className="text-slate-700 xs:hidden ">Filtres</span>
 					</button>
 				</div>
 			</div>

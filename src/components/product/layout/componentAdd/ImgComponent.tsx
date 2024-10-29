@@ -2,6 +2,16 @@ import { URL_IMAGE } from '@/utils/constante';
 import clsx from 'clsx';
 import { ReactNode, useEffect, useState } from 'react';
 
+import { A11y, Autoplay, Navigation, Pagination, Scrollbar } from 'swiper/modules';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+
 export default function ImgComponent({
 	photos,
 	title,
@@ -62,50 +72,43 @@ export default function ImgComponent({
 					></div>
 				</div>
 			)}
-			<img
-				src={`${URL_IMAGE}${photos[currentImageIndex]}`}
-				alt={title}
-				className={clsx(
-					` size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`,
-					{
-						'blur-[4px]': isLoading,
-						'blur-none	': !isLoading,
-					}
-				)}
-				loading="lazy"
-				onLoad={handleImageLoad}
-				onError={(e) => {
-					e.currentTarget.src = '/img/imgError.png';
+			<Swiper
+				modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
+				spaceBetween={12}
+				pagination={{ clickable: true, dynamicBullets: true }}
+				scrollbar={{ draggable: true }}
+				preventClicksPropagation={true}
+				mousewheel={true}
+				className="relative size-full"
+				autoplay={{
+					delay: 6500,
+					disableOnInteraction: false,
+					pauseOnMouseEnter: true,
+					reverseDirection: true,
 				}}
-			/>
-			<div
-				className={clsx('absolute inset-x-0 bottom-[-10px] flex justify-center', {
-					hidden: photos.length <= 1,
-				})}
 			>
-				{photos.map((_, index) => (
-					<button
-						key={index}
-						className={`mx-1 size-2 rounded-full p-1 hover:bg-black ${currentImageIndex === index ? 'bg-primary' : 'bg-black'}`}
-						onMouseOver={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							handleImageChange(index);
-						}}
-						onFocus={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							handleImageChange(index);
-						}}
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							handleImageChange(index);
-						}}
-					/>
+				{photos.map((i, index) => (
+					<SwiperSlide key={index}>
+						<img
+							src={`${URL_IMAGE}${i}`}
+							alt={title}
+							className={clsx(
+								` size-full rounded-md bg-cover bg-center bg-no-repeat object-cover transition-all duration-500`,
+								{
+									'blur-[4px]': isLoading,
+									'blur-none': !isLoading,
+								}
+							)}
+							loading="lazy"
+							onLoad={handleImageLoad}
+							onError={(e) => {
+								e.currentTarget.src = '/img/imgError.png';
+							}}
+						/>
+						{children}
+					</SwiperSlide>
 				))}
-			</div>
-			{children}
+			</Swiper>
 		</div>
 	);
 }

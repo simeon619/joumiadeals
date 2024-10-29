@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
 
+
+export const MenuCat: MenuCatType = {};
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -58,8 +60,8 @@ export function getAsyncUrlImage(url?: string | null | undefined): Promise<strin
 	  };
 	});
   }
-  export function getUrlImage(url?: string | null | undefined): string {
-	if (!url) return '/img/default-avatar.png';
+  export function getUrlImage(url?: string | null | undefined , type : 'product' | 'avatar' = 'product'): string {
+	if (!url) return type === 'avatar' ? '/img/default-avatar.png' : '/img/imgError.png';
 	const reslt = url.startsWith('http') ? url : URL_IMAGE + url;
 	return reslt;
   }
@@ -259,74 +261,6 @@ export const handleConnect = (e: any) => {
 		`toolbar=yes,scrollbars=yes,resizable=yes,top=${windowTop},left=${windowLeft},width=${windowWidth},height=${windowHeight}`
 	);
 };
-
-export function ToastError(message: string) {
-	toast.error(message, {
-		position: 'top-center',
-		style: {
-			border: '1px solid #7f1d1d',
-			padding: '16px',
-			backgroundColor: '#ef4444',
-			color: '#fff',
-		},
-	});
-}
-
-export function ToastSuccess(message: string) {
-	toast.success(message, {
-		position: 'top-center',
-		style: {
-			border: '1px solid #713200',
-
-			padding: '16px',
-			color: '#713200',
-		},
-	});
-}
-export function ToastLoading(message: string, myPromise: Promise<any>) {
-	toast.promise(
-		myPromise,
-		{
-			loading: 'Loading',
-			success: message,
-			error: 'Error when fetching',
-		},
-		{
-			style: {
-				minWidth: '250px',
-			},
-			success: {
-				duration: 5000,
-				icon: '🔥',
-			},
-			error: {
-				duration: 5000,
-				icon: '',
-			},
-		}
-	);
-}
-export function ToastWarn(message: string) {
-	toast.error(message, {
-		position: 'top-center',
-		style: {
-			border: '1px solid #713200',
-			padding: '16px',
-			color: '#713200',
-		},
-	});
-}
-
-export function ToastInfo(message: string) {
-	toast.success(message, {
-		position: 'top-center',
-		style: {
-			border: '1px solid #713200',
-			padding: '16px',
-			color: '#713200',
-		},
-	});
-}
 
 export function formatPrice(price: number): string {
 	return price.toLocaleString('fr-FR', {

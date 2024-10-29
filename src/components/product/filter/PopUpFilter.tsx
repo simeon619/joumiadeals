@@ -15,8 +15,8 @@ import { getAllChildCategoriesOptions, getAllfeaturesOptions } from '@/utils/que
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import clsx from 'clsx';
-import { ArrowLeftFromLine, ChevronRight, Search } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeftFromLine, ChevronRight, Layers3, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
 import { z } from 'zod';
 import FeatureComponentCheck from './component/FeatureComponentCheck';
@@ -90,21 +90,18 @@ const removeEmptyArrays = (obj: Record<string, Array<string> | string>) => {
 			{} as Record<string, Array<string> | string>
 		);
 };
-export const PopUpFilter = memo(function PopUpFilter({
-	setShowPopup,
-}: {
-	setShowPopup: () => void;
-}) {
+export default function PopUpFilter({ setShowPopup }: { setShowPopup: () => void }) {
 	const { value } = useShowPopupFilter((state) => state);
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
 	const { data: categories } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const [fieldCharac, setFieldCharac] = useState<f_form_type[]>([]);
 	const [detailFilt, setDetailFilt] = useState<string>('');
-	const [parent_cat, setParent_cat] = useState<CatCreateType>();
+	const [parent_cat, setParent_cat] = useState<CatCreateType | undefined>(undefined);
 	const [showSearchCat, setShowSearchCat] = useState(false);
 	const [stepC, setStepC] = useState<string[]>([]);
 	const [result_cat, setResult_cat] = useState<CatCreateType[]>([]);
 	const filterFrom = useSearchFilter((state) => state.value);
+	const setFilt = useSearchFilter((state) => state.setFilter);
 	const firstMount = useRef<boolean>(false);
 
 	const [storeFilter, setStoreFilter] = useState<Record<string, string | Array<string>>>({});
@@ -172,12 +169,15 @@ export const PopUpFilter = memo(function PopUpFilter({
 					});
 				}
 				if (newFilter && Object.keys(newFilter).length > 0) {
+					const filteredFeatures = Object.fromEntries(
+						Object.entries(newFilter).filter(([key, value]) => value !== undefined)
+					);
 					navigate({
-						search: (old) => ({
+						search: (old :any) => ({
 							...old,
 							filter: {
 								...old.filter,
-								features: newFilter,
+								features: filteredFeatures,
 							},
 						}),
 						replace: true,
@@ -233,7 +233,7 @@ export const PopUpFilter = memo(function PopUpFilter({
 				}
 			});
 
-			setStoreFilter(obj);
+			setStoreFilter(obj as Record<string, string | string[]>);
 		};
 		if (!firstMount.current) bh();
 		const id = filterFrom.category_id;
@@ -249,7 +249,11 @@ export const PopUpFilter = memo(function PopUpFilter({
 		const result_cat = get_children(categoryId || null, categories);
 		setResult_cat(result_cat);
 		const parent_cat = getCategorieById(categoryId || null, categories);
-		setParent_cat(parent_cat);
+		if (parent_cat && parent_cat.id !== null) {
+			setParent_cat(parent_cat);
+		} else {
+			setParent_cat(undefined); // or some other default value
+		}
 		setStepC((prev) => {
 			let newState = [...prev];
 			const parentId = parent_cat?.id || '';
@@ -289,6 +293,17 @@ export const PopUpFilter = memo(function PopUpFilter({
 		setStepC([]);
 	};
 
+	const resetFeature = () => {
+		navigate({
+			search: (old) => {
+				return {
+					filter: { status: 5, category_id: 'all', order_by: 'date_desc' },
+					page: old?.page || 1,
+				};
+			},
+		});
+	};
+
 	const handleFilterStore = ({
 		name,
 		value,
@@ -300,8 +315,6 @@ export const PopUpFilter = memo(function PopUpFilter({
 		feature_id: string;
 		collect_type: f_form_type['collect_type'];
 	}) => {
-		console.log('5 ');
-
 		setStoreFilter((prev) => {
 			const newState = { ...prev };
 			if (collect_type === 'radio' && typeof value === 'string') {
@@ -342,22 +355,23 @@ export const PopUpFilter = memo(function PopUpFilter({
 
 	return (
 		<PopUpComponent
-			animationName="translateTop"
+			animationName="translateRight"
 			isOpen={value}
 			styleContainer={'flex w-full'}
 			setHide={setShowPopup}
 			position="end"
+			zIndex={65}
 		>
-			<div className="right-0 max-h-[100vh] min-w-[430px] max-w-[430px] overflow-hidden bg-white shadow-2xl ">
+			<div className="right-0 grid w-[380px] grid-rows-[50px_1fr_30px]  overflow-hidden bg-white shadow-2xl xs:w-full ">
 				<div
 					className={clsx(
-						'flex h-[5vh] w-full items-center justify-between border-b-[1px] border-slate-300 py-2 pl-8  pr-4'
+						'flex w-full items-center justify-between border-b-[1px] border-red-300 py-2 pl-8 pr-4'
 					)}
 				>
 					<div
 						className={clsx(
 							{ hidden: !detailFilt, flex: detailFilt },
-							' w-full items-center justify-between '
+							'w-full items-center justify-between'
 						)}
 					>
 						<ArrowLeftFromLine
@@ -366,7 +380,6 @@ export const PopUpFilter = memo(function PopUpFilter({
 									if (result_cat[0]?.parent_category_id === null) {
 										return setDetailFilt('');
 									}
-
 									return handleHierachie(parent_cat?.parent_category_id || null);
 								}
 								return setDetailFilt('');
@@ -382,20 +395,16 @@ export const PopUpFilter = memo(function PopUpFilter({
 					<div
 						className={clsx(
 							{ hidden: detailFilt, flex: !detailFilt },
-							' w-full items-center justify-between '
+							'w-full items-center justify-between'
 						)}
 					>
 						<span className="text-center font-semibold text-black">Tous les filtres</span>
 						<CloseModal closePopUp={setShowPopup} style={'size-6'} />
 					</div>
 				</div>
-				<div
-					className={
-						'flex max-h-[95vh] min-h-[95vh] w-full self-center justify-self-center overflow-y-auto py-2 pl-5  pr-4'
-					}
-				>
+				<div className={' w-full justify-center overflow-y-auto py-2 pl-5 pr-4'}>
 					<div
-						className={clsx(' w-full flex-col gap-1 divide-y-2', {
+						className={clsx('w-full flex-col gap-1 divide-y-2', {
 							flex: !detailFilt,
 							hidden: detailFilt,
 						})}
@@ -404,7 +413,7 @@ export const PopUpFilter = memo(function PopUpFilter({
 							onClick={() => {
 								setDetailFilt('category_id');
 							}}
-							className="ml-2 flex flex-col items-baseline justify-start gap-3 py-3"
+							className="ml-2 flex w-full flex-col items-baseline justify-start gap-3 py-3"
 						>
 							<span className="text-[.88rem] text-gray-800">Categorie</span>
 							<div className="flex w-full justify-between text-[.91rem] text-gray-500">
@@ -435,7 +444,7 @@ export const PopUpFilter = memo(function PopUpFilter({
 									{item.collect_type === 'number' && (
 										<>
 											<HeadFilt item={item} />
-											<div className="ml-2 flex items-baseline justify-start gap-3">
+											<div className="ml-2 flex w-full flex-wrap items-baseline justify-start gap-3">
 												{['Minimum', 'Maximum'].map((value, i) => {
 													return (
 														<div key={i} className={'flex justify-start'}>
@@ -517,7 +526,7 @@ export const PopUpFilter = memo(function PopUpFilter({
 						})}
 					</div>
 					<div
-						className={clsx(' w-full flex-col gap-4', {
+						className={clsx('w-full flex-col gap-4', {
 							flex: detailFilt && detailFilt == 'category_id',
 							hidden: detailFilt !== 'category_id',
 						})}
@@ -537,63 +546,81 @@ export const PopUpFilter = memo(function PopUpFilter({
 								/>
 							</div>
 
-							{parent_cat ? (
-								<div className="flex w-full flex-row items-baseline justify-around hover:bg-gray-100">
-									<button
-										className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins')}
-										onClick={() => {
-											handleHierachie(null);
-											collectFeatures(stepC);
-											setDetailFilt('');
-										}}
-									>
+							<div className="flex w-full flex-row items-baseline justify-around hover:bg-gray-100">
+								<button
+									className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins')}
+									onClick={() => {
+										handleHierachie(null);
+										collectFeatures(stepC);
+										setDetailFilt('');
+									}}
+								>
+									{parent_cat?.icon ? (
 										<img
-											src={parent_cat.icon || ''}
+											src={parent_cat?.icon || ''}
 											className="size-4"
 											alt=""
 											style={{ filter: 'invert(0.30)' }}
 										/>
-										<span className={clsx('text-[.83rem] font-semibold')}> {parent_cat?.label}</span>
-									</button>
-									<ChevronRight className={clsx('text-slate-600')} />
-								</div>
-							) : null}
+									) : (
+										<Layers3 size={20} className="text-slate-600" />
+									)}
+									<span className={clsx('text-[.83rem] font-semibold')}>{parent_cat?.label || 'Tout'}</span>
+								</button>
+								<ChevronRight className={clsx('text-slate-600')} />
+							</div>
 							{result_cat?.map((cat) => {
 								return (
-									<div
+									<button
 										className="flex w-full flex-row items-baseline justify-around hover:bg-gray-100"
 										key={cat.id}
+										onClick={() => {
+											if (cat.is_parentable) {
+												collectFeatures([stepC, cat.id].flat());
+												handleHierachie(null);
+												return setDetailFilt('');
+											}
+											handleHierachie(cat?.id);
+										}}
 									>
-										<button
-											className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins ')}
-											onClick={() => {
-												if (cat.is_parentable) {
-													collectFeatures([stepC, cat.id].flat());
-													handleHierachie(null);
-													return setDetailFilt('');
-												}
-												handleHierachie(cat?.id);
-											}}
-										>
+										<div className={clsx('flex w-full items-center justify-start gap-2 py-4 font-poppins ')}>
 											<img src={cat.icon || ''} className="size-4" alt="" style={{ filter: 'invert(0.30)' }} />
 											<span className={clsx('text-[.83rem]')}>{cat.label}</span>
-										</button>
+										</div>
 										<ChevronRight
 											className={clsx({
-												' text-slate-300': !cat.is_parentable,
+												'text-slate-300': !cat.is_parentable,
 												'rotate-90': !!cat.is_parentable,
 											})}
 										/>
-									</div>
+									</button>
 								);
 							})}
 						</div>
 					</div>
 				</div>
+				<div className="flex items-stretch justify-between">
+					<button
+						onClick={() => {
+							setShowPopup();
+						}}
+						className="w-full bg-red-500 text-gray-50"
+					>
+						Appliquer
+					</button>
+					<button
+						onClick={() => {
+							resetFeature();
+						}}
+						className="w-full bg-green-500 text-gray-50"
+					>
+						Nettoyer
+					</button>
+				</div>
 			</div>
 		</PopUpComponent>
 	);
-});
+}
 
 const HeadFilt = ({ item }: { item: any }) => {
 	return (

@@ -84,7 +84,6 @@ export default function SimilaireProduct({ categoryId }: { categoryId: string })
 							<div className="mt-5 flex flex-col gap-y-1">
 								<span className="text-xs text-slate-900">{product.location}</span>
 								<span className="text-xs font-bold text-slate-500">
-									{' '}
 									{formatDate(product.product_created_at)}
 								</span>
 							</div>

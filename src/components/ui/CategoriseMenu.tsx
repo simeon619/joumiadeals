@@ -7,13 +7,14 @@ import {
 	NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { productsRoot } from '@/lib/route';
+import { MenuCat } from '@/lib/utils';
 import { BuildMenu } from '@/utils/mock/Menucaegorie';
 import { getAllChildCategoriesOptions } from '@/utils/queryOptions';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
-const MenuCat = {};
+
 
 export default function CategoriseMenu() {
 	const { state } = useRouter();
@@ -31,15 +32,15 @@ export default function CategoriseMenu() {
 	return (
 		<div
 			className={twMerge(
-				'mt-16 flex w-full justify-center border-t-[1px] border-gray-100 hd:hidden bg-white p-1 shadow-sm',
-				state.location.pathname.includes('/myprofile') ? 'hidden' : ''
+				'mt-16 flex w-full justify-center border-t-[1px] border-gray-100 border hd:hidden bg-white p-1 shadow-sm',
+				'/'+productsRoot.path === state.location.pathname && 'flex',
+				'/'+productsRoot.path !== state.location.pathname && 'hidden',
 			)}
 		>
 			<NavigationMenu className="flex justify-self-center">
 				<NavigationMenuList className="flex w-full justify-between pt-1 font-poppins">
 					{Object.keys(MenuCat).map((categoryKey) => {
 						const categoryData = MenuCat[categoryKey as keyof typeof MenuCat];
-
 						return (
 							<NavigationMenuItem key={categoryKey} className="flex w-full justify-between">
 								<NavigationMenuTrigger className="relative font-poppins text-[0.775rem] capitalize text-slate-800">
@@ -79,7 +80,6 @@ export default function CategoriseMenu() {
 											</NavigationMenuLink>
 											{Object.keys(categoryData).map((subCategoryKey) => {
 												if (subCategoryKey === 'icon') return null;
-
 												return (
 													<div key={subCategoryKey} className="max-w-[200px] p-2">
 														<NavigationMenuLink asChild>

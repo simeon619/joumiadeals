@@ -21,9 +21,7 @@ export default function ItemProductForL1({ product }: { product: ProductsMinType
 				<ImgComponent
 					photos={product.photos}
 					title={product.title}
-					style={clsx('aspect-[4/3] h-[200px] w-[310px] sm:h-[200px] sm:w-[100%]', {
-						// 'opacity-70': product.status === 'AWAIT',
-					})}
+					style={clsx('aspect-[4/3] h-[200px] w-[310px] sm:h-[200px] sm:w-[100%]', {})}
 				>
 					<>
 						<ActionFavourite
@@ -34,29 +32,6 @@ export default function ItemProductForL1({ product }: { product: ProductsMinType
 								// product.status === 'AWAIT' && 'hidden'
 							)}
 						/>
-						<div className="absolute inset-x-0 bottom-0 flex justify-center gap-x-6 rounded-md bg-slate-950 font-sans opacity-0 transition-all duration-500 group-hover:opacity-100 hd:opacity-100">
-							<div
-								title="nombre de vue sur l'annonce"
-								className="flex flex-row items-center justify-center gap-1 text-white"
-							>
-								<span className="">0</span>
-								<Eye size={size_icon} />
-							</div>
-							<div
-								title="nombre de conversation sur l'annonce"
-								className="flex flex-row items-center justify-center gap-1 text-white"
-							>
-								<span className="">0</span>
-								<MessageSquare size={size_icon} />
-							</div>
-							<div
-								title="nombre de partage sur l'annonce"
-								className="flex flex-row items-center justify-center gap-1 text-white"
-							>
-								<span className="">0</span>
-								<Share2 size={size_icon} />
-							</div>
-						</div>
 					</>
 				</ImgComponent>
 				<ContainAnnounceForL1 product={product} />

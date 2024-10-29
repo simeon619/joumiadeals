@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { productsRoot } from '@/lib/route';
+import { productDetailsRoot, productsRoot } from '@/lib/route';
 import { getUrlImage, handleConnect } from '@/lib/utils';
 import { useAuth } from '@/services/state/User/auth';
 import { filterCategory } from '@/utils/helpers';
@@ -10,9 +10,8 @@ import { get_second_cat } from '@/utils/mock/Menucaegorie';
 import { getAllChildCategoriesOptions, getAllfeaturesOptions } from '@/utils/queryOptions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import clsx from 'clsx';
-import { Bell, Heart, Mail, Search, User2Icon } from 'lucide-react';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
+import { AlignJustify, Bell, Heart, Mail, Search, User2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebounce } from 'react-use';
@@ -21,7 +20,7 @@ import { z } from 'zod';
 import AvatarComponent from '../ui/AvatarComponent';
 import Name from '../ui/Name';
 import SetAdvert from '../ui/setAdvert';
-
+import PopPupMenu from './menu/PopPupMenu';
 const SearchSchema = z.object({
 	search: z.string(),
 });
@@ -38,17 +37,13 @@ export default function Header() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { data } = useSuspenseQuery(getAllChildCategoriesOptions());
 	const { data: features } = useSuspenseQuery(getAllfeaturesOptions());
-	// const { value, direction } = useHideFilter((state) => state);
-	const [isShadow, setIsShadow] = useState(false);
+	const state = useRouterState();
 	const [searchterms, setSearchterms] = useState<Record<string, string>>({});
 	const navigate = useNavigate({ from: productsRoot.fullPath });
 	const { watch, register } = useForm<SearchSchemaType>({
 		resolver: zodResolver(SearchSchema),
 	});
 
-	const styleFilter = clsx(
-		'absolute -z-1 flex w-full items-center justify-center border-t-[1px] border-gray-100  bg-white p-1 shadow-sm'
-	);
 	const searchTerm = watch('search');
 	const [currentTab, setCurrentTab] = useState(0);
 	useDebounce(
@@ -76,16 +71,6 @@ export default function Header() {
 		205,
 		[searchTerm]
 	);
-	useEffect(() => {
-		window.onscroll = (e) => {
-			const scrollY = window.scrollY;
-			if (scrollY > 10) {
-				setIsShadow(true);
-			} else {
-				setIsShadow(false);
-			}
-		};
-	}, []);
 	const serachContainer = twMerge(
 		'transition-all duration-100 ease-linear',
 		isOpen && searchTerm
@@ -130,21 +115,37 @@ export default function Header() {
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [searchterms, currentTab]);
+
+	const [showMenu, setShowMenu] = useState(false);
+	const handleClose = () => {
+		setShowMenu(false);
+		document.body.style.overflow = 'auto';
+	};
+	const handleOpen = () => {
+		setShowMenu(true);
+		document.body.style.overflow = 'hidden';
+	};
 	return (
-		<div
-			className={twMerge(
-				'fixed top-0 z-50 inset-x-0 flex justify-center flex-col min-w-full items-center bg-white',
-				isShadow && 'shadow-lg'
-			)}
-		>
-			<div className="flex w-full flex-col items-center bg-white py-2">
-				<div className={`relative flex w-full items-center justify-center gap-x-3`}>
+		<>
+			<div
+				className={twMerge(
+					' top-0 z-50 inset-x-0 flex justify-center flex-col min-w-full items-center bg-white',
+					'/'+productsRoot.path === state.location.pathname && 'fixed',
+					'/'+productsRoot.path !== state.location.pathname && 'absolute',
+					productDetailsRoot.path.split('/')[0] === state.location.pathname.split('/')[1] && 'md:hidden',
+					// isShadow && 'shadow-lg'
+				)}
+			>
+				<div className={`relative flex w-full items-center justify-center gap-x-3 py-2 hd:px-3`}>
 					<div className="flex items-center gap-x-2 hd:hidden">
 						<Name />
 						<SetAdvert />
 					</div>
+					<button onClick={handleOpen} className="hidden hd:block">
+						<AlignJustify size={33} className="text-gray-600" />
+					</button>
 					<div
-						className={`relative flex w-[270px] items-center rounded-xl bg-slate-100 px-2 hd:mx-6 hd:w-[800px]`}
+						className={`relative flex w-[270px] items-center rounded-xl bg-slate-100 px-2 hd:w-[800px]`}
 					>
 						<input
 							{...register('search')}
@@ -155,7 +156,7 @@ export default function Header() {
 							onBlur={handleBlurSearch}
 							type="text"
 							placeholder="Rechercher sur Amedeals"
-							className="w-full border-0 bg-transparent p-2 py-3 text-[.9rem] placeholder:text-slate-700 focus:outline-none"
+							className="w-full border-0 bg-transparent p-2 py-[.72] text-[.9rem] placeholder:text-slate-700 focus:outline-none"
 							autoComplete="off"
 							autoCapitalize="off"
 							inputMode="text"
@@ -257,8 +258,8 @@ export default function Header() {
 					</div>
 				</div>
 			</div>
-			{/* <FilterProduct style={styleFilter} isHeader={true} /> */}
-		</div>
+			<PopPupMenu setClosePopup={handleClose} showMenu={showMenu} />
+		</>
 	);
 }
 

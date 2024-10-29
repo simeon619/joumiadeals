@@ -107,7 +107,7 @@ export default function MyprofilePage() {
 	});
 
 	return (
-		<>
+		<div className='px-4'>
 			<HeaderProfile
 				avatar_url={getUrlImage(InfoUser?.avatar_url)}
 				name={InfoUser?.name}
@@ -238,6 +238,6 @@ export default function MyprofilePage() {
 					</div>
 				</form>
 			</PopUpComponent>
-		</>
+		</div>
 	);
 }

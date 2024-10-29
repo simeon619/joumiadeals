@@ -7,7 +7,16 @@ import { ProductsMinType, StatusType } from '@/services/api/product_categorie';
 import { formatDate } from '@/utils/formating';
 import { useUpdateMutationproductStatus } from '@/utils/queryOptions';
 import clsx from 'clsx';
-import { BadgeX, Pause, PlayCircle, Rocket, SquarePen } from 'lucide-react';
+import {
+	BadgeX,
+	Eye,
+	MessageSquare,
+	Pause,
+	PlayCircle,
+	Rocket,
+	Share2,
+	SquarePen,
+} from 'lucide-react';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import FeatureComponent from '../../FeatureComponent';
@@ -75,6 +84,29 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 	return (
 		<>
 			<div className={clsx(`w-full px-2 py-1`)}>
+				<div className="flex justify-center gap-x-6 rounded-md bg-slate-500 font-sans text-white">
+					<div
+						title="nombre de vue sur l'annonce"
+						className="flex flex-row items-center justify-center gap-1 text-white"
+					>
+						<span className="">0</span>
+						<Eye size={size_icon} />
+					</div>
+					<div
+						title="nombre de conversation sur l'annonce"
+						className="flex flex-row items-center justify-center gap-1 text-white"
+					>
+						<span className="">0</span>
+						<MessageSquare size={size_icon} />
+					</div>
+					<div
+						title="nombre de partage sur l'annonce"
+						className="flex flex-row items-center justify-center gap-1 text-white"
+					>
+						<span className="">0</span>
+						<Share2 size={size_icon} />
+					</div>
+				</div>
 				{product.status === 'PAUSE' && (
 					<div className={twMerge([className.containStyle, ''])}>
 						<div className="flex flex-col justify-between gap-3">
@@ -96,7 +128,6 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 									openModal(e, 'confirm');
 									setInfo('Voulez vous republier cette annonce');
 									setFn('repost');
-									//
 								}}
 							>
 								<PlayCircle size={size_icon} />
@@ -223,6 +254,9 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 							<p className="font-roboto text-sm font-bold text-stone-800">{formatPrice(product.price)}</p>
 						</div>
 						<FeatureComponent productId={product.product_id} nbrFeature={4} />
+						<span className="font-roboto text-xs text-gray-600">
+							{formatDate(product.product_created_at)}
+						</span>
 						<div className="flex w-full flex-col items-baseline justify-start gap-x-1">
 							<span
 								className={clsx(
@@ -270,9 +304,6 @@ export default function ContainAnnounceForL1({ product }: { product: ProductsMin
 								</div>
 							)}
 						</div>
-						<span className="font-roboto text-xs text-gray-600">
-							{formatDate(product.product_created_at)}
-						</span>
 					</div>
 				)}
 			</div>

@@ -33,7 +33,7 @@ export default function ModalViewImage({
 		<PopUpComponent
 			styleContainer="relative bg-white flex items-center size-full justify-start"
 			isOpen={showPopUp}
-			// setHide={closePopUp}
+			setHide={closePopUp}
 		>
 			<button onClick={() => closePopUp()}>
 				<X
@@ -50,7 +50,7 @@ export default function ModalViewImage({
 					<CarouselContent>
 						{product.photos.map((image, index) => (
 							<CarouselItem key={index}>
-								<div className="aspect-[4/3] h-[500px] w-[80%] rounded-sm">
+								<div className="aspect-[4/3]  rounded-sm">
 									<img
 										aria-label="product image"
 										className="size-full bg-center bg-no-repeat object-cover"

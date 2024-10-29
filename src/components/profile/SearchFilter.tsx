@@ -30,7 +30,7 @@ const className = {
 	input: `mt-1 flex rounded-full border w-[200px] border-slate-300 bg-white px-3 py-2 shadow-sm placeholder:text-slate-400 hover:border-f focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm`,
 };
 export default function SearchFilter({ componentRoot }: { componentRoot: any }) {
-	const searchParams = componentRoot.useSearch() ;
+	const searchParams = componentRoot.useSearch();
 	const { register, watch } = useForm<FilterProductType>({
 		resolver: zodResolver(filterProductSchema),
 	});
@@ -46,7 +46,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	useEffect(() => {
 		if (filtParams?.price) {
 			navigate({
-				search: (old) => {
+				search: (old: any) => {
 					return {
 						...old,
 						filter: {
@@ -63,7 +63,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	useEffect(() => {
 		if (filtParams?.order_by) {
 			navigate({
-				search: (old) => {
+				search: (old: any) => {
 					return {
 						...old,
 						filter: {
@@ -80,7 +80,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	useEffect(() => {
 		if (filtParams?.text) {
 			navigate({
-				search: (old) => {
+				search: (old :any) => {
 					return {
 						...old,
 						filter: {
@@ -113,7 +113,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 				}
 
 				navigate({
-					search: (old) => {
+					search: (old:any) => {
 						return {
 							...old,
 							filter: {
@@ -126,7 +126,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 				});
 			} else {
 				navigate({
-					search: (old) => {
+					search: (old:any) => {
 						return {
 							...old,
 							filter: {
@@ -146,7 +146,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 	useEffect(() => {
 		if (orderBy) {
 			navigate({
-				search: (old) => {
+				search: (old :any) => {
 					return {
 						...old,
 						filter: {
@@ -164,7 +164,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 		() => {
 			if (searchTerm) {
 				navigate({
-					search: (old) => {
+					search: (old :any) => {
 						return {
 							...old,
 							filter: {
@@ -177,7 +177,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 				});
 			} else {
 				navigate({
-					search: (old) => {
+					search: (old :any) => {
 						return {
 							...old,
 							filter: {
@@ -221,7 +221,7 @@ export default function SearchFilter({ componentRoot }: { componentRoot: any }) 
 						defaultValue={filtParams?.price?.[0]}
 					/>
 					<input
-							type={'number'}
+						type={'number'}
 						inputMode="numeric"
 						{...register('price_max', { valueAsNumber: true })}
 						name={'price_max'}

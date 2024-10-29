@@ -4,7 +4,7 @@ import { useSearchFilter } from '@/services/state/App/filterState';
 import { FilterProductType } from '@/utils/queryOptions';
 import { useEffect, useState } from 'react';
 const className = {
-	input: `rounded-s-xl  border w-[120px] border-slate-300 bg-white p-[10px] shadow-sm placeholder:text-slate-400 hover:border-filt focus:border-filt focus:outline-none focus:ring-1 focus:ring-filt sm:text-sm`,
+	input: `rounded-s-xl  border w-[110px] border-slate-300 bg-white p-[7px] shadow-sm placeholder:text-slate-400 hover:border-filt focus:border-filt focus:outline-none focus:ring-1 focus:ring-filt text-sm`,
 };
 function areArraysEqual(arr1: string | Array<number>, arr2: string | Array<number>) {
 	if (typeof arr1 !== typeof arr2) return false;
